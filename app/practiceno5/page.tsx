@@ -1,8 +1,8 @@
-import Link from 'next/link'
+import Link from 'next/link';
 
 const Practiceno5Details = () => {
   return (
-    <div>
+    <div className='bg-blackg h-screen text-black'>
       <h1>Welcome to the Practiceno5 Details Page!</h1>
       <p>
         This is the **details page** for `/practiceno5/practiceno5`.
