@@ -8,6 +8,7 @@ import Toast from "@/components/Toast"
 import Modal from "@/components/Modal"
 const PracticeNo4 = () => {
     const [showForm, setShowForm] = useState<boolean>(false);
+    
     const collegeProgramsPH: string[] = [
         "Bachelor of Science in Information Technology (BSIT)",
         "Bachelor of Science in Computer Science (BSCS)",
@@ -49,6 +50,7 @@ const PracticeNo4 = () => {
     const [students, setStudent] = useState<properties[][]>(
           Array.from({ length: 15 }, () => [])
     )
+    
     const [rowStudent, setRowStudent] = useState<properties[]>(students.flat());
         type Row = {
             studentID: number | string;
