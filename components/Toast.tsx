@@ -2,7 +2,7 @@ import React from 'react'
 
 interface ToastProps {
     label: React.ReactNode,
-    background: string,
+    background: React.ReactNode,
     padding: string
     condition: boolean;
     translateTrue: React.ReactNode,
@@ -12,8 +12,8 @@ interface ToastProps {
 const Toast = ({label, background ,padding, condition ,translateTrue, translateFalse} : ToastProps) => {
   return (
     <div>
-        <span className={`fixed ${background} ${condition ? translateTrue: translateFalse} ${padding} text-white border-none bottom-[1.25rem] right-[1.25rem] transition-all duration-300 ease-in-out rounded-3xl font-sans`}>
-            <p>{label}</p>
+        <span className={`fixed ${background} ${condition ? translateTrue: translateFalse} ${padding} text-white border-none bottom-5 right-5 transition-all duration-300 ease-in-out rounded-3xl font-sans`}>
+            <p className='text-xs md:text-lg text-center'>{label}</p>
         </span>
     </div>
   )

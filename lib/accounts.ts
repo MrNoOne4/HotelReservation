@@ -1,14 +1,10 @@
-import mysql2 from "mysql2/promise";
+import mysql, { Pool } from "mysql2/promise";
 
-let pool: mysql2.Pool | null = null;
+export const pool: Pool = mysql.createPool({
+  host: process.env.MYSQL_HOST,
+  user: process.env.MYSQL_USER,
+  password: process.env.MYSQL_PASSWORD,
+  database: process.env.MYSQL_DATABASE2,
+  port: Number(process.env.MYSQL_PORT),
+});
 
-if (!pool) {
-    pool = mysql2.createPool({
-       host: process.env.MYSQL_HOST,
-       user: process.env.MYSQL_USER,
-       database: process.env.MYSQL_DATABASE2,
-       port: Number(process.env.MYSQL_PORT)
-    })
-}
-
-export { pool };
