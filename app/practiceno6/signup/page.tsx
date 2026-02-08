@@ -53,14 +53,14 @@ const LoginPage = () => {
     const result = await response.json();
 
    if (result.success) {
-     setAccount({
-      firstName: '',
-      lastName: '',
-      gender: '',
-      email: '',
-      password: '',
-      birthDate: '' 
-    });
+      setAccount({
+          firstName: '',
+          lastName: '',
+          gender: '',
+          email: '',
+          password: '',
+          birthDate: '' 
+      });
 
      setSucessToast(result.success);
      setTimeout(() => setSucessToast(false), 3000);

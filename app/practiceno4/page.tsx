@@ -1,16 +1,14 @@
-"use client";
 "use strict";
+"use client";
 
-import React from 'react'
-import { useState, useEffect, useMemo} from 'react';
-import { X } from "lucide-react";
-import Toast from "@/components/Toast"
-import Modal from "@/components/Modal"
-const PracticeNo4 = () => {
-    const [showForm, setShowForm] = useState<boolean>(false);
-    
+import {X} from "lucide-react";
+import { useEffect, useState } from "react";
+import Toast from "../../components/Toast";
+import Modal from "../../components/Modal";
+
+const StudentManagement = () => {
+
     const collegeProgramsPH: string[] = [
-        "Bachelor of Science in Information Technology (BSIT)",
         "Bachelor of Science in Computer Science (BSCS)",
         "Bachelor of Science in Business Administration (BSBA)",
         "Bachelor of Science in Accountancy (BSA)",
@@ -27,487 +25,534 @@ const PracticeNo4 = () => {
         "Bachelor of Science in Criminology (BS Criminology)"
     ];
 
-    interface properties {
-        firstName: string,
-        middleName: string,
-        lastName: string,
-        program: string,
-        yearLevel: string,
-        studentID: number | string,
-        gmail: string
+
+    interface Student {
+        firstName: string;
+        middleName: string;
+        lastName: string;
+        collegeProgram: string;
+        yearLevel: string;
+        studentID: string;
+        gmail: string;
+        profilePicture:  string;
     }
 
-    const [form, getForm] = useState<properties>({
-        firstName: '',
-        middleName: '',
-        lastName: '',
-        program: '',
-        yearLevel: '1st Year',
-        studentID: '',
-        gmail: ''
-    })
+    const [form, setForm] = useState<boolean>(false);
+    const [modal, setModal] = useState<boolean>(false);
 
-    const [students, setStudent] = useState<properties[][]>(
-          Array.from({ length: 15 }, () => [])
-    )
-    
-    const [rowStudent, setRowStudent] = useState<properties[]>(students.flat());
-        type Row = {
-            studentID: number | string;
-            program: string;
-        };
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement> ) => {
-    const { name, value } = e.target;
-
-      getForm((prev) => ({
-                ...prev,
-                [name]: value,
-            }));
-        }
-    
-    function handleUpdateSubmit(e: React.FormEvent<HTMLFormElement>) {
-        e.preventDefault();
-        const find = students.flat().some(item => item.studentID === form.studentID);
-        if (find) {
-            setToast({
-                label: 'Student ID is already in the system it cannot be duplicate',
-                condition: true,
-                backgroundColor: 'bg-red-500'
-            });
-
-             setTimeout(() => setToast(prev => ({ ...prev, condition: false })), 3000);
-            return;
-        }
-        const programIndex = collegeProgramsPH.indexOf(form.program);
-        if (programIndex !== -1) {
-            setStudent(prev => {
-                const newItems = [...prev];
-                newItems[programIndex] = [...newItems[programIndex], { ...form }];
-                return newItems;
-            });
-        }
-        getForm({
-            firstName: '',
-            middleName: '',
-            lastName: '',
-            program: '', 
-            yearLevel: '1st Year',
-            studentID: '',
-            gmail: ''
-        })
-
-        setShowForm(false);
-
-        setToast({
-            label: 'Student Successfully added',
-            condition: true,
-            backgroundColor: 'bg-green-500'
-        });
-
-        setTimeout(() => setToast(prev => ({ ...prev, condition: false })), 3000);
-    }
-
-    const [row, setRow] = useState<Row>({
-        studentID: 0,
-        program: '',
+    const [students, setStudents] = useState<Student>({
+        firstName: "",
+        middleName: "",
+        lastName: "",
+        collegeProgram: "",
+        yearLevel: "",
+        studentID: "",
+        gmail: "",
+        profilePicture: ""
     });
 
-    const [toast, setToast] = useState({
-        label: '',
-        condition: false, 
-        backgroundColor: ''
-    })
 
+    const [studentsList, setStudentsList] = useState<Student[]>([]);
+    const [failedToast, setFailedToast] = useState<{show: boolean; message: string}>({show: false, message: ""});
+    const [successToast, setSuccessToast] = useState<{show: boolean; message: string}>({show: false, message: ""});
+    const [setprofile, viewProfile] = useState<boolean>(false);
 
-    useEffect(() => {
-        setRowStudent(students.flat());
-    }, [students]);
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const {name, value, type} = e.target;
+         setStudents(prev => ({...prev, [name]: value}));
+         
+        if (type === "file") {
+            const file = e.target.files?.[0];
+            if (!file) {
+                setFailedToast({show: true, message: "No file selected. Please choose a profile picture."});
+                setTimeout(() => {
+                    setFailedToast({show: false, message: ""});
+                }, 2000)
+                return;
+            }
 
-    const [update, setUpdate] = useState<boolean>(false);
-    const [formUpdate, setUpdateForm] = useState<properties>({
-            firstName: '',
-            middleName: '',
-            lastName: '',
-            program: '',
-            yearLevel: '1st Year',
-            studentID: '',
-            gmail: ''
-    })
-
-    function updateFunction(e: properties) {
-        setUpdateForm({...e})
-        setRow({
-            studentID: Number(e.studentID),
-            program: e.program
-        })
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setStudents(prev => ({...prev, profilePicture: reader.result as string}));
+            }
+            reader.readAsDataURL(file);
+        }
     }
 
-    function updateHandleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
-        const {name, value} =  e.target;
-            setUpdateForm((prev) => ({
-            ...prev,
-            [name]: value,
-        }));
+
+
+    const updateHandleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const {name, value, type} = e.target;
+
+         setUpdateStudentData(prev => ({...prev, [name]: value}));
+
+        if (type === "file")  {
+            const file = e.target.files?.[0];
+            if (!file) {
+                setFailedToast({show: true, message: "No file selected. Please choose a profile picture."});
+                setTimeout(() => {
+                    setFailedToast({show: false, message: ""});
+                }, 2000)
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setUpdateStudentData(prev => ({...prev, profilePicture: reader.result as string}));
+            }
+
+            reader.readAsDataURL(file);
+        }
     }
 
-    function updateHandleSubmit(e: React.FormEvent<HTMLFormElement>) {
-        
+    const [id, getID] = useState<string>("");
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        let count: number = 0;
-        const find = students.flat().some(item => {
-            if (item.studentID === formUpdate.studentID) {
-                count++;
-            }
-            return count > 1
-        });
-
-        if (find) {
-            setToast({
-                label: 'Student ID is already in the system it cannot be Updated',
-                condition: true,
-                backgroundColor: 'bg-red-500'
+        if (!students.profilePicture) {
+            setFailedToast({
+                show: true,
+                message: "Please select a profile picture"
             });
+            setTimeout(() => {
+                setFailedToast({show: false, message: "Please select a profile picture"});
+            }, 2000);
 
-            setTimeout(() => setToast(prev => ({ ...prev, condition: false })), 3000);
             return;
         }
 
-        const programIndex = collegeProgramsPH.indexOf(row.program)
-        const column = students[programIndex].findIndex(s => String(s.studentID) === String(row.studentID));
-        if (column !== -1 && programIndex !== -1) {
-            setStudent((prev) => {
-                const newItem = [...prev];
-                newItem[programIndex][column] = {
-                    firstName: formUpdate.firstName,
-                    middleName: formUpdate.middleName,
-                    lastName: formUpdate.lastName,
-                    program: formUpdate.program,
-                    yearLevel: formUpdate.yearLevel,
-                    studentID: formUpdate.studentID,
-                    gmail: formUpdate.gmail
-                }
-                return newItem
+            const formData = new FormData();
+            formData.append("firstName", students.firstName);
+            formData.append("middleName", students.middleName);
+            formData.append("lastName", students.lastName);
+            formData.append("collegeProgram", students.collegeProgram);
+            formData.append("yearLevel", students.yearLevel);
+            formData.append("studentID", students.studentID);
+            formData.append("gmail", students.gmail);
+            formData.append("profilePicture", students.profilePicture);
+            
+
+        const res = await fetch("/api/studentApi", {
+                method: "POST",
+                body: formData,
+            });
+            
+            const data = await res.json();
+
+            if (!res.ok) {  
+                setFailedToast({show: true, message: data.message });
+                setTimeout(() => {
+                    setFailedToast({show: false, message: data.message});
+                }, 2000);
+                return;
+            }
+
+            setSuccessToast({show: true, message: data.message });
+            setTimeout(() => {
+                setSuccessToast({show: false, message: data.message});
+            }, 2000);
+                
+            setStudents({
+                firstName: "",
+                middleName: "",
+                lastName: "",
+                collegeProgram: "",
+                yearLevel: "",
+                studentID: "",
+                gmail: "",
+                profilePicture: ""
             })
-            setToast({
-                label: 'Student Info Successfully Updated',
-                condition: true,
-                backgroundColor: 'bg-green-500'
-            });
-            setTimeout(() => setToast(prev => ({ ...prev, condition: false })), 3000);
-            setUpdate(false);
+            setForm(form => !form);
+
+            fetchStudents();
         }
-    }
 
-    const [stateDelete, setStateDelete] = useState<Row>({
-        studentID: '',
-        program: ''
-    })
-
-    const [modalOn, setModalOn] = useState<boolean>(false);
-    function deleteInfo() {
-        const index = collegeProgramsPH.indexOf(stateDelete.program);
-            setStudent(prev => {
-                const newItem = [...prev];
-                newItem[index] = newItem[index].filter(s => s.studentID !== stateDelete.studentID);
-                return newItem;
-            });
-            setToast({
-                label: 'Student Info Successfully Deleted',
-                condition: true,
-                backgroundColor: 'bg-green-500'
-            });
-            setTimeout(() => setToast(prev => ({ ...prev, condition: false })), 3000);
-            setModalOn(false)
-    }
-    const [filterValue, setFilterValue] = useState<string>('');
+            
+    const fetchStudents = async () => {
+        try {
+            const res = await fetch("/api/studentApi", { method: "GET" });
+            if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+            const data = await res.json();
+            setStudentsList(data.students);
+        } catch (error) {
+            console.error("Oops something went wrong while fetching students data", error);
+        }
+    };
 
     useEffect(() => {
-        if (!filterValue) {
-            setRowStudent(students.flat());
+        fetchStudents();
+    }, []);
+
+    const [studentProfile, setStudentProfile] = useState<Student | null>({
+        firstName: "",
+        middleName: "",
+        lastName: "",
+        collegeProgram: "",
+        yearLevel: "",
+        studentID: "",
+        gmail: "",
+        profilePicture: ""
+    });
+
+    const setViewProfile = (student: Student[], index: number) => {
+            viewProfile(true);
+            setStudentProfile({
+                firstName: student[index].firstName,
+                middleName: student[index].middleName,
+                lastName: student[index].lastName,
+                collegeProgram: student[index].collegeProgram,
+                yearLevel: student[index].yearLevel,
+                studentID: student[index].studentID,
+                gmail: student[index].gmail,
+                profilePicture: student[index].profilePicture
+         });
+    }
+
+    const deleteStudent = async (studentID: string) => {
+        const res = await fetch("/api/studentApi", {
+            method: "DELETE",
+            body: JSON.stringify({ studentID }),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+        const data = await res.json();
+        if (!res.ok) {
+            setFailedToast({show: true, message: data.message });
+            setTimeout(() => {
+                setFailedToast({show: false, message: data.message});
+            }, 2000);
             return;
         }
-        
-        const timerId = setTimeout(() => {
-            const items = students.flat().filter(item => String(item.studentID).includes(filterValue));
-            setRowStudent(items);
-        }, 500)
+                
+        setSuccessToast({show: true, message: data.message });
+        setTimeout(() => {
+            setSuccessToast({show: false, message: data.message});
+        }, 2000);
+        fetchStudents();
+    }
 
-        return () => clearTimeout(timerId);
-    }, [filterValue])
+    const openModal = (studentID: string) => {
+        setModal(true);
+        getID(studentID);
+    }
 
-    const [filter, setFilter] = useState({
-        yearLevel: '',
-        course: ''
-    })
+    const acceptDelete = () => {
+        deleteStudent(id);
+        setModal(false);
+    }
 
-    useMemo(() => {
-        if (filter.yearLevel === "All Year" && filter.course === "All Program") {
-            setRowStudent(students.flat());
-            return;
-        } 
+    const [update, setUpdate] = useState<boolean>(false);
 
-        if (filter.yearLevel === "All Year") {
-            const items = students.flat().filter(item => item.program === filter.course);
-            setRowStudent(items);
-            return;
-        }
-
-        if (filter.course === "All Program") {
-            const items = students.flat().filter(item => item.yearLevel === filter.yearLevel);
-            setRowStudent(items);
-            return;
-        }
-
-        const items = students.flat().filter(item => item.yearLevel === filter.yearLevel && item.program === filter.course);
-        setRowStudent(items);
-        
-
-    }, [filter.yearLevel, filter.course])
     
+const [updateStudentData, setUpdateStudentData] = useState<Student>({
+    firstName: "",
+    middleName: "",
+    lastName: "",
+    collegeProgram: "",
+    yearLevel: "",
+    studentID: "",
+    gmail: "",
+    profilePicture: ""
+});
 
-  return (
-    <div className='m-0 p-0 border h-screen w-screen font-sans bg-blue-200 text-black flex justify-center items-center '>
-        <div className='h-screen w-screen lg:h-[80vh] lg:w-[60vw] shadow-[0_0_0_1px_rgba(0,0,0,0.05)] lg:rounded-lg bg-white '>
-            <div>
-                <h1 className='text-center text-lg md:text-md xl:text-2xl mt-3 font-semibold'>Student Record Management System. CREATE, READ UPDATE, DELETE (CRUD)</h1><br/>
-                <button className='mx-auto block bg-black hover:bg-[#333333] cursor-pointer text-white font-semibold px-1 py-2.5 lg:px-[0.7rem] lg:py-[0.5rem] rounded-md' onClick={() => setShowForm(prev => !prev)}>Add Students</button>
-            </div>
-                <hr className='mt-3 w-[95%] block mx-auto'/>
-            <div className='flex flex-col 2xl:flex-row justify-between'>
-                    <div className='flex flex-col 2xl:flex-row'>
-                    <div className='flex gap-1 items-center mt-3 ml-7'>
-                        <h5>Year level</h5>
-                        <select className='border rounded-xs py-0.5 px-1 text-sm lg:text-lg cursor-pointer' value={filter.yearLevel} onChange={e => {setFilter((prev) => ({
-                            ...prev, yearLevel: e.target.value
-                        }))}}>
-                            <option value={"All Year"}>All Year</option>
-                            <option value={"1st Year"}>1st Year</option>
-                            <option value={"2nd Year"}>2nd Year</option>
-                            <option value={"3rd Year"}>3rd Year</option>
-                            <option value={"4th Year"}>4th Year</option>
-                        </select>
+
+    
+    const updateStudent = async (e: React.FormEvent) => {
+        e.preventDefault();
+            const formdata = new FormData();
+            formdata.append("firstName", updateStudentData.firstName);
+            formdata.append("middleName", updateStudentData.middleName);
+            formdata.append("lastName", updateStudentData.lastName);
+            formdata.append("collegeProgram", updateStudentData.collegeProgram);
+            formdata.append("yearLevel", updateStudentData.yearLevel);
+            formdata.append("studentID", updateStudentData.studentID);
+            formdata.append("gmail", updateStudentData.gmail);
+            formdata.append("profilePicture", updateStudentData.profilePicture);
+
+            const data = await fetch("/api/studentApi", {
+                method : "PUT",
+                body: formdata
+            });
+
+            const res = await data.json();
+            if (!data.ok) {
+                setFailedToast({show: true, message: res.message });
+                setTimeout(() => {
+                    setFailedToast({show: false, message: res.message});
+                }, 2000);
+                return;
+            }
+
+            setSuccessToast({show: true, message: res.message });
+            setTimeout(() => {
+                setSuccessToast({show: false, message: res.message});
+            }, 2000);
+
+            setUpdate(false);
+            setUpdateStudentData({
+                firstName: "",
+                middleName: "",
+                lastName: "",
+                collegeProgram: "",
+                yearLevel: "",
+                studentID: "",
+                gmail: "",
+                profilePicture: ""
+             });
+
+             fetchStudents();
+        }    
+        
+    return (
+        <div className="m-0 p-0 box-border h-screen flex justify-center items-center bg-blue-200 font-sans text-black ">
+            <div className="bg-white rounded-sm p-10 relative">
+                <h1 className="text-lg md:text-xl font-semibold text-center">Student Record Management System. CREATE, READ, UPDATE, DELETE</h1>
+                <div className="mt-4">
+                    <button  onClick={() => setForm(prev => !prev)} className="py-2 px-4 mx-auto block rounded-md bg-black text-white cursor-pointer">Update students</button>
+                </div>
+                <hr className="m-2 mt-3 p-3"></hr>
+                <div className="flex lg:flex-row flex-col lg:justify-between lg:items-center p-0 lg:p-10">
+                    <div className="flex lg:flex-row flex-col lg:justify-between lg:items-center">
+                        <label className="mr-10">Year Level 
+                            <select className="ml-2 border p-1" >
+                                <option value="1st Year" defaultValue="1st Year">1st Year</option>
+                                <option value="2nd Year">2nd Year</option>
+                                <option value="3rd Year">3rd Year</option>
+                                <option value="4th Year">4th Year</option>
+                            </select>
+                        </label>
+
+                        <label className="mr-10 flex text-center">Program 
+                            <select className="ml-2 border p-1 required">
+                                <option value="" defaultValue="Select Program" disabled>Select Program</option>
+                                <option>Bachelor of Science in Information Technology (BSIT)</option>
+                                {collegeProgramsPH.map(e => (
+                                    <option key={e} value={e}>{e}</option>
+                                ))}
+                            </select>
+                        </label>
                     </div>
 
-                    <div className='flex gap-1 items-center mt-3 ml-7'>
-                        <h5>Program</h5>
-                        <select className='border rounded-xs py-0.5 px-1 text-sm lg:text-md cursor-pointer' value={filter.course} onChange={e => {setFilter((prev) => ({
-                            ...prev, course: e.target.value
-                        }))}}>
-                            <option value={"All Program"}>All Program</option>
-                            {collegeProgramsPH.map((e, index) => (
-                                <option value={`${e}`} key={`${e}-${index}`}>
-                                    {e}
-                                </option>
+                    <div>
+                        <label htmlFor="">Search</label>
+                        <input type="text" className="border p-1 ml-2" placeholder="Search by name or ID"/>
+                    </div>
+                </div>
+                <hr className="m-2 mt-3 p-3"></hr>
+                <div className="overflow-x-auto p-10">
+                    <table className="w-full text-center border-collapse border border-gray-400">
+                        <thead>
+                            <tr>
+                                <th className="border p-2">ID</th>
+                                <th className="border p-2">First Name</th>
+                                <th className="border p-2">Middle Name</th>
+                                <th className="border p-2">Last Name</th>
+                                <th className="border p-2">College Program</th>
+                                <th className="border p-2">Year Level</th>
+                                <th className="border p-2">Student ID</th>
+                                <th className="border p-2">Gmail</th>
+                                <th className="border p-2">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {studentsList.map((student, index) => (
+                                <tr key={index}>
+                                    <td className="border p-2">{index + 1}</td>
+                                    <td className="border p-2">{student.firstName}</td>
+                                    <td className="border p-2">{student.middleName}</td>
+                                    <td className="border p-2">{student.lastName}</td>
+                                    <td className="border p-2">{student.collegeProgram}</td>
+                                    <td className="border p-2">{student.yearLevel}</td>
+                                    <td className="border p-2">{student.studentID}</td>
+                                    <td className="border p-2">{student.gmail}</td>
+                                    <td className="border p-2 flex gap-4">
+                                        <button className="bg-blue-500 text-white py-1 px-3 rounded-sm mr-2 cursor-pointer" onClick={() => {
+                                            setUpdate(prev => !prev),
+                                            setUpdateStudentData({
+                                                firstName: student.firstName,
+                                                middleName: student.middleName,
+                                                lastName: student.lastName,
+                                                collegeProgram: student.collegeProgram,
+                                                yearLevel: student.yearLevel,
+                                                studentID: student.studentID,
+                                                gmail: student.gmail,
+                                                profilePicture: student.profilePicture
+                                            })
+                                        }}>Edit</button>
+                                        <button className="bg-red-500 text-white py-1 px-3 rounded-sm cursor-pointer" onClick={() => openModal(student?.studentID)}>Delete</button>
+                                        <button className="bg-green-500 text-white py-1 px-3 rounded-sm cursor-pointer" onClick={() => setViewProfile(studentsList, index)}>View Profile</button>
+                                    </td>   
+                                </tr>
                             ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div className={`inset-0 absolute bg-black/50 flex items-center justify-center z-50 text-black transition-[opacity_z] duration-300 ease-in-out transform ${form ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+                <form method="POST" className={`p-10 border-none justify-center border bg-white transform duration-300 ease-in-out rounded-md ${form ? "translate-y-0" : "-translate-y-[200%]"}`} autoComplete="off" onSubmit={handleSubmit}>
+                    <div className="flex justify-end">
+                        <button type="button" className="cursor-pointer" onClick={() => {setForm(form => !form), 
+                            setStudents({
+                                firstName: "",
+                                middleName: "",
+                                lastName: "",
+                                collegeProgram: "",
+                                yearLevel: "",
+                                studentID: "",
+                                gmail: "",
+                                profilePicture: ""
+                            })
+                        }}><X size={40}/></button>
+                    </div>
+                    <h1 className="font-semibold text-center text-2xl mb-5">Add Student </h1>
+                    <div className="mt-6  flex justify-between items-center">
+                        <label htmlFor="firstName">First Name</label>
+                        <input type="text" className="border-b outline-none p-1 ml-2" id="firstName" value={students.firstName} name="firstName" onChange={handleChange} required/>
+                    </div>
+
+                    <div className="mt-6 flex justify-between items-center ">
+                        <label htmlFor="middleName">Middle Name</label>
+                        <input type="text" className="border-b outline-none p-1 ml-2" id="middleName" value={students.middleName} name="middleName" onChange={handleChange} required/>
+                    </div>
+
+                    <div className="mt-6  flex justify-between items-center">
+                        <label htmlFor="lastName">Last Name</label>
+                        <input type="text" className="border-b outline-none p-1 ml-2" id="lastName"  value={students.lastName} name="lastName" onChange={handleChange} required/>
+                    </div>
+
+                    <div className="mt-6 flex  items-center">
+                        <label className="mr-8">College<br/>Program</label>
+                            <select className="ml-2 border p-1 max-w-55 truncate" value={students.collegeProgram} name="collegeProgram" onChange={handleChange} required>
+                                <option value="" defaultValue="Select Program" disabled>Select Program</option>
+                                <option>Bachelor of Science in Information Technology (BSIT)</option>
+                                {collegeProgramsPH.map(e => (
+                                    <option key={e} value={e}>{e}</option>
+                                ))}
+                            </select>
+                    </div>
+                    <div className="mt-6  flex items-center">
+                        <label className="mr-8" htmlFor="studentYear">Year Level</label>
+                        <select className="border p-1  w-55 truncate" id="studentYear" value={students.yearLevel} name="yearLevel" onChange={handleChange} required>
+                            <option value="" defaultValue="Select Year Level" disabled>Select Year Level</option>
+                            <option value="1st Year">1st Year</option>
+                            <option value="2nd Year">2nd Year</option>
+                            <option value="3rd Year">3rd Year</option>
+                            <option value="4th Year">4th Year</option>
                         </select>
                     </div>
-                </div>
 
-                <div className='flex gap-1 items-center mt-3 ml-7 lg:mr-7'>
-                    <h5>Search</h5>
-                    <input className='border placeholder:ml-7 placeholder:block placeholder:text-sm' placeholder=' Student ID' value={filterValue} onChange={e => setFilterValue(e.target.value)}/>
-                </div>
-            </div>
-
-           <div className='overflow-scroll'>
-                <table className='w-full font-normal border-collapse mt-3 text-left break-words whitespace-normal'>
-                <thead className='border-b-1 border-black'>
-                    <tr className='text-center'>
-                        <th className='px-3 py-5'>#</th>
-                        <th className='px-3 py-5'>First Name</th>
-                        <th className='px-3 py-5'>Middle Name</th>
-                        <th className='px-3 py-5'>Last Name</th>
-                        <th className='px-3 py-5'>College Program</th>
-                        <th className='px-3 py-5'>Year Level</th>
-                        <th className='px-3 py-5'>Student ID</th>
-                        <th className='px-3 py-5'>Gmail</th>
-                        <th className='px-3 py-5'>Action</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    {rowStudent.map((element: properties, index: number) => (
-                        <tr key={`${element.studentID}-${index}`} className='text-center'>
-                                <td className='whitespace-normal break-words'>{index + 1}</td>
-                                <td className='whitespace-normal break-words'>{element.firstName}</td>
-                                <td className='whitespace-normal break-words'>{element.middleName}</td>
-                                <td className='whitespace-normal break-words'>{element.lastName}</td>
-                                <td className='whitespace-normal break-words'>{element.program}</td>
-                                <td className='whitespace-normal break-words'>{element.yearLevel}</td>
-                                <td className='whitespace-normal break-words'>{element.studentID}</td>
-                                <td className='whitespace-normal break-words'>{element.gmail}</td>
-                                <td className='flex gap-3 mt-3 ml-2 whitespace-normal break-words'>
-                                    <button className={`p-[0.5rem] px-[1.125rem] border-none text-[0.875rem] cursor-pointer bg-blue-500 text-white hover:bg-blue-600`} onClick={() => {setUpdate(prev => !prev); updateFunction(element)}} >Update </button>
-                                    <button className={`p-[0.5rem] px-[1.125rem] mr-[1rem] border-none text-[0.875rem] cursor-pointer bg-red-500 text-white hover:bg-red-600`} onClick={() => {setModalOn(prev => !prev); setStateDelete({
-                                        studentID: element.studentID,
-                                        program: element.program
-                                    })}} >Delete</button>
-                                </td>
-                        </tr>
-                    ))}
-
-                </tbody>
-            </table>
-           </div>
-
-            <div>
-                 <Toast label={toast.label} background={toast.backgroundColor} padding='py-[0.8rem] px-[2rem]' condition={toast.condition} translateTrue="translate-y-0" translateFalse="translate-y-[200%]"/>
-            </div>
-
-            <div>
-                <Modal isOpen={modalOn} label='Are you sure you want to delete this?' modalInner='This action cannot be undone' buttonAccept='Continue' methodClose={() => setModalOn(prev => !prev)} methodAccept={() => deleteInfo()}/>
-            </div>
-        </div>
-
-        <div className={`h-screen w-screen absolute ${showForm ? 'bg-black/50' : 'bg-transparent'} ${showForm ? 'z-[1]' : 'z-[-1]'}`}>
-             <div className={`absolute top-1/2 left-1/2 transform ${showForm ? '-translate-y-1/2 ' : '-translate-y-[200%]'} transition-all duration-150 ease-in-out -translate-x-1/2  h-1/2 w-1/2 sm:w-[30vw] lg:w-[25vw] xl:w-[15vw] transform scale-[1.5] bg-white`}>
-                    <div className='p-3 relative overflow-hidden'>
-                        <div className='flex justify-between items-center'>
-                            <h1 className="text-xl">Add student data</h1>
-                            <button className='cursor-pointer' title="Close Form" aria-label="Close" onClick={() => {setShowForm(false); 
-                                        getForm({
-                                            firstName: '',
-                                            middleName: '',
-                                            lastName: '',
-                                            program: '', 
-                                            yearLevel: '',
-                                            studentID: '',
-                                            gmail: ''
-                                        })
-
-
-                            }}><X size={20} color='red'/></button>
-                        </div>
-                        
-                        <form className='flex flex-col gap-5 mt-5' autoComplete="off" onSubmit={e => handleUpdateSubmit(e)}>
-
-                            <div className='relative w-full  transition-all duration-200 ease-in-out'>
-                                <input type="text" className="w-full  peer transition-all duration-150 ease-in-out focus:outline-none border-b-1 border-b-black" name="firstName" value={form.firstName} placeholder='' onChange={handleChange} required/>
-                                <label className='absolute top-0 left-2 peer-focus:-top-5 transition-all ease-in-out peer-focus:text-sm peer-not-placeholder-shown:text-sm peer-not-placeholder-shown:-top-5'>First Name</label>
-                            </div>
-
-                            <div className='relative  w-full transition-all duration-200 ease-in-out'>
-                                <input type="text" className="w-full  peer transition-all duration-150 ease-in-out  focus:outline-none border-b border-b-black" name="middleName" value={form.middleName} placeholder='' onChange={handleChange} required/>
-                                <label className='absolute top-0 left-2 peer-focus:-top-5 transition-all ease-in-out peer-focus:text-sm peer-not-placeholder-shown:text-sm peer-not-placeholder-shown:-top-5'>Middle Name</label>
-                            </div>
-
-                            <div className='relative  w-full  transition-all duration-200 ease-in-out'>
-                                <input type="text" className="w-full  peer transition-all duration-150 ease-in-out  focus:outline-none border-b border-b-black" name="lastName" value={form.lastName} placeholder='' onChange={handleChange} required/>
-                                <label className='absolute top-0 left-2 peer-focus:-top-5 transition-all ease-in-out peer-focus:text-sm peer-not-placeholder-shown:text-sm peer-not-placeholder-shown:-top-5'>Last Name</label>
-                            </div>
-
-                            <div>
-                                <h1>Program</h1>
-                                <select className='border rounded-xs text-xs w-[99%]' name='program' value={form.program} onChange={handleChange} required>
-                                    <option disabled value=''>Student Program</option>
-                                    {collegeProgramsPH.map((e, index) => (
-                                        <option value={`${e}`} key={`${index}-${e}`}>
-                                            {e}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            <div>
-                                <h5>Year level</h5>
-                                <select className='border rounded-xs text-xs w-[99%]' name='yearLevel' value={form.yearLevel} onChange={handleChange} required>
-                                    <option value={"1st Year"}>1st Year</option>
-                                    <option value={"2nd Year"}>2nd Year</option>
-                                    <option value={"3rd Year"}>3rd Year</option>
-                                    <option value={"4th Year"}>4th Year</option>
-                                </select>
-                            </div>
-
-                            <div className='relative bg-white w-full  transition-all duration-200 ease-in-out'>
-                                <input type="number" className="w-full  peer transition-all duration-150 ease-in-out focus:outline-none  border-b border-b-black" name="studentID" value={form.studentID} placeholder='' onChange={handleChange} required/>
-                                <label className='absolute top-0 left-2 peer-focus:-top-5 transition-all ease-in-out peer-focus:text-sm peer-not-placeholder-shown:text-sm peer-not-placeholder-shown:-top-5'>Student ID</label>
-                            </div>
-
-                            <div className='relative bg-white w-full  transition-all duration-200 ease-in-out'>
-                                <input type="email" className="w-full  peer transition-all duration-150 ease-in-out focus:outline-none  border-b border-b-black" name="gmail"  value={form.gmail} placeholder='' onChange={handleChange} required/>
-                                <label className='absolute top-0 left-2 peer-focus:-top-5 transition-all ease-in-out peer-focus:text-sm peer-not-placeholder-shown:text-sm peer-not-placeholder-shown:-top-5'>Gmail</label>
-                            </div>
-                            <button className='bg-blue-400 hover:bg-blue-500 cursor-pointer text-white font-semibold'>Submit </button>
-                        </form>
+                    <div className="mt-6  flex justify-between items-center">
+                        <label>Student ID</label>
+                        <input type="text" className="border-b outline-none p-1 ml-2" value={students.studentID} name="studentID" onChange={handleChange} required/>
                     </div>
-             </div>
-        </div>
 
-
-        <div className={`h-screen w-screen absolute ${update ? 'bg-black/50' : 'bg-transparent'} ${update ? 'z-[1]' : 'z-[-1]'}`}>
-             <div className={`absolute top-1/2 left-1/2 transform ${update ? '-translate-y-1/2 ' : '-translate-y-[200%]'} transition-all duration-150 ease-in-out -translate-x-1/2  h-1/2 w-1/2 sm:w-[30vw] lg:w-[25vw] xl:w-[15vw] transform scale-[1.5] bg-white`}>
-                    <div className='p-3 relative overflow-hidden'>
-                        
-                        <div className='flex justify-between items-center'>
-                            <h1 className="text-xl">Update student data</h1>
-                            <button className='cursor-pointer' title="Close Form" aria-label="Close" onClick={() => {setUpdate(false); setUpdateForm({
-                                firstName: '',
-                                middleName: '',
-                                lastName: '',
-                                program: '',
-                                yearLevel: '',
-                                studentID: '',
-                                gmail: ''
-                            })}}><X size={20} color='red'/></button>
-                        </div>
-                        
-                        <form className='flex flex-col gap-5 mt-5' autoComplete="off" onSubmit={e => updateHandleSubmit(e)}>
-
-                            <div className='relative w-full  transition-all duration-200 ease-in-out'>
-                                <input type="text" className="w-full  peer transition-all duration-150 ease-in-out  focus:outline-none  border-b-1 border-b-black" name="firstName" value={formUpdate.firstName} placeholder='' onChange={updateHandleChange} required/>
-                                <label className='absolute top-0 left-2 peer-focus:-top-5 transition-all ease-in-out peer-focus:text-sm peer-not-placeholder-shown:text-sm peer-not-placeholder-shown:-top-5'>First Name</label>
-                            </div>
-
-                            <div className='relative  w-full transition-all duration-200 ease-in-out'>
-                                <input type="text" className="w-full  peer transition-all duration-150 ease-in-out  focus:outline-none border-b border-b-black" name="middleName" value={formUpdate.middleName} placeholder='' onChange={updateHandleChange} required/>
-                                <label className='absolute top-0 left-2 peer-focus:-top-5 transition-all ease-in-out peer-focus:text-sm peer-not-placeholder-shown:text-sm peer-not-placeholder-shown:-top-5'>Middle Name</label>
-                            </div>
-
-                            <div className='relative  w-full  transition-all duration-200 ease-in-out'>
-                                <input type="text" className="w-full  peer transition-all duration-150 ease-in-out  focus:outline-none border-b border-b-black" name="lastName" value={formUpdate.lastName} placeholder='' onChange={updateHandleChange} required/>
-                                <label className='absolute top-0 left-2 peer-focus:-top-5 transition-all ease-in-out peer-focus:text-sm peer-not-placeholder-shown:text-sm peer-not-placeholder-shown:-top-5'>Last Name</label>
-                            </div>
-
-                            <div>
-                                <h1>Program</h1>
-                                <select className='border rounded-xs text-xs w-[99%]' name='program' value={formUpdate.program} onChange={updateHandleChange} required>
-                                    <option disabled value=''>Student Program</option>
-                                    {collegeProgramsPH.map((e, index) => (
-                                        <option value={`${e}`} key={`${index}-${e}`}>
-                                            {e}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            <div>
-                                <h5>Year level</h5>
-                                <select className='border rounded-xs text-xs w-[99%]' name='yearLevel' value={formUpdate.yearLevel} onChange={updateHandleChange} required>
-                                    <option value={"1st Year"}>1st Year</option>
-                                    <option value={"2nd Year"}>2nd Year</option>
-                                    <option value={"3rd Year"}>3rd Year</option>
-                                    <option value={"4th Year"}>4th Year</option>
-                                </select>
-                            </div>
-
-                            <div className='relative bg-white w-full  transition-all duration-200 ease-in-out'>
-                                <input type="number" className="w-full  peer transition-all duration-150 ease-in-out focus:outline-none  border-b border-b-black cursor-not-allowed" name="studentID" value={formUpdate.studentID} placeholder='' onChange={updateHandleChange} required disabled/>
-                                <label className='absolute top-0 left-2 peer-focus:-top-5 transition-all ease-in-out peer-focus:text-sm peer-not-placeholder-shown:text-sm peer-not-placeholder-shown:-top-5'>Student ID</label>
-                            </div>
-
-                            <div className='relative bg-white w-full  transition-all duration-200 ease-in-out'>
-                                <input type="email" className="w-full  peer transition-all duration-150 ease-in-out focus:outline-none  border-b border-b-black" name="gmail"  value={formUpdate.gmail} placeholder='' onChange={updateHandleChange} required/>
-                                <label className='absolute top-0 left-2 peer-focus:-top-5 transition-all ease-in-out peer-focus:text-sm peer-not-placeholder-shown:text-sm peer-not-placeholder-shown:-top-5'>Gmail</label>
-                            </div>
-                            <button className='bg-blue-400 hover:bg-blue-500 cursor-pointer text-white font-semibold'>Update Submit </button>
-                        </form>
+                    <div className="mt-6  flex justify-between items-center">
+                        <label>Gmail</label>
+                        <input type="email" className="border-b outline-none p-1 ml-2" value={students.gmail} name="gmail" onChange={handleChange} required/>
                     </div>
+
+
+                     <div className="mt-6">
+                       <div className="flex justify-between items-center">
+                            <label>Profile Picture</label>
+                                <input id="fileInput" type="file" className="hidden" accept="image/*" name="profilePicture" onChange={handleChange} />
+                            <label htmlFor="fileInput" className="p-2.5 border border-black inline-block cursor-pointer ml-7" >Select Profile Picture</label>
+                       </div>
+                        <div className=" max-w-50 truncate">
+                        </div>
+                    </div>
+
+                    <button className="mx-auto block mt-4 py-2 px-10 rounded-sm bg-green-500 font-semibold text-xl cursor-pointer text-white">Submit</button>
+                </form>
              </div>
+
+             <div className={`inset-0 absolute bg-black/50 flex items-center justify-center z-50 text-black transition-[opacity_z] duration-300 ease-in-out transform ${setprofile ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+                <div className={`p-10 border-none justify-center flex-col border bg-white transform duration-300 ease-in-out rounded-md ${setprofile  ? "translate-y-0" : "-translate-y-[200%]"}`} >
+                        <button type="button" className="cursor-pointer" onClick={() => viewProfile(prev => !prev)}><X size={40}/></button>
+                        <div className="flex justify-end"><img src={ studentProfile?.profilePicture ? studentProfile.profilePicture.startsWith("data:") ? studentProfile.profilePicture : `data:image/png;base64,${studentProfile.profilePicture}` : "/placeholder.png" } alt="Profile picture" className="w-1/2 h-1/2" />
+                        <p>Name: {studentProfile?.firstName} {studentProfile?.middleName} {studentProfile?.lastName}</p>
+    
+                         </div>
+                </div>
+             </div>
+
+            <div className={`inset-0 absolute bg-black/50 flex items-center justify-center z-50 text-black transition-[opacity_z] duration-300 ease-in-out transform ${update ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+                <form method="POST" className={`p-10 border-none justify-center border bg-white transform duration-300 ease-in-out rounded-md ${update ? "translate-y-0" : "-translate-y-[200%]"}`} autoComplete="off" onSubmit={updateStudent}>
+                    <div className="flex justify-end">
+                        <button type="button" className="cursor-pointer" onClick={() => {setUpdate(prev => !prev), 
+                            setUpdateStudentData({
+                                firstName: "",
+                                middleName: "",
+                                lastName: "",
+                                collegeProgram: "",
+                                yearLevel: "",
+                                studentID: "",
+                                gmail: "",
+                                profilePicture: ""
+                            })
+                        }}><X size={40}/></button>
+                    </div>
+                    <h1 className="font-semibold text-center text-2xl mb-5">Update Student </h1>
+                    <div className="mt-6  flex justify-between items-center">
+                        <label htmlFor="firstName">First Name</label>
+                        <input type="text" className="border-b outline-none p-1 ml-2" id="firstName" value={updateStudentData.firstName} name="firstName" onChange={updateHandleChange} required/>
+                    </div>
+
+                    <div className="mt-6 flex justify-between items-center ">
+                        <label htmlFor="middleName">Middle Name</label>
+                        <input type="text" className="border-b outline-none p-1 ml-2" id="middleName" value={updateStudentData.middleName} name="middleName" onChange={updateHandleChange} required/>
+                    </div>
+
+                    <div className="mt-6  flex justify-between items-center">
+                        <label htmlFor="lastName">Last Name</label>
+                        <input type="text" className="border-b outline-none p-1 ml-2" id="lastName"  value={updateStudentData.lastName} name="lastName" onChange={updateHandleChange} required/>
+                    </div>
+
+                    <div className="mt-6 flex  items-center">
+                        <label className="mr-8">College<br/>Program</label>
+                            <select className="ml-2 border p-1 max-w-55 truncate" value={updateStudentData.collegeProgram} name="collegeProgram" onChange={updateHandleChange} required>
+                                <option value="" defaultValue="Select Program" disabled>Select Program</option>
+                                <option>Bachelor of Science in Information Technology (BSIT)</option>
+                                {collegeProgramsPH.map(e => (
+                                    <option key={e} value={e}>{e}</option>
+                                ))}
+                            </select>
+                    </div>
+                    <div className="mt-6  flex items-center">
+                        <label className="mr-8" htmlFor="studentYear">Year Level</label>
+                        <select className="border p-1  w-55 truncate" id="studentYear" value={updateStudentData.yearLevel} name="yearLevel" onChange={updateHandleChange} required>
+                            <option value="" defaultValue="Select Year Level" disabled>Select Year Level</option>
+                            <option value="1st Year">1st Year</option>
+                            <option value="2nd Year">2nd Year</option>
+                            <option value="3rd Year">3rd Year</option>
+                            <option value="4th Year">4th Year</option>
+                        </select>
+                    </div>
+
+                    <div className="mt-6  flex justify-between items-center">
+                        <label>Student ID</label>
+                        <input type="text" className="border-b cursor-not-allowed outline-none p-1 ml-2" value={updateStudentData.studentID} name="studentID" onChange={updateHandleChange} disabled/>
+                    </div>
+
+                    <div className="mt-6  flex justify-between items-center">
+                        <label>Gmail</label>
+                        <input type="email" className="border-b outline-none p-1 ml-2" value={updateStudentData.gmail} name="gmail" onChange={updateHandleChange} required/>
+                    </div>
+
+
+                    <button className="mx-auto block mt-4 py-2 px-10 rounded-sm bg-green-500 font-semibold text-xl cursor-pointer text-white">Update </button>
+                </form>
+             </div>
+
+            <Modal isOpen={modal} label="Student Profile" modalInner={"Are you sure do you want to delete this student?"} buttonAccept="Yes" methodClose={() => setModal(() => false)} methodAccept={() => acceptDelete()}/>
+            <Toast label={failedToast.message} background="bg-[#FF0000]" padding='py-[0.8rem] px-[2rem]' condition={failedToast.show} translateTrue="translate-y-0" translateFalse="translate-y-[200%]"/>
+            <Toast label={successToast.message} background="bg-[#90EE90]" padding='py-[0.8rem] px-[2rem]' condition={successToast.show} translateTrue="translate-y-0" translateFalse="translate-y-[200%]"/>
+
         </div>
-    </div>
-  )
+    )
 }
 
-export default PracticeNo4
+export default StudentManagement;
