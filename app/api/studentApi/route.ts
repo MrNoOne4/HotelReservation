@@ -1,11 +1,39 @@
 import { pool } from "../../../lib/studentDB";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
     try {
-        const [rows] = await pool?.query("SELECT * FROM students LIMIT 10");
+        const { searchParams } = new URL(request.url);
+        const yearLevel = searchParams.get("yearLevel");
+        const program = searchParams.get("program");
+        const search = searchParams.get("search");
+
+        let query = "SELECT * FROM students WHERE 1=1"; 
+        const params: any[] = [];
+
+        if (yearLevel && yearLevel !== "All Year Level") {
+            query += " AND yearLevel = ?";
+            params.push(yearLevel);
+        }
+
+        if (program && program !== "All Program") {
+            query += " AND collegeProgram = ?";
+            params.push(program);
+        }
+
+        if (search && search.trim() !== "") {
+            const searchTerm = `%${search.trim()}%`;
+            query += " AND (firstName LIKE ? OR middleName LIKE ? OR lastName LIKE ? OR studentID LIKE ?)";
+            params.push(searchTerm, searchTerm, searchTerm, searchTerm);
+        }
+
+        query += " LIMIT 10";
+
+        const [rows] = await pool?.execute(query, params);
         return NextResponse.json({ students: rows }, { status: 200 });
+
     } catch (error) {
+        console.error(error);
         return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
     }
 }

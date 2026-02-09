@@ -2,7 +2,7 @@
 "use client";
 
 import {X} from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Toast from "../../components/Toast";
 import Modal from "../../components/Modal";
 
@@ -168,10 +168,23 @@ const StudentManagement = () => {
             fetchStudents();
         }
 
+        const [yearLevelFilter, setYearLevelFilter] = useState<string>("All Year Level");
+        const [programFilter, setProgramFilter] = useState<string>("All Program");
+        const [searchQuery, setSearchQuery] = useState<string>("");
+
             
     const fetchStudents = async () => {
         try {
-            const res = await fetch("/api/studentApi", { method: "GET" });
+            const params = new URLSearchParams({
+                yearLevel: yearLevelFilter || "",
+                program: programFilter || "",
+                search: searchQuery || "",
+            });
+
+            const res = await fetch (`/api/studentApi?${params.toString()}`, {
+                method: "GET",
+            });
+  
             if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
             const data = await res.json();
             setStudentsList(data.students);
@@ -181,8 +194,9 @@ const StudentManagement = () => {
     };
 
     useEffect(() => {
-        fetchStudents();
-    }, []);
+        const timer = setTimeout(() => { fetchStudents()}, 300);
+        return () => clearTimeout(timer);
+    }, [yearLevelFilter, programFilter, searchQuery]);
 
     const [studentProfile, setStudentProfile] = useState<Student | null>({
         firstName: "",
@@ -304,30 +318,34 @@ const [updateStudentData, setUpdateStudentData] = useState<Student>({
 
              fetchStudents();
         }    
-        
+         
+
+
     return (
-        <div className="m-0 p-0 box-border h-screen flex justify-center items-center bg-blue-200 font-sans text-black ">
-            <div className="bg-white rounded-sm p-10 relative">
-                <h1 className="text-lg md:text-xl font-semibold text-center">Student Record Management System. CREATE, READ, UPDATE, DELETE</h1>
+        <div className="box-border flex justify-center p-0 m-0 font-sans text-black bg-blue-200 over">
+            <div className={`relative inset-0 p-10 ${form ? "overflow-hidden" : "overflow-y-auto"} h-screen bg-white rounded-sm `}>
+                <h1 className="text-lg font-semibold text-center md:text-xl">Student Record Management System. CREATE, READ, UPDATE, DELETE</h1>
                 <div className="mt-4">
-                    <button  onClick={() => setForm(prev => !prev)} className="py-2 px-4 mx-auto block rounded-md bg-black text-white cursor-pointer">Update students</button>
+                    <button  onClick={() => setForm(prev => !prev)} className="block px-4 py-2 mx-auto text-white bg-black rounded-md cursor-pointer">Add students</button>
                 </div>
-                <hr className="m-2 mt-3 p-3"></hr>
-                <div className="flex lg:flex-row flex-col lg:justify-between lg:items-center p-0 lg:p-10">
-                    <div className="flex lg:flex-row flex-col lg:justify-between lg:items-center">
+                <hr className="p-3 m-2 mt-3"></hr>
+
+                <div className="flex flex-col gap-6 p-0 lg:flex-row lg:justify-between lg:items-center lg:p-10">
+                    <div className="flex flex-col gap-6 lg:flex-row lg:justify-between lg:items-center">
                         <label className="mr-10">Year Level 
-                            <select className="ml-2 border p-1" >
-                                <option value="1st Year" defaultValue="1st Year">1st Year</option>
+                            <select className="p-1 ml-2 border" value={yearLevelFilter} onChange={e => setYearLevelFilter(e.target.value)}>
+                                <option defaultValue="All">All Year Level</option>
+                                <option value="1st Year" >1st Year</option>
                                 <option value="2nd Year">2nd Year</option>
                                 <option value="3rd Year">3rd Year</option>
                                 <option value="4th Year">4th Year</option>
                             </select>
                         </label>
 
-                        <label className="mr-10 flex text-center">Program 
-                            <select className="ml-2 border p-1 required">
-                                <option value="" defaultValue="Select Program" disabled>Select Program</option>
-                                <option>Bachelor of Science in Information Technology (BSIT)</option>
+                        <label className="flex mr-10 text-center">Program 
+                            <select className="p-1 ml-2 truncate border max-w-55" value={programFilter} onChange={e => setProgramFilter(e.target.value)} required>
+                                <option value="" defaultValue="Select Program" >All Program</option>
+                                <option className="p-1 ml-2 truncate border max-w-55">Bachelor of Science in Information Technology (BSIT)</option>
                                 {collegeProgramsPH.map(e => (
                                     <option key={e} value={e}>{e}</option>
                                 ))}
@@ -337,38 +355,39 @@ const [updateStudentData, setUpdateStudentData] = useState<Student>({
 
                     <div>
                         <label htmlFor="">Search</label>
-                        <input type="text" className="border p-1 ml-2" placeholder="Search by name or ID"/>
+                        <input type="text" className="p-1 ml-2 border" value={searchQuery} placeholder="Search by name or ID" onChange={e => setSearchQuery(e.target.value)}/>
                     </div>
                 </div>
-                <hr className="m-2 mt-3 p-3"></hr>
-                <div className="overflow-x-auto p-10">
-                    <table className="w-full text-center border-collapse border border-gray-400">
+
+                <hr className="p-3 m-2 mt-3"></hr>
+                <div className={`p-10 ${form ? "overflow-hidden" : "overflow-x-auto"}`}>
+                    <table className="w-full text-center border border-collapse border-gray-400">
                         <thead>
                             <tr>
-                                <th className="border p-2">ID</th>
-                                <th className="border p-2">First Name</th>
-                                <th className="border p-2">Middle Name</th>
-                                <th className="border p-2">Last Name</th>
-                                <th className="border p-2">College Program</th>
-                                <th className="border p-2">Year Level</th>
-                                <th className="border p-2">Student ID</th>
-                                <th className="border p-2">Gmail</th>
-                                <th className="border p-2">Action</th>
+                                <th className="p-2 border">ID</th>
+                                <th className="p-2 border">First Name</th>
+                                <th className="p-2 border">Middle Name</th>
+                                <th className="p-2 border">Last Name</th>
+                                <th className="p-2 border">College Program</th>
+                                <th className="p-2 border">Year Level</th>
+                                <th className="p-2 border">Student ID</th>
+                                <th className="p-2 border">Gmail</th>
+                                <th className="p-2 border">Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             {studentsList.map((student, index) => (
                                 <tr key={index}>
-                                    <td className="border p-2">{index + 1}</td>
-                                    <td className="border p-2">{student.firstName}</td>
-                                    <td className="border p-2">{student.middleName}</td>
-                                    <td className="border p-2">{student.lastName}</td>
-                                    <td className="border p-2">{student.collegeProgram}</td>
-                                    <td className="border p-2">{student.yearLevel}</td>
-                                    <td className="border p-2">{student.studentID}</td>
-                                    <td className="border p-2">{student.gmail}</td>
-                                    <td className="border p-2 flex gap-4">
-                                        <button className="bg-blue-500 text-white py-1 px-3 rounded-sm mr-2 cursor-pointer" onClick={() => {
+                                    <td className="p-2 border">{index + 1}</td>
+                                    <td className="p-2 border">{student.firstName}</td>
+                                    <td className="p-2 border">{student.middleName}</td>
+                                    <td className="p-2 border">{student.lastName}</td>
+                                    <td className="p-2 border">{student.collegeProgram}</td>
+                                    <td className="p-2 border">{student.yearLevel}</td>
+                                    <td className="p-2 border">{student.studentID}</td>
+                                    <td className="p-2 border">{student.gmail}</td>
+                                    <td className="flex gap-4 p-2 border">
+                                        <button className="px-3 py-1 mr-2 text-white bg-blue-500 rounded-sm cursor-pointer" onClick={() => {
                                             setUpdate(prev => !prev),
                                             setUpdateStudentData({
                                                 firstName: student.firstName,
@@ -381,8 +400,8 @@ const [updateStudentData, setUpdateStudentData] = useState<Student>({
                                                 profilePicture: student.profilePicture
                                             })
                                         }}>Edit</button>
-                                        <button className="bg-red-500 text-white py-1 px-3 rounded-sm cursor-pointer" onClick={() => openModal(student?.studentID)}>Delete</button>
-                                        <button className="bg-green-500 text-white py-1 px-3 rounded-sm cursor-pointer" onClick={() => setViewProfile(studentsList, index)}>View Profile</button>
+                                        <button className="px-3 py-1 text-white bg-red-500 rounded-sm cursor-pointer" onClick={() => openModal(student?.studentID)}>Delete</button>
+                                        <button className="px-3 py-1 text-white bg-green-500 rounded-sm cursor-pointer" onClick={() => setViewProfile(studentsList, index)}>View Profile</button>
                                     </td>   
                                 </tr>
                             ))}
@@ -391,8 +410,8 @@ const [updateStudentData, setUpdateStudentData] = useState<Student>({
                 </div>
             </div>
 
-            <div className={`inset-0 absolute bg-black/50 flex items-center justify-center z-50 text-black transition-[opacity_z] duration-300 ease-in-out transform ${form ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-                <form method="POST" className={`p-10 border-none justify-center border bg-white transform duration-300 ease-in-out rounded-md ${form ? "translate-y-0" : "-translate-y-[200%]"}`} autoComplete="off" onSubmit={handleSubmit}>
+            <div className={`inset-0 absolute  bg-black/50 flex items-center justify-center z-50 text-black transition-[opacity_z] duration-300 ease-in-out transform ${form ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+                <form method="POST" className={`p-3 md:p-10 border-none justify-center border bg-white transform duration-300 ease-in-out rounded-md ${form ? "translate-y-0" : "-translate-y-[200%]"}`} autoComplete="off" onSubmit={handleSubmit}>
                     <div className="flex justify-end">
                         <button type="button" className="cursor-pointer" onClick={() => {setForm(form => !form), 
                             setStudents({
@@ -407,25 +426,25 @@ const [updateStudentData, setUpdateStudentData] = useState<Student>({
                             })
                         }}><X size={40}/></button>
                     </div>
-                    <h1 className="font-semibold text-center text-2xl mb-5">Add Student </h1>
-                    <div className="mt-6  flex justify-between items-center">
+                    <h1 className="mb-5 text-2xl font-semibold text-center">Add Student </h1>
+                    <div className="flex items-center justify-between mt-6">
                         <label htmlFor="firstName">First Name</label>
-                        <input type="text" className="border-b outline-none p-1 ml-2" id="firstName" value={students.firstName} name="firstName" onChange={handleChange} required/>
+                        <input type="text" className="p-1 ml-2 border-b outline-none" id="firstName" value={students.firstName} name="firstName" onChange={handleChange} required/>
                     </div>
 
-                    <div className="mt-6 flex justify-between items-center ">
+                    <div className="flex items-center justify-between mt-6 ">
                         <label htmlFor="middleName">Middle Name</label>
-                        <input type="text" className="border-b outline-none p-1 ml-2" id="middleName" value={students.middleName} name="middleName" onChange={handleChange} required/>
+                        <input type="text" className="p-1 ml-2 border-b outline-none" id="middleName" value={students.middleName} name="middleName" onChange={handleChange} required/>
                     </div>
 
-                    <div className="mt-6  flex justify-between items-center">
+                    <div className="flex items-center justify-between mt-6">
                         <label htmlFor="lastName">Last Name</label>
-                        <input type="text" className="border-b outline-none p-1 ml-2" id="lastName"  value={students.lastName} name="lastName" onChange={handleChange} required/>
+                        <input type="text" className="p-1 ml-2 border-b outline-none" id="lastName"  value={students.lastName} name="lastName" onChange={handleChange} required/>
                     </div>
 
-                    <div className="mt-6 flex  items-center">
+                    <div className="flex items-center mt-6">
                         <label className="mr-8">College<br/>Program</label>
-                            <select className="ml-2 border p-1 max-w-55 truncate" value={students.collegeProgram} name="collegeProgram" onChange={handleChange} required>
+                            <select className="p-1 ml-2 truncate border max-w-55" value={students.collegeProgram} name="collegeProgram" onChange={handleChange} required>
                                 <option value="" defaultValue="Select Program" disabled>Select Program</option>
                                 <option>Bachelor of Science in Information Technology (BSIT)</option>
                                 {collegeProgramsPH.map(e => (
@@ -433,9 +452,9 @@ const [updateStudentData, setUpdateStudentData] = useState<Student>({
                                 ))}
                             </select>
                     </div>
-                    <div className="mt-6  flex items-center">
+                    <div className="flex items-center mt-6">
                         <label className="mr-8" htmlFor="studentYear">Year Level</label>
-                        <select className="border p-1  w-55 truncate" id="studentYear" value={students.yearLevel} name="yearLevel" onChange={handleChange} required>
+                        <select className="p-1 truncate border w-55" id="studentYear" value={students.yearLevel} name="yearLevel" onChange={handleChange} required>
                             <option value="" defaultValue="Select Year Level" disabled>Select Year Level</option>
                             <option value="1st Year">1st Year</option>
                             <option value="2nd Year">2nd Year</option>
@@ -444,28 +463,28 @@ const [updateStudentData, setUpdateStudentData] = useState<Student>({
                         </select>
                     </div>
 
-                    <div className="mt-6  flex justify-between items-center">
+                    <div className="flex items-center justify-between mt-6">
                         <label>Student ID</label>
-                        <input type="text" className="border-b outline-none p-1 ml-2" value={students.studentID} name="studentID" onChange={handleChange} required/>
+                        <input type="text" className="p-1 ml-2 border-b outline-none" value={students.studentID} name="studentID" onChange={handleChange} required/>
                     </div>
 
-                    <div className="mt-6  flex justify-between items-center">
+                    <div className="flex items-center justify-between mt-6">
                         <label>Gmail</label>
-                        <input type="email" className="border-b outline-none p-1 ml-2" value={students.gmail} name="gmail" onChange={handleChange} required/>
+                        <input type="email" className="p-1 ml-2 border-b outline-none" value={students.gmail} name="gmail" onChange={handleChange} required/>
                     </div>
 
 
                      <div className="mt-6">
-                       <div className="flex justify-between items-center">
+                       <div className="flex items-center justify-between">
                             <label>Profile Picture</label>
                                 <input id="fileInput" type="file" className="hidden" accept="image/*" name="profilePicture" onChange={handleChange} />
                             <label htmlFor="fileInput" className="p-2.5 border border-black inline-block cursor-pointer ml-7" >Select Profile Picture</label>
                        </div>
-                        <div className=" max-w-50 truncate">
+                        <div className="truncate max-w-50">
                         </div>
                     </div>
 
-                    <button className="mx-auto block mt-4 py-2 px-10 rounded-sm bg-green-500 font-semibold text-xl cursor-pointer text-white">Submit</button>
+                    <button className="block px-10 py-2 mx-auto mt-4 text-xl font-semibold text-white bg-green-500 rounded-sm cursor-pointer">Submit</button>
                 </form>
              </div>
 
@@ -480,7 +499,7 @@ const [updateStudentData, setUpdateStudentData] = useState<Student>({
              </div>
 
             <div className={`inset-0 absolute bg-black/50 flex items-center justify-center z-50 text-black transition-[opacity_z] duration-300 ease-in-out transform ${update ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-                <form method="POST" className={`p-10 border-none justify-center border bg-white transform duration-300 ease-in-out rounded-md ${update ? "translate-y-0" : "-translate-y-[200%]"}`} autoComplete="off" onSubmit={updateStudent}>
+                <form method="POST" className={`p-3 md:p-10  border-none justify-center border bg-white transform duration-300 ease-in-out rounded-md ${update ? "translate-y-0" : "-translate-y-[200%]"}`} autoComplete="off" onSubmit={updateStudent}>
                     <div className="flex justify-end">
                         <button type="button" className="cursor-pointer" onClick={() => {setUpdate(prev => !prev), 
                             setUpdateStudentData({
@@ -495,25 +514,25 @@ const [updateStudentData, setUpdateStudentData] = useState<Student>({
                             })
                         }}><X size={40}/></button>
                     </div>
-                    <h1 className="font-semibold text-center text-2xl mb-5">Update Student </h1>
-                    <div className="mt-6  flex justify-between items-center">
+                    <h1 className="mb-5 text-2xl font-semibold text-center">Update Student </h1>
+                    <div className="flex items-center justify-between mt-6">
                         <label htmlFor="firstName">First Name</label>
-                        <input type="text" className="border-b outline-none p-1 ml-2" id="firstName" value={updateStudentData.firstName} name="firstName" onChange={updateHandleChange} required/>
+                        <input type="text" className="p-1 ml-2 border-b outline-none" id="firstName" value={updateStudentData.firstName} name="firstName" onChange={updateHandleChange} required/>
                     </div>
 
-                    <div className="mt-6 flex justify-between items-center ">
+                    <div className="flex items-center justify-between mt-6 ">
                         <label htmlFor="middleName">Middle Name</label>
-                        <input type="text" className="border-b outline-none p-1 ml-2" id="middleName" value={updateStudentData.middleName} name="middleName" onChange={updateHandleChange} required/>
+                        <input type="text" className="p-1 ml-2 border-b outline-none" id="middleName" value={updateStudentData.middleName} name="middleName" onChange={updateHandleChange} required/>
                     </div>
 
-                    <div className="mt-6  flex justify-between items-center">
+                    <div className="flex items-center justify-between mt-6">
                         <label htmlFor="lastName">Last Name</label>
-                        <input type="text" className="border-b outline-none p-1 ml-2" id="lastName"  value={updateStudentData.lastName} name="lastName" onChange={updateHandleChange} required/>
+                        <input type="text" className="p-1 ml-2 border-b outline-none" id="lastName"  value={updateStudentData.lastName} name="lastName" onChange={updateHandleChange} required/>
                     </div>
 
-                    <div className="mt-6 flex  items-center">
+                    <div className="flex items-center mt-6">
                         <label className="mr-8">College<br/>Program</label>
-                            <select className="ml-2 border p-1 max-w-55 truncate" value={updateStudentData.collegeProgram} name="collegeProgram" onChange={updateHandleChange} required>
+                            <select className="p-1 ml-2 truncate border max-w-55" value={updateStudentData.collegeProgram} name="collegeProgram" onChange={updateHandleChange} required>
                                 <option value="" defaultValue="Select Program" disabled>Select Program</option>
                                 <option>Bachelor of Science in Information Technology (BSIT)</option>
                                 {collegeProgramsPH.map(e => (
@@ -521,9 +540,9 @@ const [updateStudentData, setUpdateStudentData] = useState<Student>({
                                 ))}
                             </select>
                     </div>
-                    <div className="mt-6  flex items-center">
+                    <div className="flex items-center mt-6">
                         <label className="mr-8" htmlFor="studentYear">Year Level</label>
-                        <select className="border p-1  w-55 truncate" id="studentYear" value={updateStudentData.yearLevel} name="yearLevel" onChange={updateHandleChange} required>
+                        <select className="p-1 truncate border w-55" id="studentYear" value={updateStudentData.yearLevel} name="yearLevel" onChange={updateHandleChange} required>
                             <option value="" defaultValue="Select Year Level" disabled>Select Year Level</option>
                             <option value="1st Year">1st Year</option>
                             <option value="2nd Year">2nd Year</option>
@@ -532,18 +551,18 @@ const [updateStudentData, setUpdateStudentData] = useState<Student>({
                         </select>
                     </div>
 
-                    <div className="mt-6  flex justify-between items-center">
+                    <div className="flex items-center justify-between mt-6">
                         <label>Student ID</label>
-                        <input type="text" className="border-b cursor-not-allowed outline-none p-1 ml-2" value={updateStudentData.studentID} name="studentID" onChange={updateHandleChange} disabled/>
+                        <input type="text" className="p-1 ml-2 border-b outline-none cursor-not-allowed" value={updateStudentData.studentID} name="studentID" onChange={updateHandleChange} disabled/>
                     </div>
 
-                    <div className="mt-6  flex justify-between items-center">
+                    <div className="flex items-center justify-between mt-6">
                         <label>Gmail</label>
-                        <input type="email" className="border-b outline-none p-1 ml-2" value={updateStudentData.gmail} name="gmail" onChange={updateHandleChange} required/>
+                        <input type="email" className="p-1 ml-2 border-b outline-none" value={updateStudentData.gmail} name="gmail" onChange={updateHandleChange} required/>
                     </div>
 
 
-                    <button className="mx-auto block mt-4 py-2 px-10 rounded-sm bg-green-500 font-semibold text-xl cursor-pointer text-white">Update </button>
+                    <button className="block px-10 py-2 mx-auto mt-4 text-xl font-semibold text-white bg-green-500 rounded-sm cursor-pointer">Update </button>
                 </form>
              </div>
 
