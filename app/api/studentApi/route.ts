@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
         const search = searchParams.get("search");
 
         let query = "SELECT * FROM students WHERE 1=1"; 
-        const params: any[] = [];
+        const params: (string | number)[] = [];
 
         if (yearLevel && yearLevel !== "All Year Level") {
             query += " AND yearLevel = ?";
