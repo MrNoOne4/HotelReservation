@@ -1,5 +1,6 @@
 import { pool } from "../../../lib/studentDB";
 import { NextRequest, NextResponse } from "next/server";
+// import {prisma} from "../../hello-prisma/lib/prisma"
 
 export async function GET(request: NextRequest) {
     try {
