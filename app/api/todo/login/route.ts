@@ -3,10 +3,12 @@ import bcryptjs from "bcryptjs";
 import { prisma } from "../../../../hello-prisma/lib/prisma";
 import jwt from 'jsonwebtoken';
 
+
+
 export async function POST(req: NextRequest) {
   try {
-    const { email, password } = await req.json();
 
+    const { email, password } = await req.json();
     const user = await prisma.todolistaccount.findFirst({
       where: { gmail: email },
     });

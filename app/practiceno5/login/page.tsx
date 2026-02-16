@@ -1,14 +1,20 @@
 "use client";
 "use strict";
 import { User, Lock, Eye, EyeOff, Facebook, Github, Mail} from 'lucide-react';
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useState,  } from "react";
 import { useRouter } from 'next/navigation';
 import Toast from "../../../components/Toast"
+import jwt  from "jsonwebtoken"
+
+
+
 
 export default function AuthPage() {
     const [passwordToggle, setPasswordToggle] = useState<boolean>(false);
     const router = useRouter();
-    
+
+
+
     interface login {
         email: string,
         password: string
@@ -19,10 +25,6 @@ export default function AuthPage() {
         condition: boolean
     }
 
-    interface setToast {
-        label: string,
-        condition: boolean
-    }
 
     const [failedFetch, setFailedFetch] = useState<failedToast>({label: '', condition: false});
 
@@ -81,12 +83,12 @@ export default function AuthPage() {
                                 <h1 className="m-6 mt-6 text-3xl font-bold text-center">Login</h1>
                                 <form className='flex flex-col gap-5' onSubmit={handleSubmit} method="POST">
                                     <section className='relative'>
-                                        <input type='text' className='block px-10 py-2 mx-auto border border-black rounded-sm' placeholder='Username or Email' name="email" value={loginField.email} onChange={handleChange}/>
+                                        <input type='text' className='block px-10 py-2 mx-auto border border-black rounded-sm' placeholder='Username or Email' name="email" value={loginField.email} onChange={handleChange} required/>
                                         <span className='absolute top-2 left-9'><User size={24} color="black" /></span>
                                     </section>
 
                                     <section className='relative'>
-                                        <input type={passwordToggle ? "text" : "password"} className='block px-10 py-2 mx-auto border border-black rounded-sm' placeholder='Enter your password' name="password" value={loginField.password} onChange={handleChange}/>
+                                        <input type={passwordToggle ? "text" : "password"} className='block px-10 py-2 mx-auto border border-black rounded-sm' placeholder='Enter your password' name="password" value={loginField.password} onChange={handleChange} required/>
                                         <span className='absolute top-2 left-9 '><Lock size={24} color="black" /></span>
                                         <span className='absolute top-2 right-9'><button type="button"  onClick={() => setPasswordToggle(prev => !prev)} className='cursor-pointer'> {passwordToggle ? <Eye size={24} color="black" /> : <EyeOff size={24} color="black" />}</button></span>
                                     </section>
@@ -103,7 +105,7 @@ export default function AuthPage() {
                                     <button className='py-3 mx-5 text-white bg-blue-500 rounded-full cursor-pointer hover:bg-blue-600'>Login</button>
 
                                     <article className='flex justify-center gap-2'>
-                                        <p className='text-gray-600'>Don't have an account?</p>
+                                        <p className='text-gray-600'>Don&apos;t have an account?</p>
                                         <button className='text-blue-500 cursor-pointer' type="button" onClick={() => goToPage()}>Sign up</button>
                                     </article>
 

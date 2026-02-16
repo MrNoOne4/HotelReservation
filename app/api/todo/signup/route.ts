@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcryptjs from "bcryptjs";
 import { prisma } from "../../../../hello-prisma/lib/prisma";
+import jwt from 'jsonwebtoken';
 
 export async function POST(req: NextRequest) {
     try {
@@ -32,7 +33,31 @@ export async function POST(req: NextRequest) {
             data: { firstName, lastName, gmail, userPassword: hash }
         });
 
-        return NextResponse.json({ success: true }, { status: 201 });
+            const findUser = await prisma.todolistaccount.findFirst({
+                where: { gmail: gmail },
+            });
+
+            if (!findUser) {
+                return NextResponse.json(
+                    { error: "Failed to create user account" },
+                    { status: 500 }
+                );
+            }
+
+            const token = jwt.sign({ userID: findUser.userID }, process.env.JWT_SECRET!, { expiresIn: "1d" });
+            const response = NextResponse.json({ success: true }, { status: 200 });
+        
+            response.cookies.set("token", token, {
+              httpOnly: true,
+              secure: process.env.NODE_ENV === "production",
+              path: "/",
+              maxAge: 60 * 60 * 24,
+              sameSite: "lax",
+            });
+        
+            return response;
+        
+        
     } catch (error) {
         console.error("Signup API error:", error);
         return NextResponse.json({ error: "Internal Error" }, { status: 500 });

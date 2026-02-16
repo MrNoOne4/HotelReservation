@@ -89,7 +89,7 @@ const LoginPage = () => {
               <div className='absolute top-2 left-2'>
                 <Mail size={24} color="black" />
               </div>
-                <input type="email" id="email" placeholder=" " className="w-full p-2 pl-10 mb-4 border-b outline-none peer focus:border-black not-placeholder-shown:border-black " value={account.email} name="email" onChange={handleChange}/>
+                <input type="email" id="email" placeholder=" " className="w-full p-2 pl-10 mb-4 border-b outline-none peer focus:border-black not-placeholder-shown:border-black " value={account.email} name="email" onChange={handleChange} required/>
                 <label htmlFor="email" className="absolute text-base font-semibold text-gray-200 transition-all duration-300 left-10 top-2 peer-focus:-top-3 peer-focus:text-sm peer-focus:text-black peer-not-placeholder-shown:-top-3 peer-not-placeholder-shown:text-black " > Email </label>
             </div>
             
@@ -97,7 +97,7 @@ const LoginPage = () => {
                <div className='absolute top-2 left-2'>
                 <Lock size={24} color="black" />
               </div>
-              <input type={showPassword ? "password" : "text"} placeholder=' ' className='w-full p-2 pl-10 mb-4 border-b outline-none pr-11 peer focus:border-black not-placeholder-shown:border-black ' value={account.password} name="password" onChange={handleChange}/>
+              <input type={showPassword ? "password" : "text"} placeholder=' ' className='w-full p-2 pl-10 mb-4 border-b outline-none pr-11 peer focus:border-black not-placeholder-shown:border-black ' value={account.password} name="password" onChange={handleChange} required/>
               <label htmlFor="email" className="absolute text-base font-semibold text-gray-200 transition-all duration-300 left-10 top-2 peer-focus:-top-3 peer-focus:text-sm peer-focus:text-black peer-not-placeholder-shown:-top-3 peer-not-placeholder-shown:text-black " > Password </label>
               {showPassword ?
                   <button className='absolute cursor-pointer right-2 top-1' onClick={() => setShowPassword(prev => !prev)} type='button'><Eye size={24} color="black" /></button>
@@ -121,7 +121,7 @@ const LoginPage = () => {
           <Toast label={successToast.message} background= "bg-[#4CAF50]"  padding='py-[0.8rem] px-[2rem]' condition={successToast.show} translateTrue="translate-y-0" translateFalse="translate-y-[200%]"/>
           <Toast label={failedToast.message} background="bg-[#FF0000]" padding='py-[0.8rem] px-[2rem]' condition={failedToast.show} translateTrue="translate-y-0" translateFalse="translate-y-[200%]"/>
     </div>
-  )
+  )   
 }
 
 export default LoginPage

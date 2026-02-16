@@ -566,7 +566,7 @@ const [updateStudentData, setUpdateStudentData] = useState<Student>({
                 </form>
              </div>
 
-            <Modal isOpen={modal} label="Student Profile" modalInner={"Are you sure do you want to delete this student?"} buttonAccept="Yes" methodClose={() => setModal(() => false)} methodAccept={() => acceptDelete()}/>
+            <Modal isOpen={modal} label="Delete Student" modalInner={"Are you sure do you want to delete this student?"} buttonAccept="Yes" methodClose={() => setModal(() => false)} methodAccept={() => acceptDelete()}/>
             <Toast label={failedToast.message} background="bg-[#FF0000]" padding='py-[0.8rem] px-[2rem]' condition={failedToast.show} translateTrue="translate-y-0" translateFalse="translate-y-[200%]"/>
             <Toast label={successToast.message} background="bg-[#90EE90]" padding='py-[0.8rem] px-[2rem]' condition={successToast.show} translateTrue="translate-y-0" translateFalse="translate-y-[200%]"/>
 

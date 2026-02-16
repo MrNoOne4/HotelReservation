@@ -539,8 +539,8 @@ const [products, setProducts] = useState(
                          <div className=" h-[23%] w-full pt-[2rem]  bg-fixed bg-center bg-no-repeat bg-cover "style={{  backgroundImage: `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://cdn.pixabay.com/photo/2020/10/01/17/11/store-5619201_1280.jpg')` }}>
                              <div className="hidden lg:block">
                                     <header className={`w-1/2 h-12  mx-auto rounded-full flex items-center justify-between p-4 mt-0 z-[-1] shadow-[inset_0px_30px_60px_-12px_rgba(50,50,93,0.25),inset_0px_18px_36px_-18px_rgba(0,0,0,0.3)] backdrop-blur-md bg-${theme ? '[rgba(255,255,255,0.1)]' : '[rgba(255,255,255,1)]' }`}>
-                                    <h1 className="text-md lg:text-2xl m-4 p-2 hidden xl:block"> Stocklytics </h1>
-                                    <nav className=" text-sm">
+                                    <h1 className="hidden p-2 m-4 text-md lg:text-2xl xl:block"> Stocklytics </h1>
+                                    <nav className="text-sm ">
                                         <ul className="flex gap-8 font-[600]">
                                             <li className="lg:text-lg text-md"><a href="#" onClick={(e) => {e.preventDefault(); scrollTo("products")}}>Products</a></li>
                                             <li className="lg:text-lg text-md"><a href="#" onClick={(e) => {e.preventDefault(); scrollTo("stocks")}}>Stock Levels</a></li>
@@ -549,18 +549,18 @@ const [products, setProducts] = useState(
                                     </nav>
 
                                     <label className="border border-gray-500 h-[2.125rem] w-[5rem] relative rounded-full overflow-hidden cursor-pointer flex items-center">
-                                        <input type="checkbox" className="peer opacity-0 w-full h-full cursor-pointer z-10" onChange={() => setTheme(!theme)}/>
+                                        <input type="checkbox" className="z-10 w-full h-full opacity-0 cursor-pointer peer" onChange={() => setTheme(!theme)}/>
                                         <span className="absolute top-[0.1rem] left-[0.4rem] w-[1.8rem] h-[1.8rem] bg-black rounded-full transition-all duration-300 ease-in-out peer-checked:left-[2.7rem] peer-checked:bg-white"></span>
                                     </label>
                                 </header>
                              </div>
 
-                            <div className="w-full min-h-screen flex flex-col items-center justify-center text-center text-white px-4 sm:px-6 md:px-8 lg:px-16 tracking-wide">
-                                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6">
+                            <div className="flex flex-col items-center justify-center w-full min-h-screen px-4 tracking-wide text-center text-white sm:px-6 md:px-8 lg:px-16">
+                                <h1 className="mb-4 text-3xl font-bold sm:text-4xl md:text-5xl lg:text-6xl md:mb-6">
                                     Welcome to Stocklytics
                                 </h1>
 
-                                <h6 className="text-sm sm:text-base md:text-lg lg:text-xl max-w-xl">
+                                <h6 className="max-w-xl text-sm sm:text-base md:text-lg lg:text-xl">
                                     Helps you effortlessly track, manage, and organize your inventory with real-time updates and intuitive tools
                                 </h6>
                                 <Button label="Get Started" background="bg-[#228be6]" color="text-white mt-6 md:mt-8 hover:bg-[#1971c2]" onclick={(e) => { e.preventDefault(); scrollTo("products"); }} />
@@ -585,7 +585,7 @@ const [products, setProducts] = useState(
                                 {
                                     filteredProducts.map((product, index) => (
                                         <div key={index} className={`flex flex-col items-center justify-center border border-gray-300 rounded-lg p-4 bg-white text-sm  lg:text-md ${itemCategory === "All" || !itemCategory ? 'h-full' : 'h-[100%]'} `}>
-                                            <Card key={`${product.title}-${index}`} title={ <> {product.title} <br /> <div className="flex w-full items-center justify-center gap-5">{"$" + product.price}{" "} {product.quantity > 0 ? ( <> <span className="flex"><Box /> {product.quantity}</span> </> ) : ( <> <ShoppingCart /> Out of Stock </> )}</div> </> } img={product.img} description={product.description} />
+                                            <Card key={`${product.title}-${index}`} title={ <> {product.title} <br /> <div className="flex items-center justify-center w-full gap-5">{"$" + product.price}{" "} {product.quantity > 0 ? ( <> <span className="flex"><Box /> {product.quantity}</span> </> ) : ( <> <ShoppingCart /> Out of Stock </> )}</div> </> } img={product.img} description={product.description} />
                                         </div>
                                     ))
                                 }
@@ -637,8 +637,8 @@ const [products, setProducts] = useState(
                                                 <li className="cursor-pointer">Support</li>
                                                 <li className="cursor-pointer">Upgrade</li>
                                                 <li className="cursor-pointer">Custom Developments</li>
-                                                <li className="cursor-pointer mb-2">Education</li>
-                                                <li className="cursor-pointer mb-2">Find an Account</li>
+                                                <li className="mb-2 cursor-pointer">Education</li>
+                                                <li className="mb-2 cursor-pointer">Find an Account</li>
                                                 <li className="cursor-pointer">Find a Partner</li>
                                                 <li className="cursor-pointer">Become a Partner</li>
 
@@ -651,25 +651,25 @@ const [products, setProducts] = useState(
                                                 <li className="mb-1">Our company</li>
                                                 <li className="cursor-pointer">Brand Assets</li>
                                                 <li className="cursor-pointer">Contact us</li>
-                                                <li className="cursor-pointer mb-2">Jobs</li>
+                                                <li className="mb-2 cursor-pointer">Jobs</li>
                                                 <li className="cursor-pointer">Events</li>
                                                 <li className="cursor-pointer">Podcast</li>
                                                 <li className="cursor-pointer">Blog</li>
-                                                <li className="cursor-pointer mb-2">Customers</li>
+                                                <li className="mb-2 cursor-pointer">Customers</li>
                                                 <div className="cursor-pointer ">Legal Privacy</div>
                                                 <li className="cursor-pointer">Security</li>
                                             </ul>
                                         </div>
 
                                         <div className="flex flex-col gap-4 ">
-                                            <h1 className=" text-lg lg:text-2xl mb-1">Contact us</h1>
+                                            <h1 className="mb-1 text-lg  lg:text-2xl">Contact us</h1>
                                             <ul className="text-[#ccc] cursor-pointer">
                                                 <li className="cursor-pointer">+69123456789</li>
                                                 <li className="cursor-pointer">1234 Stocklytics St.</li>
                                             </ul>
 
                                             <h1>INQUIRES</h1>
-                                            <p className="cursor-pointer mb-1 text-sm">theMan@gmail.com</p>
+                                            <p className="mb-1 text-sm cursor-pointer">theMan@gmail.com</p>
 
                                             <h1>CAREERS</h1>
                                             <p className="cursor-pointer">Dream@halo-lab.team</p>
@@ -678,7 +678,7 @@ const [products, setProducts] = useState(
                                     </section>
                                 </div>
                                 <footer className="w-full h-12 bg-[#1b1c26] mt-8 flex items-center justify-center text-white">
-                                    <h1 className="text-center text-sm"> © 2024 Stocklytics. All rights reserved. </h1>
+                                    <h1 className="text-sm text-center"> © 2024 Stocklytics. All rights reserved. </h1>
                                 </footer>
                         </footer>
 
@@ -695,17 +695,17 @@ const [products, setProducts] = useState(
 
                                                 <div className="xl:h-[7%] relative ">
                                                     <input type="text" className="border border-black w-full p-[0.5rem] rounded-sm peer " name="productName" value={formData.productName}  onChange={handleChange}  required placeholder=""/>
-                                                    <label className="absolute left-1 top-[0.5rem] left-[1rem] peer-focus:top-[-1.5rem] transition-all duration-500 ease-in-out peer-not-placeholder-shown:top-[-1.5rem] text-sm lg:text-md">Product Name</label>
+                                                    <label className="absolute left-4 top-[0.5rem] peer-focus:top-[-1.5rem] transition-all duration-500 ease-in-out peer-not-placeholder-shown:top-[-1.5rem] text-sm lg:text-md">Product Name</label>
                                                 </div>
 
                                                 <div className="xl:h-[7%] relative">
                                                     <input type="number" className="border border-black w-full p-[0.5rem] rounded-sm peer" name="productPrice" value={formData.productPrice}  onChange={handleChange}  required placeholder=""/>
-                                                    <label className="absolute left-1 top-[0.5rem] left-[1rem] peer-focus:top-[-1.5rem] transition-all duration-500 ease-in-out peer-not-placeholder-shown:top-[-1.5rem] text-sm lg:text-md">Product Price</label>
+                                                    <label className="absolute left-4 top-[0.5rem] peer-focus:top-[-1.5rem] transition-all duration-500 ease-in-out peer-not-placeholder-shown:top-[-1.5rem] text-sm lg:text-md">Product Price</label>
                                                 </div>
 
                                                 <div className="xl:h-[7%] relative">
                                                     <input type="number" className="border border-black w-full p-[0.5rem] rounded-sm peer" name="productQuantity" value={formData.productQuantity}  onChange={handleChange}  required placeholder=""/>
-                                                    <label className="absolute left-1 top-[0.5rem] left-[1rem] peer-focus:top-[-1.5rem] transition-all duration-500 ease-in-out peer-not-placeholder-shown:top-[-1.5rem] text-sm lg:text-md">Stock Quantity </label>
+                                                    <label className="absolute left-4 top-[0.5rem] peer-focus:top-[-1.5rem] transition-all duration-500 ease-in-out peer-not-placeholder-shown:top-[-1.5rem] text-sm lg:text-md">Stock Quantity </label>
                                                 </div>
                                                 
                                                 <select className="border p-[1rem] rounded-sm" value={formData.productCategory}  name="productCategory" onChange={handleChange} required>
@@ -718,7 +718,7 @@ const [products, setProducts] = useState(
                                                 </select>
 
                                                 <textarea className="border border-black w-full xl:h-[20%] placeholder:pl-[1rem] placeholder:pt-[0.5rem] rounded-sm" name="productDescription" value={formData.productDescription}  onChange={handleChange} placeholder="Description" required ></textarea>
-                                                <div className="flex items-center justify-center w-full  ">
+                                                <div className="flex items-center justify-center w-full ">
                                                     <label className={`flex flex-col items-center  justify-center px-4 ${modal || update? 'bg-[rgba(0,0,0,0.5)]' : 'bg-white'} hover:bg-blue-400 rounded-lg shadow-lg tracking-wide uppercase border border-blue cursor-pointer hover:text-black  h-[40px] w-full max-w-sm`}>
                                                         <span className="text-base leading-normal hover:[bg-red-200]">Select a img</span>
                                                         <input type="file" className="hidden"  onChange={handleChange} name="productImg" required accept="image/*"/>
@@ -778,26 +778,26 @@ const [products, setProducts] = useState(
 
 
                                     <div className={` lg:w-[70%] w-[100%] absolute z-[99999]  transform ${ update ? 'translate-y-0' : '-translate-y-[200%]'} transition-all duration-200 ease-in-out`}>
-                                        <div className="relative h-full w-full flex justify-center items-center">
+                                        <div className="relative flex items-center justify-center w-full h-full">
                                             <div className={`lg:w-[50%] xl:w-[30%] w-[70%] lg:h-[70%] h-[50%] rounded-lg shadow-[0_0_10px_rgba(0,0,0,0.1)] mt-[1rem] lg:mt-0 bg-white`}>
                                                 <span className="flex justify-center items-center gap-3 font-[600] text-xl lg:text-2xl font-sans tracking-wide pt-6 "><PackagePlus size={30} /> <h1>Update Item</h1> <button className="cursor-pointer" title="Cancel Update Form" onClick={() => setUpdate(!update)}><X size={30} /></button></span>
                                                 
-                                                    <form className="h-full w-full gap-6 flex flex-col p-10" onSubmit={e => handleUpdateSubmit(e)}>
+                                                    <form className="flex flex-col w-full h-full gap-6 p-10" onSubmit={e => handleUpdateSubmit(e)}>
 
                                                         <div className="xl:h-[7%] relative ">
                                                             <input type="text" className="border border-black w-full p-[0.5rem] rounded-sm peer " name="updateProductName"  onChange={updateHandleChange} value={updateFormData.updateProductName} required placeholder=""/>
-                                                            <label className="absolute left-1 top-[0.5rem] left-[1rem] peer-focus:top-[-1.5rem] transition-all duration-500 ease-in-out peer-not-placeholder-shown:top-[-1.5rem] text-sm lg:text-md">Update Product Name</label>
+                                                            <label className="absolute left-4 top-[0.5rem] peer-focus:top-[-1.5rem] transition-all duration-500 ease-in-out peer-not-placeholder-shown:top-[-1.5rem] text-sm lg:text-md">Update Product Name</label>
                                                         </div>
 
                                                         <div className="xl:h-[7%] relative">
                                                             <input type="number" className="border border-black w-full p-[0.5rem] rounded-sm peer" name="updateProductPrice"  onChange={updateHandleChange} value={updateFormData.updateProductPrice}  required placeholder=""/>
-                                                            <label className="absolute left-1 top-[0.5rem] left-[1rem] peer-focus:top-[-1.5rem] transition-all duration-500 ease-in-out peer-not-placeholder-shown:top-[-1.5rem] text-sm lg:text-md">Update Product Price</label>
+                                                            <label className="absolute left-4 top-[0.5rem] peer-focus:top-[-1.5rem] transition-all duration-500 ease-in-out peer-not-placeholder-shown:top-[-1.5rem] text-sm lg:text-md">Update Product Price</label>
 
                                                         </div>
 
                                                         <div className="xl:h-[7%] relative">
                                                             <input type="number" className="border border-black w-full p-[0.5rem] rounded-sm peer" name="updateProductQuantity"  onChange={updateHandleChange} value={updateFormData.updateProductQuantity} required placeholder=""/>
-                                                            <label className="absolute left-1 top-[0.5rem] left-[1rem] peer-focus:top-[-1.5rem] transition-all duration-500 ease-in-out peer-not-placeholder-shown:top-[-1.5rem] text-sm lg:text-md">Update Stock Quantity </label>
+                                                            <label className="absolute left-4 top-[0.5rem] peer-focus:top-[-1.5rem] transition-all duration-500 ease-in-out peer-not-placeholder-shown:top-[-1.5rem] text-sm lg:text-md">Update Stock Quantity </label>
                                                         </div>
                                                         
                                                         <select className="border p-[1rem] rounded-sm" name="updateProductCategory" required  value={updateFormData.updateProductCategory}  onChange={updateHandleChange}>
@@ -829,9 +829,9 @@ const [products, setProducts] = useState(
                         
                      </section>}
 
-                    {page[2] && <section className="w-full h-full  m-0 p-0"> </section>}
+                    {page[2] && <section className="w-full h-full p-0 m-0"> </section>}
 
-                    {page[3] && <section className="w-full h-full m-0 p-0"> 
+                    {page[3] && <section className="w-full h-full p-0 m-0"> 
                         
                     </section>}
 
