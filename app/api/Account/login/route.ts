@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { pool } from "../../../../lib/accounts";
 import bcryptjs from "bcryptjs";
+import { RowDataPacket } from "mysql2";
 
 export async function POST (userRequest: NextRequest) {
-    interface user {
+    interface user extends RowDataPacket {
         id: number;
         email: string;
         password_hash: string;
