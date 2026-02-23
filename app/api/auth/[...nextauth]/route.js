@@ -1,34 +1,41 @@
 import NextAuth from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
-import { prisma } from "@/lib/prisma";
-import { compare } from "bcryptjs";
+import GoogleProvider from "next-auth/providers/google"; 
+import FacebookProvider from "next-auth/providers/facebook";
 
 export const authOptions = {
   providers: [
-    CredentialsProvider({
-      name: "Credentials",
-      credentials: {
-        email: { label: "Email", type: "text" },
-        password: { label: "Password", type: "password" },
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      authorization: {
+        params: {
+          prompt: "consent",
+          access_type: "offline",
+          response_type: "code",
+        },
       },
-      async authorize(credentials) {
-        const user = await prisma.todolistaccount.findFirst({
-          where: { gmail: credentials.email },
-        });
-
-        if (!user) return null;
-
-        const isValid = await compare(credentials.password, user.userPassword);
-
-        if (!isValid) return null;
-
-        // Return object that will be stored in session
-        return { id: user.id, email: user.gmail, firstName: user.firstName };
-      },
+    }),
+    FacebookProvider({
+      clientId: process.env.FACEBOOK_CLIENT_ID,
+      clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
+      authorization: { params: { scope: "public_profile" } },
     }),
   ],
   session: { strategy: "jwt" },
-  pages: { signIn: "/login" },
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id || user.sub;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (token && token.id) {
+        session.user.id = token.id; 
+      }
+      return session;
+    },
+  },
 };
 
 const handler = NextAuth(authOptions);

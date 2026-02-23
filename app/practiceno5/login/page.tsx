@@ -4,16 +4,11 @@ import { User, Lock, Eye, EyeOff, Facebook, Github, Mail} from 'lucide-react';
 import { ChangeEvent, useState,  } from "react";
 import { useRouter } from 'next/navigation';
 import Toast from "../../../components/Toast"
-import jwt  from "jsonwebtoken"
-
-
-
+import { signOut,signIn,useSession } from 'next-auth/react'
 
 export default function AuthPage() {
     const [passwordToggle, setPasswordToggle] = useState<boolean>(false);
     const router = useRouter();
-
-
 
     interface login {
         email: string,
@@ -25,10 +20,7 @@ export default function AuthPage() {
         condition: boolean
     }
 
-
     const [failedFetch, setFailedFetch] = useState<failedToast>({label: '', condition: false});
-
-
     const [loginField, setLoginField] = useState<login>({email: '', password: ''})
 
     const resetField = () => {
@@ -116,7 +108,7 @@ export default function AuthPage() {
                                     </div>
 
                                     <article className='flex items-center justify-center gap-4 mb-6'>
-                                        <button type="button" className="cursor-pointer"><Facebook size={24}  /></button>
+                                        <button type="button" className="cursor-pointer" onClick={() => signIn("", {callbackUrl: "/practiceno5/dashboard"})}><Facebook size={24}  /></button>
                                         <button type="button"  className='cursor-pointer'><Github size={24}  /></button>
                                         <button type="button" className='cursor-pointer'><Mail size={24}  /></button>
                                     </article>

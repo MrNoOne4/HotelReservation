@@ -1,9 +1,17 @@
-import React from 'react'
+"use client";
+"use strict";
+import Providers from "@/components/Providers";
+import Appbar from "@/components/Appbar"
 
-const page = () => {
+export default function Home() {
+
+
   return (
-    <div>page</div>
+      <div className="flex justify-center items-center h-screen">
+          {/* <Providers>
+          <Appbar />
+          {children}
+        </Providers> */}
+      </div>
   )
 }
-
-export default page

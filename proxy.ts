@@ -1,24 +1,40 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
-import jwt from "jsonwebtoken";
+import { NextResponse } from 'next/server';
 
-export  function proxy(req: NextRequest) {
-    const token = req.cookies.get('token')?.value;
-    if (!token) {
-    }
+export function proxy(request) {
+  const token = request.cookies.get('token')?.value;
+  const { pathname } = request.nextUrl;
 
-    try {
-        return NextResponse.next();
-    } catch(error) {
-        return NextResponse.redirect(new URL("/login", req.url))
-    }
+  const isAuthPage =
+    pathname === '/practiceno5/login' ||
+    pathname === '/practiceno5/signup';
 
+  const isProtectedPage =
+    pathname.startsWith('/practiceno5/dashboard');
 
+  // Not logged in → trying to access dashboard
+  if (!token && isProtectedPage) {
+    return NextResponse.redirect(
+      new URL('/practiceno5/login', request.url)
+    );
+  }
+
+  // Logged in → trying to access login/register
+  if (token && isAuthPage) {
+    return NextResponse.redirect(
+      new URL('/practiceno5/dashboard', request.url)
+    );
+  }
+
+  return NextResponse.next();
 }
 
 export const config = {
-    matcher: ['/api/:path*']
-}
+  matcher: [
+    '/practiceno5/login',
+    '/practiceno5/signup',
+    '/practiceno5/dashboard/:path*',
+  ],
+};
 
 // // pages/dashboard.js
 // import jwt from 'jsonwebtoken';

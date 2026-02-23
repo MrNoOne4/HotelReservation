@@ -1,0 +1,11 @@
+model task {
+  taskID       Int     @id @default(autoincrement())
+  userID       Int?
+  taskName     String  @db.VarChar(100)
+  taskStatus   String  @db.VarChar(100)
+  taskPriority String  @db.VarChar(100)
+  taskDate     String  @db.VarChar(100)
+  taskFinish   Boolean @default(false)
+
+  @@index([userID], map: "userID")
+}

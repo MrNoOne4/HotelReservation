@@ -4,6 +4,7 @@
 import { Menu, X, PlusSquare, ClipboardList, LogOut} from "lucide-react";
 import {useState, useEffect, useRef, ChangeEvent} from "react";
 import Toast from "@/components/Toast";
+import Modal from "@/components/Modal";
 
 const TodoList = () => {
   const [formToggle, setFormToggle] = useState<boolean>(false);
@@ -51,7 +52,7 @@ const TodoList = () => {
     taskName: string,
     taskStatus: string,
     taskPriority: string,
-    taskDate: number
+    taskDate: string
   }
 
     interface filterFormProps {
@@ -60,14 +61,32 @@ const TodoList = () => {
       taskPriority: string,
   }
 
+  interface updateFormProps {
+    taskName: string,
+    taskStatus: string,
+    taskPriority: string,
+    taskDate: string,
+    taskID?: 0,
+    condition?: string,
+  }
+
   const [taskForm, setTaskForm] = useState<formProps>({
         taskName: '',
         taskStatus: '',
         taskPriority: '',
-        taskDate: 0
+        taskDate: ''
   })
 
-    const [FilterForm, setFilterFormForm] = useState<filterFormProps>({
+  const [updateForm,setUpdateForm] = useState<updateFormProps>({
+        taskName: '',
+        taskStatus: '',
+        taskPriority: '',
+        taskDate: '',
+        taskID: 0,
+        condition: "All",
+  })
+
+    const [filterForm, setFilterFormForm] = useState<filterFormProps>({
         taskName: '',
         taskStatus: '',
         taskPriority: ''
@@ -76,6 +95,11 @@ const TodoList = () => {
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const {name, value} = e.target;
     setTaskForm(prev => ({...prev, [name]: value}))
+  }
+
+  const updateHandleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const {name, value} = e.target;
+    setUpdateForm(prev => ({...prev, [name]: value}))
   }
   
   const filterHandleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -88,9 +112,19 @@ const TodoList = () => {
         taskName: '',
         taskStatus: '',
         taskPriority: '',
-        taskDate: 0
+        taskDate: ''
     })
   }
+
+    const resetUpdateTaskForm = () => {
+    setUpdateForm({
+        taskName: '',
+        taskStatus: '',
+        taskPriority: '',
+        taskDate: ''
+    })
+  }
+
     const [failedToast, setFailedToast] = useState<{show: boolean; message: string}>({show: false, message: ""});
     const [successToast, setSuccessToast] = useState<{show: boolean; message: string}>({show: false, message: ""});
 
@@ -105,19 +139,17 @@ const TodoList = () => {
     taskName: string;
     taskStatus: string;
     taskPriority: string;
-    taskDate: Date; 
+    taskDate: string; 
   }
 
-
   const [task, setTask] = useState<Task[]>([]);
-  
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const req = await fetch ('/api/todo/taskTodo', {
       method: "POST",
-      body: JSON.stringify({taskForm}),
+      body: JSON.stringify(taskForm),
       headers: {
           "Content-Type": "application/json"
         }
@@ -138,43 +170,150 @@ const TodoList = () => {
         setSuccessToast({show: false, message: data.message});
     }, 2000);
 
-    resetTaskForm();
     fetchTask();
+    setForm(false);
+    resetTaskForm();
   }
 
-  const fetchTask = async () => {
-    try {
-      const params = new URLSearchParams({
-          taskName: FilterForm.taskName || '',
-          taskStatus: FilterForm.taskPriority || '',
-          taskPriority: FilterForm.taskStatus || '',
-        })
+    const updateHandleSubmit = async (e: (React.FormEvent)) => {
+      e.preventDefault();
 
-        const res = await fetch (`/api/todo/taskTodo?${params.toString}`, {
-          method: "GET",
-        });
-        const data = await res.json();
-        if (!res.ok) {
+      const req = await fetch ('/api/todo/taskTodo', {
+        method: "PUT",
+        body: JSON.stringify(updateForm),
+        headers: {
+            "Content-Type": "application/json"
+          }
+      })
+
+      const data = await req.json();
+
+      if (!req.ok) {
           setFailedToast({show: true, message: data.message });
           setTimeout(() => {
               setFailedToast({show: false, message: data.message});
           }, 2000);
           return;
+      }
+      setTask(data.tasks);
+      setSuccessToast({show: true, message: data.message });
+      setTimeout(() => {
+          setSuccessToast({show: false, message: data.message});
+      }, 2000);
+
+      fetchTask();
+      setUpdateTask(false);
+      resetUpdateTaskForm();
+  }
+
+      const clickUpdateHandleSubmit = async (taskName: string, taskStatus: string, taskPriority: string, taskDate: string, index: number) => {
+        setUpdateForm({
+          taskName: taskName,
+          taskStatus: taskStatus,
+          taskPriority: taskPriority,
+          taskDate: taskDate,
+          taskID: index
+        })
+      const req = await fetch ('/api/todo/taskTodo', {
+        method: "PUT",
+        body: JSON.stringify(updateForm),
+        headers: {
+            "Content-Type": "application/json"
+          }
+      })
+
+      const data = await req.json();
+
+      if (!req.ok) {
+          setFailedToast({show: true, message: data.message });
+          setTimeout(() => {
+              setFailedToast({show: false, message: data.message});
+          }, 2000);
+          return;
+      }
+      setTask(data.tasks);
+      setSuccessToast({show: true, message: data.message });
+      setTimeout(() => {
+          setSuccessToast({show: false, message: data.message});
+      }, 2000);
+
+      fetchTask();
+      setUpdateTask(false);
+      resetUpdateTaskForm();
+  }
+
+  
+
+  const fetchTask = async () => {
+    try {
+      const params = new URLSearchParams({
+          taskName: filterForm.taskName || '',
+          taskStatus: filterForm.taskStatus || '',
+          taskPriority: filterForm.taskPriority || '',
+        })
+
+      const res = await fetch(`/api/todo/taskTodo?${params.toString()}`, {
+          method: "GET",
+        });
+        
+        const data = await res.json();
+        
+        if (!res.ok) {
+          setFailedToast({show: true, message: data.message });
+          setTimeout(() => {             
+            setFailedToast({show: false, message: data.message});
+          }, 2000);
+          return;
         }
 
-        setTask(data);
-
+       setTask(data.userTask)
         
     } catch (error) {
       console.error("Oops something went wrong while fetching students data", error);
     }
   }
 
+    const [taskId, setTaskId] = useState<number>(0);
+    const [modal, setModal] = useState<boolean>(false);
+    const [updateTask, setUpdateTask] = useState<boolean>(false);
+
     useEffect(() => {
         const timer = setTimeout(() => { fetchTask()}, 300);
         return () => clearTimeout(timer);
-    }, [FilterForm.taskName, FilterForm.taskPriority, FilterForm.taskStatus]);
-  
+    }, [filterForm.taskName, filterForm.taskPriority, filterForm.taskStatus]);
+
+    const openDeleteModal = (index: number) => {
+      setModal(true);
+      setTaskId(index);
+    }
+
+    const confirmDelete = async () => {
+      const request = await fetch ('/api/todo/taskTodo', {
+        method: "DELETE",
+        body: JSON.stringify(taskId),
+          headers: {
+          "Content-Type": "application/json"
+        }
+      })
+
+      const result = await request.json();
+      if (!request.ok) {
+         setFailedToast({show: true, message: result.message });
+            setTimeout(() => {
+                setFailedToast({show: false, message: result.message});
+            }, 2000);
+          return;
+      }
+
+     setSuccessToast({show: true, message: result.message });
+        setTimeout(() => {
+            setSuccessToast({show: false, message: result.message});
+        }, 2000);
+        fetchTask();
+        setModal(false);
+    }
+
+
   return (
     <div className="box-border h-screen p-0 m-0 overflow-hidden font-sans text-black bg-white">
       <div className="flex">
@@ -199,103 +338,267 @@ const TodoList = () => {
             <button className="m-5 cursor-pointer" onClick={() => setSideBar(prev => !prev)}><Menu color="white"/></button>
         </div>
 
-        <div className="grid w-screen h-screen grid-cols-1 gap-2 ml-0 2xl:gap-10 2xl:ml-10 xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 overflow-y-sc">
+        <div className="grid w-screen h-screen grid-cols-1 ml-0 2xl:gap-50 2xl:ml-10 xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 overflow-y-scroll  ">
+          {task?.map((e, index: number) => (
+            <div className=" mx-auto max-h-80 bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300 my-4 " key={`${index}-${e.taskName}`}>
+              <div className="bg-linear-to-r from-purple-500 to-pink-500 text-white px-6 py-3">
+                <h2 className="text-lg font-bold">Task Report</h2>
+              </div>
+              <div className="px-6 py-4 space-y-2">
+  
+    
+              <p>
+                <span className="font-medium mr-2">Task name:</span>
+                <span className="inline-block  text-sm font-semibold text-white bg-yellow-500 rounded-full mr-2 px-4 py-1">{e.taskName}</span>
+              </p>
 
-        </div>
+              <p>
+                <span className="font-medium mr-2">Status:</span>
+                <span className="inline-block text-sm font-semibold text-white bg-yellow-500 rounded-full mr-2 px-4 py-1">{e.taskStatus}</span>
+              </p>
+
+              <p>
+                <span className="font-medium mr-2">Priority:</span>
+                <span className="inline-block text-sm font-semibold text-white bg-red-500 rounded-full mr-2 px-4 py-1">{e.taskPriority}</span>
+              </p>
+
+              <p><span className="font-medium">Deadline:</span> {e.taskDate}</p>
+            </div>
+
+            <div className="px-6 py-4 flex gap-2">
+              <button className="flex-1 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg transition-colors duration-200 cursor-pointer px-6 py-4" onClick={() => { clickUpdateHandleSubmit(e.taskName, e.taskStatus, e.taskPriority, e.taskDate, e.taskID)}}>Finish</button>
+              <button className="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition-colors duration-200 cursor-pointer px-6 py-4" onClick={() => {setUpdateTask(true), setUpdateForm({
+                taskName: e.taskName,
+                taskStatus: e.taskStatus,
+                taskPriority: e.taskPriority,
+                taskDate: e.taskDate,
+                taskID: e.taskID,
+                condition: "All"
+              })}}>Edit</button>
+              <button className="flex-1 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg transition-colors duration-200 cursor-pointer px-6 py-4" onClick={() => openDeleteModal(e.taskID)}>Remove</button>
+            </div>
+          </div>
+              ))}
+            </div>
       </div>
 
 
-      <section className={`h-screen w-screen bg-black/50 absolute z-99999999 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 ${form ? 'z-auto' : 'z-[-1]'}  transition-all duration-200 ease-in-out`}>
-            <div className={`absolute transition-all duration-200 ease-in-out -translate-x-1/2 ${form ? '-translate-y-1/2' : '-translate-y-100'} bg-white w-60 z-99999999 top-1/2 left-1/2 h-100 md:scale-[1.3] scale-[1]`}>
-              <div className="flex justify-end ">
-                  <button className="absolute p-2 m-2 cursor-pointer -top-2 -right-2" onClick={() => {setForm(false), resetTaskForm()}}><X color="black"/></button>
-              </div>
+    <section
+      className={`fixed inset-0 flex items-center justify-center bg-black/50 transition-opacity duration-200 ease-in-out
+        ${form ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+    >
+      <div
+        className={`relative bg-white w-72 md:w-96 p-6 rounded-lg shadow-lg transform transition-transform duration-300 ease-in-out
+          ${form ? "translate-y-0 scale-100" : "-translate-y-full scale-95"}`}
+      >
+        <button
+          className="absolute top-2 right-2 p-2 rounded-full hover:bg-gray-200 transition cursor-pointer"
+          onClick={() => {
+            setForm(false);
+            resetTaskForm();
+          }}
+        >
+          <X color="black" />
+        </button>
 
-              <form method="POST" onSubmit={handleSubmit}>
-                  <h1 className="mt-4 mb-4 text-2xl font-semibold text-center">Add task</h1>
-                  
-                  <div className="mb-4">
-                    <input placeholder="Task Name" className="block py-1 pl-4 mx-auto border w-[90%] rounded-sm" value={taskForm.taskName} name="taskName" onChange={handleChange} required/>
-                  </div>
-                  
-                  <div className="mb-4 ">
-                    <select className="block py-1 pl-4 mx-auto border w-[90%] rounded-sm" value={taskForm.taskStatus} name="taskStatus" onChange={handleChange} required>
-    
-                      {Array.from({length: 4}).map((e, index: number) => (
-                        index === 0 ? <option defaultValue={"Select Status"} value={""} key={`${index}${""}`}>Select Status</option> : index === 1 ?
-                        <option value={"Pending"} key={`${index}-Pending`}>Pending</option> : index === 2 ? <option value={"In Progress"} key={`${index}-InProgress`}>In Progress</option>
-                        : <option value={"Completed"} key={`${index}-Completed`}>In Completed</option>
-                      ))}
-                    </select>
-                  </div>
+        <h1 className="text-2xl font-semibold text-center mb-6">Add Task</h1>
+        <form method="POST" onSubmit={handleSubmit} className="space-y-4">
+          <input
+            placeholder="Task Name"
+            className="block w-full px-4 py-2 border rounded-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+            value={taskForm.taskName}
+            name="taskName"
+            onChange={handleChange}
+            required
+          />
 
-                  <div className="mb-4 ">
-                    <select className="block py-1 pl-4 mx-auto border w-[90%] rounded-sm" value={taskForm.taskPriority} name="taskPriority" onChange={handleChange} required>
-                      {Array.from({length: 4}).map((e, index: number) => (
-                        index === 0 ? <option defaultValue={"Select Priority"} value={""} key={`${index}${""}`}>Select Priority</option> : index === 1 ?
-                        <option value={"Low Priority"} key={`${index}-Low Priority`}>Low Priority</option> : index === 2 ? <option value={"Medium Priority"} key={`${index}-Medium Priority`}>Medium Priority</option>
-                        : <option value={"High Priority"} key={`${index}-High Priority`}>High Priority</option>
-                      ))}
-                      
-                    </select>
-                  </div>
+          <select
+            className="block w-full px-4 py-2 border rounded-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+            value={taskForm.taskStatus}
+            name="taskStatus"
+            onChange={handleChange}
+            required
+          >
+            {["Select Status","Select Status", "Pending", "In Progress", "Completed"].map((status, idx) => (
+              <option key={idx} value={status} disabled={idx === 0} hidden={idx === 0}>
+               {status}
+              </option>
+            ))}
+          </select>
 
-                  <div className="mb-4">
-                    <input type="datetime-local"  className="block py-1 pl-4 mx-auto border w-[90%] rounded-sm" value={taskForm.taskDate} name="taskDate" onChange={handleChange} required/>
-                  </div>
+          <select
+            className="block w-full px-4 py-2 border rounded-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+            value={taskForm.taskPriority}
+            name="taskPriority"
+            onChange={handleChange}
+            required
+          >
+            {["Select Priority","Select Priority","Low Priority", "Medium Priority", "High Priority"].map((priority, idx) => (
+              <option key={idx} value={priority} disabled={idx === 0} hidden={idx === 0}>
+                {priority}
+              </option>
+            ))}
+          </select>
 
-                  <div className="mt-5">
-                    <button className="block py-2 mx-auto text-white bg-blue-400 rounded-full cursor-pointer w-50 active:bg-blue-500 hover:bg-blue-500">Submit Task</button>
-                  </div>
-              </form>
-            </div>
-      </section>
+          <input
+            type="datetime-local"
+            className="block w-full px-4 py-2 border rounded-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+            value={taskForm.taskDate}
+            name="taskDate"
+            onChange={handleChange}
+            required
+          />
 
+          <button
+            type="submit"
+            className="w-full py-2 bg-blue-400 text-white rounded-full hover:bg-blue-500 active:bg-blue-600 transition cursor-pointer"
+          >
+            Submit Task
+          </button>
+        </form>
+      </div>
+    </section>
 
-            <section className={`h-screen w-screen bg-black/50 absolute z-99999999 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 ${formFilter ? 'z-auto' : 'z-[-1]'}  transition-all duration-200 ease-in-out`}>
-            <div className={`absolute transition-all duration-200 ease-in-out -translate-x-1/2 ${formFilter ? '-translate-y-1/2' : '-translate-y-100'} bg-white w-60 z-99999999 top-1/2 left-1/2 h-100 md:scale-[1.3] scale-[1]`}>
-              <div className="flex justify-end ">
-                  <button className="absolute p-2 m-2 cursor-pointer -top-2 -right-2" onClick={() => {setFormFilter(false), resetTaskFilterForm()}}><X color="black"/></button>
-              </div>
+    <section className={`fixed inset-0 flex items-center justify-center bg-black/50 transition-opacity duration-200 ease-in-out ${formFilter ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}>
+      <div className={`relative bg-white  p-6 rounded-lg shadow-lg transform transition-transform duration-300 ease-in-out  ${formFilter ? "translate-y-0 scale-100" : "-translate-y-full scale-95"} p-6`}>
+        <button className="absolute top-2 right-2 p-2 rounded-full hover:bg-gray-200 transition cursor-pointer" onClick={() => {setFormFilter(false);resetTaskFilterForm(); }} >
+          <X color="black" />
+        </button>
 
-              <form method="GET">
-                  <h1 className="mt-4 mb-4 text-2xl font-semibold text-center">Filter task</h1>
-                  <div className="mb-4">
-                    <input placeholder="Task Name" className="block py-1 pl-4 mx-auto border w-[90%] rounded-sm" value={FilterForm.taskName} name="taskName" onChange={filterHandleChange} required/>
-                  </div>
-                  
-                  <div className="mb-4 ">
-                    <select className="block py-1 pl-4 mx-auto border w-[90%] rounded-sm" value={FilterForm.taskStatus} name="taskStatus" onChange={filterHandleChange} required>
-    
-                      {Array.from({length: 4}).map((e, index: number) => (
-                        index === 0 ? <option defaultValue={"Select Status"} value={""} key={`${index}${""}`}>Select Status</option> : index === 1 ?
-                        <option value={"Pending"} key={`${index}-Pending`}>Pending</option> : index === 2 ? <option value={"In Progress"} key={`${index}-InProgress`}>In Progress</option>
-                        : <option value={"Completed"} key={`${index}-Completed`}>In Completed</option>
-                      ))}
-                    </select>
-                  </div>
+        <h1 className="text-2xl font-semibold text-center mb-6">Filter Task</h1>
+        <form method="GET" className="space-y-4">
+          <input placeholder="Task Name" className="block w-70 px-4 py-2 border rounded-sm focus:outline-none focus:ring-2 focus:ring-blue-400" value={filterForm.taskName} name="taskName" onChange={filterHandleChange}  />
 
-                  <div className="mb-4 ">
-                    <select className="block py-1 pl-4 mx-auto border w-[90%] rounded-sm" value={FilterForm.taskPriority} name="taskPriority" onChange={filterHandleChange} required>
-                      {Array.from({length: 4}).map((e, index: number) => (
-                        index === 0 ? <option defaultValue={"Select Priority"} value={""} key={`${index}${""}`}>Select Priority</option> : index === 1 ?
-                        <option value={"Low Priority"} key={`${index}-Low Priority`}>Low Priority</option> : index === 2 ? <option value={"Medium Priority"} key={`${index}-Medium Priority`}>Medium Priority</option>
-                        : <option value={"High Priority"} key={`${index}-High Priority`}>High Priority</option>
-                      ))}
-                      
-                    </select>
-                  </div>
+          <select
+            className="block w-70 px-4 py-2 border rounded-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+            value={filterForm.taskStatus}
+            name="taskStatus"
+            onChange={filterHandleChange}
+            
+          >
+            {["", "Pending", "In Progress", "Completed"].map((status, idx) => (
+              <option
+                key={idx}
+                value={status}
+                disabled={idx === 0}
+                hidden={idx === 0}
+              >
+                {idx === 0 ? "Select Status" : status}
+              </option>
+            ))}
+          </select>
 
-                    <div className="mt-5">
-                      <button className="block py-2 mx-auto text-white bg-blue-400 rounded-full cursor-pointer w-50 active:bg-blue-500 hover:bg-blue-500">Submit</button>
-                  </div>
-              </form>
+          <select
+            className="block w-70 px-4 py-2 border rounded-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+            value={filterForm.taskPriority}
+            name="taskPriority"
+            onChange={filterHandleChange}
+            
+          >
+            {["", "Low Priority", "Medium Priority", "High Priority"].map(
+              (priority, idx) => (
+                <option
+                  key={idx}
+                  value={priority}
+                  disabled={idx === 0}
+                  hidden={idx === 0}
+                >
+                  {idx === 0 ? "Select Priority" : priority}
+                </option>
+              )
+            )}
+          </select>
 
+          <button
+            type="submit"
+            className="w-60 mx-auto block py-2 bg-blue-400 text-white rounded-full hover:bg-blue-500 active:bg-blue-600 transition cursor-pointer"
+          >
+            Submit
+          </button>
+        </form>
+      </div>
+    </section>
 
-            </div>
-      </section>
-            <Toast label={failedToast.message} background="bg-[#FF0000]" padding='py-[0.8rem] px-[2rem]' condition={failedToast.show} translateTrue="translate-y-0" translateFalse="translate-y-[200%]"/>
-            <Toast label={successToast.message} background="bg-[#90EE90]" padding='py-[0.8rem] px-[2rem]' condition={successToast.show} translateTrue="translate-y-0" translateFalse="translate-y-[200%]"/>
+        <section
+      className={`fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-xs transition-opacity duration-200 ease-in-out
+        ${updateTask ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+    >
+      <div
+        className={`relative bg-white w-72 md:w-96 p-6 rounded-lg shadow-lg transform transition-transform duration-300 ease-in-out
+          ${updateTask ? "translate-y-0 scale-100" : "-translate-y-full scale-95"}`}
+      >
+        <button
+          className="absolute top-2 right-2 p-2 rounded-full hover:bg-gray-200 transition cursor-pointer"
+          onClick={() => {
+            setUpdateTask(false);
+            resetUpdateTaskForm();
+          }}
+        >
+          <X color="black" />
+        </button>
+
+        <h1 className="text-2xl font-semibold text-center mb-6">Edit Task </h1>
+        <form method="POST" onSubmit={updateHandleSubmit} className="space-y-4">
+          <input
+            placeholder="Task Name"
+            className="block w-full px-4 py-2 border rounded-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+            value={updateForm.taskName}
+            name="taskName"
+            onChange={updateHandleChange}
+            required
+          />
+
+          <select
+            className="block w-full px-4 py-2 border rounded-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+            value={updateForm.taskStatus}
+            name="taskStatus"
+            onChange={updateHandleChange}
+            required
+          >
+            {["Select Status","Select Status", "Pending", "In Progress", "Completed"].map((status, idx) => (
+              <option key={idx} value={status} disabled={idx === 0} hidden={idx === 0}>
+               {status}
+              </option>
+            ))}
+          </select>
+
+          <select
+            className="block w-full px-4 py-2 border rounded-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+            value={updateForm.taskPriority}
+            name="taskPriority"
+            onChange={updateHandleChange}
+            required
+          >
+            {["Select Priority","Select Priority","Low Priority", "Medium Priority", "High Priority"].map((priority, idx) => (
+              <option key={idx} value={priority} disabled={idx === 0} hidden={idx === 0}>
+                {priority}
+              </option>
+            ))}
+          </select>
+
+          <input
+            type="datetime-local"
+            className="block w-full px-4 py-2 border rounded-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+            value={updateForm.taskDate}
+            name="taskDate"
+            onChange={updateHandleChange}
+            required
+          />
+
+          <button
+            type="submit"
+            className="w-full py-2 bg-blue-400 text-white rounded-full hover:bg-blue-500 active:bg-blue-600 transition cursor-pointer"
+          >
+            Update Task
+          </button>
+        </form>
+      </div>
+    </section>
+
+      <Toast label={failedToast.message} background="bg-[#FF0000]" padding='py-[0.8rem] px-[2rem]' condition={failedToast.show} translateTrue="translate-y-0" translateFalse="translate-y-[200%]"/>
+      <Toast label={successToast.message} background="bg-[#90EE90]" padding='py-[0.8rem] px-[2rem]' condition={successToast.show} translateTrue="translate-y-0" translateFalse="translate-y-[200%]"/>
+      <Modal isOpen={modal} label="Are you sure you want to delete this task?" modalInner="The action cannot be undone." methodClose={() => setModal(false)} buttonAccept="Delete" methodAccept={() => confirmDelete()}/>
+        
     </div>
   );
 }
