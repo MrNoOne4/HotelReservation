@@ -58,6 +58,12 @@ export default function AuthPage() {
             resetField();
             router.push("/practiceno5/dashboard");
 
+            await signIn("credentials", {
+                email: loginField?.email,
+                password: loginField?.password,
+                callbackUrl: "/practiceno5/dashboard"
+            })
+
         } catch (error) {
             console.error("Whoops something went wrong", error);
             setFailedFetch({ label: "Unexpected error occurred", condition: true });
@@ -94,7 +100,7 @@ export default function AuthPage() {
                                         <button className='font-semibold text-blue-500' type="button">Forgot password?</button>
                                     </section>
 
-                                    <button className='py-3 mx-5 text-white bg-blue-500 rounded-full cursor-pointer hover:bg-blue-600'>Login</button>
+                                    <button className='py-3 mx-5 text-white bg-blue-500 rounded-full cursor-pointer hover:bg-blue-600' type='submit'>Login</button>
 
                                     <article className='flex justify-center gap-2'>
                                         <p className='text-gray-600'>Don&apos;t have an account?</p>
@@ -108,7 +114,7 @@ export default function AuthPage() {
                                     </div>
 
                                     <article className='flex items-center justify-center gap-4 mb-6'>
-                                        <button type="button" className="cursor-pointer" onClick={() => signIn("", {callbackUrl: "/practiceno5/dashboard"})}><Facebook size={24}  /></button>
+                                        <button type="button" className="cursor-pointer"><Facebook size={24}  /></button>
                                         <button type="button"  className='cursor-pointer'><Github size={24}  /></button>
                                         <button type="button" className='cursor-pointer'><Mail size={24}  /></button>
                                     </article>

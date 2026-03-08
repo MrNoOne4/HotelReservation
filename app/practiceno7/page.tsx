@@ -536,7 +536,7 @@ const [products, setProducts] = useState(
                 <main className="w-full h-full ">
                     {page[0] && <section className="w-full h-[350vh] font-sans bg-transparent" id="Top"> 
 
-                         <div className=" h-[23%] w-full pt-[2rem]  bg-fixed bg-center bg-no-repeat bg-cover "style={{  backgroundImage: `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://cdn.pixabay.com/photo/2020/10/01/17/11/store-5619201_1280.jpg')` }}>
+                         <div className=" h-[23%] w-full pt-[2rem]  bg-fixed bg-center bg-no-repeat bg-cover " style={{  backgroundImage: `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://cdn.pixabay.com/photo/2020/10/01/17/11/store-5619201_1280.jpg')` }}>
                              <div className="hidden lg:block">
                                     <header className={`w-1/2 h-12  mx-auto rounded-full flex items-center justify-between p-4 mt-0 z-[-1] shadow-[inset_0px_30px_60px_-12px_rgba(50,50,93,0.25),inset_0px_18px_36px_-18px_rgba(0,0,0,0.3)] backdrop-blur-md bg-${theme ? '[rgba(255,255,255,0.1)]' : '[rgba(255,255,255,1)]' }`}>
                                     <h1 className="hidden p-2 m-4 text-md lg:text-2xl xl:block"> Stocklytics </h1>
@@ -662,7 +662,7 @@ const [products, setProducts] = useState(
                                         </div>
 
                                         <div className="flex flex-col gap-4 ">
-                                            <h1 className="mb-1 text-lg  lg:text-2xl">Contact us</h1>
+                                            <h1 className="mb-1 text-lg lg:text-2xl">Contact us</h1>
                                             <ul className="text-[#ccc] cursor-pointer">
                                                 <li className="cursor-pointer">+69123456789</li>
                                                 <li className="cursor-pointer">1234 Stocklytics St.</li>

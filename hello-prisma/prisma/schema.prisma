@@ -1,8 +1,28 @@
 generator client {
-    provider = "prisma-client"
-    output   = "../generated/prisma"
+  provider = "prisma-client"
+  output   = "../generated/prisma"
 }
 
 datasource db {
-    provider = "mysql"
+  provider = "mysql"
+}
+
+model task {
+  taskID       Int     @id @default(autoincrement())
+  userID       Int?
+  taskName     String  @db.VarChar(100)
+  taskStatus   String  @db.VarChar(100)
+  taskPriority String  @db.VarChar(100)
+  taskDate     String  @db.VarChar(100)
+  taskFinish   Boolean @default(false)
+
+  @@index([userID], map: "userID")
+}
+
+model todolistaccount {
+  userID       Int    @id @default(autoincrement())
+  firstName    String @db.VarChar(100)
+  lastName     String @db.VarChar(100)
+  gmail        String @unique(map: "gmail") @db.VarChar(100)
+  userPassword String @db.VarChar(255)
 }

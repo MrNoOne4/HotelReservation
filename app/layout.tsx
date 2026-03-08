@@ -34,13 +34,13 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Providers>
-          <Appbar />
+        {/* <Providers>
+          <Appbar /> */}
           {children}
-        </Providers>
-        <Providers>
+        {/* </Providers> */}
+        {/* <Providers>
           <SigninButton/>
-        </Providers>
+        </Providers> */}
       </body>
     </html>
   );

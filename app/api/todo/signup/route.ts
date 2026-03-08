@@ -8,9 +8,9 @@ export async function POST(req: NextRequest) {
         const body = await req.json();
         const { firstName, lastName, gmail, password } = body;
 
-        const user = await prisma.todolistaccount.findFirst({
-            where: { gmail }
-        });
+            const user = await prisma.todolistaccount.findFirst({
+                where: { gmail: gmail }
+            });
 
         if (user) {
             return NextResponse.json(
