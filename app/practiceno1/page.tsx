@@ -14,6 +14,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
+import { LoginForm } from "@/components/login-form"
+import { SignupForm } from "@/components/signup-form"
+
 import { ArrowUpIcon } from "lucide-react"
 
   const HotelReservation = () => {
@@ -356,12 +359,13 @@ import { ArrowUpIcon } from "lucide-react"
       </footer>
 
       <div className={`fixed flex items-center justify-center w-screen h-screen -translate-x-1/2 -translate-y-1/2 bg-black/50 backdrop-blur-xs top-1/2 left-1/2 ${showForm ? "z-40" : "z-[-1]"}`}>
-          <section className='text-white h-130 lg:h-150 w-90 lg:w-[90%] 2xl:w-250 z-999 perspective-[1000px] group'>
+          <section className=' lg:w-[90%] 2xl:w-250 z-999 perspective-[1000px] group'>
                   {/**Login form */}
 
                 <section className={`inset-0 relative w-full h-full transition-all ease-in-out duration-600 transform-3d ${signUp ? "rotate-y-180" : "rotate-y-0"} ${showForm ? "top-0" : "-top-200" }`}>
-                    <section className='absolute flex items-center justify-center w-full h-full bg-white backface-hidden'>
-                      <div className="hidden w-full h-full lg:block">
+                    <section className='absolute flex items-center justify-center w-full h-full backface-hidden'>
+
+                      {/* <div className="hidden w-full h-full lg:block">
                         <img className='w-full h-full bg-center bg-cover z-999' alt="LoginImage" src='/images/Login.jpg'/>
                       </div >
 
@@ -392,20 +396,24 @@ import { ArrowUpIcon } from "lucide-react"
                             </div>
                             <h5 className='mt-4 font-semibold text-center'>Don't have an account? <button className='text-blue-600 cursor-pointer' type='button' onClick={() => {showSignUp(true), restForm()}}>Sign up</button></h5>
                           </form>
-                      </div>
+                      </div> */}
+
+                                    <LoginForm />
+
                     </section>
                   
                   {/**Sign up form */}
                     <section className='absolute w-full bg-blue-400 h-150 rotate-y-180 backface-hidden'>
                       <section className='absolute flex items-center justify-center w-full h-full bg-white backface-hidden'>
-                        <div className="hidden w-full h-full lg:block">
+
+                        {/* <div className="hidden w-full h-full lg:block">
                             <div className="relative w-full h-full"> 
                                   <img className="object-cover w-full h-full" alt="LoginImage" src="/images/upscalemedia-transformed.jpeg" />
                                    <div className="absolute inset-0 bg-black/50"></div> 
                             </div>
-                        </div >
+                        </div > */}
 
-                        <div className="w-full h-full">
+                        {/* <div className="w-full h-full">
                             <form className="w-full h-full text-black" autoComplete='off'>
                               <div className='px-5 text-right translate-y-5'> <button className='cursor-pointer' title='close button' type='button' onClick={() => {setShowForm(false), showSignUp(false), restForm()}}><X size={32} color='black'/></button> </div>
                                 <div className='flex flex-col items-center justify-center'>
@@ -450,7 +458,9 @@ import { ArrowUpIcon } from "lucide-react"
                               </div>
                               <h5 className='mt-4 font-semibold text-center'>Already have an account? <button className='text-blue-600 cursor-pointer' type='button' onClick={() => {showSignUp(false), restForm()}}>Login</button></h5>
                             </form>
-                        </div>
+                        </div> */}
+                                                      <SignupForm />
+
                       </section>
                     </section>
                 </section>

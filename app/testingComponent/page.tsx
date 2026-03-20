@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { LoginForm } from "@/components/login-form"
 
 export default function Upload() {
   const [file, setFile] = useState<File | null>(null);
@@ -21,12 +22,14 @@ export default function Upload() {
 
   return (
     <div>
-      <input
+      {/* <input
         type="file"
         accept="image/*"
         onChange={(e) => setFile(e.target.files?.[0] || null)}
       />
-      <button onClick={handleUpload}>Upload</button>
+      <button onClick={handleUpload}>Upload</button> */}
+
+
     </div>
   );
 }
