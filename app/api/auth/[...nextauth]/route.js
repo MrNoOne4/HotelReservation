@@ -1,10 +1,10 @@
 import NextAuth from "next-auth";
-import GoogleProvider from "next-auth/providers/google"; 
+import GoogleProvider from "next-auth/providers/google";
 import FacebookProvider from "next-auth/providers/facebook";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { PrismaAdapter } from "@next-auth/prisma-adapter"
-import bcrypt from "bcrypt"
-import {prisma} from "../../../../hello-prisma/lib/prisma"
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import bcrypt from "bcrypt";
+import { prisma } from "../../../../hello-prisma/lib/prisma";
 import { redirect } from "next/navigation";
 import { NextResponse, NextRequest } from "next/server";
 export const authOptions = {
@@ -13,35 +13,30 @@ export const authOptions = {
     CredentialsProvider({
       credentials: {
         email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" }
+        password: { label: "Password", type: "password" },
       },
 
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          return null;
-        }
+        if (!credentials?.email || !credentials?.password) return null;
 
         const user = await prisma.todolistaccount.findUnique({
-          where: {gmail: credentials?.email}
-        })
+          where: { gmail: credentials.email },
+        });
 
-        if (!user || !user?.userPassword) {
-          return null;
-        }
+        if (!user || !user.userPassword) return null;
 
-        const isValid = await bcrypt.compare(user.userPassword, credentials.password);
-        
-        if (!isValid) {
-          return null;
-        }
+        const isValid = await bcrypt.compare(
+          credentials.password,
+          user.userPassword,
+        );
+        if (!isValid) return null;
 
-      return {
+        return {
           id: user.userID,
           name: `${user.firstName} ${user.lastName}`,
           email: user.gmail,
         };
-      }
-      
+      },
     }),
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
@@ -61,7 +56,6 @@ export const authOptions = {
     }),
   ],
 
-
   pages: {
     signIn: "/practiceno5/login",
   },
@@ -76,7 +70,7 @@ export const authOptions = {
     },
     async session({ session, token }) {
       if (token && token.id) {
-        session.user.id = token.id; 
+        session.user.id = token.id;
       }
       return session;
     },

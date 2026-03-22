@@ -1,7 +1,7 @@
 "use client";
 "use strict";
 
-import React, { ChangeEvent, useState } from 'react'
+import React, { ChangeEvent, useRef, useState } from 'react'
 import {ThumbsUp, MessageCircle, Instagram, Send, Facebook, Menu ,  X, LogIn, User, Mail, UserCircle, Lock, Eye, EyeOff } from "lucide-react";
 import { useEffect} from 'react';
 import { Badge } from "@/components/ui/badge"
@@ -13,9 +13,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-
+import { toast } from "sonner"
 import { LoginForm } from "@/components/login-form"
 import { SignupForm } from "@/components/signup-form"
+import { InputOTPForm } from "@/components/InputOTPForm"
 
 import { ArrowUpIcon } from "lucide-react"
 
@@ -59,7 +60,6 @@ import { ArrowUpIcon } from "lucide-react"
       message: ''
     })
 
-    const [loginShowPassword, setLoginShowPassword] = useState<boolean>(false);
 
     const handleMessageChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       const {value, name} = e.target as HTMLInputElement;
@@ -69,61 +69,60 @@ import { ArrowUpIcon } from "lucide-react"
     const [showForm, setShowForm] = useState<boolean>(false)
     const [signUp, showSignUp] = useState<boolean>(false);
 
-
-    interface loginForm {
-      email: string,
-      password: string,
+    interface SignupData {
+      fullName: string;
+      signUpEmail: string;
+      signUpPassword: string;
+      signUpConfirmPassword: string;
     }
 
-    const [loginForm, setLoginForm] = useState({
-      email: '',
-      password: '',
-    })
 
-    
-    const handleLoginUpForm = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const {value, name} = e.target as HTMLInputElement;
-      setLoginForm((prev) => ({...prev, [name]: value}));
-    }
-    
-    interface signupForm {
-      signUpFirstName: string,
-      signUpLastName: string,
-      signUpEmail: string,
-      signUpPassword: string,
-      signUpConfirmPassword: string,
+    const handleLoginSubmit = async (e: React.FormEvent<HTMLFormElement>, data: { email: string; password: string; }) => {
+      e.preventDefault();
+
+      alert(data.email + " " + data.password); 
+      data.email = " ";
+      data.password = " ";
+
+
     }
 
-    const [signUpPass, setSignUpPass] = useState<boolean>(false);
-    const [signUpConfirmPass, setSignUpConfirmPass] = useState<boolean>(false);
+    const signUpReferences = useRef<HTMLDivElement>(null);
+    const [otpForm, showOtpForm] = useState<boolean>(true); 
 
-    const [signupForm, setSignupForm] = useState<signupForm>({
-        signUpFirstName: '',
-        signUpLastName: '',
-        signUpEmail: '',
-        signUpPassword: '',
-        signUpConfirmPassword: '',
-    })
+    const handleSignupSubmit = async ( e: React.FormEvent<HTMLFormElement>, data: SignupData) => {
+      e.preventDefault();
 
-    const handleSignUpForm = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const {value, name} = e.target as HTMLInputElement;
-      setSignupForm((prev) => ({...prev, [name]: value}));
+      if (!validateForm(data)) {
+        return;
+      }
+
+      showOtpForm(false);
+      
+
     }
 
-    const restForm = () => {
-      setSignupForm({
-        signUpFirstName: '',
-        signUpLastName: '',
-        signUpEmail: '',
-        signUpPassword: '',
-        signUpConfirmPassword: '',
-      })
 
-      setLoginForm({
-        email: '',
-        password: '',
-      })
+    const validateForm = (data : SignupData) : boolean => {
+      const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
 
+      if (data.signUpPassword !== data.signUpConfirmPassword) {
+          toast.warning("Passwords do not match!", { position: "top-center" });
+        return false;
+      }
+
+      if (data.signUpPassword.length < 8 || data.signUpConfirmPassword.length < 8) {
+          toast.warning("Password must contain at least 8 letters", { position: "top-center" });
+        return false;
+      }
+
+
+      if (!passwordRegex.test(data.signUpPassword)) {
+          toast.warning( "Password must contain at least 8 letters, 1 number, 1 special character, 1 uppercase, and 1 lowercase letter", { position: "top-center" } );
+        return false;
+      }
+
+      return true;
     }
 
     return (
@@ -137,7 +136,7 @@ import { ArrowUpIcon } from "lucide-react"
 
         {/* Navigation Bar Section */}
         <nav className='text-xl font-medium'>
-          <ul className='flex flex-col gap-3 lg:gap-10 lg:flex-row'>
+          <ul className='flex flex-col gap-3 text-black lg:gap-10 lg:flex-row'>
             <li><a href="#" onClick={()=> scrollTo("heroSection")}>Home</a></li>
             <li><a href="#" onClick={()=> scrollTo("aboutUs")}>About</a></li>
             <li><a href="#" onClick={() => scrollTo("hotelRooms")}>Hotel Rooms</a></li>
@@ -183,9 +182,9 @@ import { ArrowUpIcon } from "lucide-react"
                 </div>
 
               {/*Card Container*/}
-              <div className='z-0 grid grid-cols-1 gap-10 py-10 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' id='hotelRooms'>
+              <div className='z-0 grid grid-cols-1 py-10 space-y-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' id='hotelRooms'>
                   {Array.from({length: 8}).map((e, index: number) => (
-                    <article className='z-0 block mx-auto'>
+                    <article className='z-0 block w-full mx-auto ' key={`${index}_${e}`}>
                       <Card className="relative w-full max-w-sm pt-0 ">
                         <div className="absolute inset-0 z-30 aspect-video bg-black/35" />
                         <img
@@ -214,7 +213,7 @@ import { ArrowUpIcon } from "lucide-react"
       </section>
 
       <section id='contact' className='block w-full py-9 bg-[#f0dbd3] 2xl:px-80 px-5'>
-              <section className='flex justify-between gap-10 pb-4 mx-auto bg-white lg:py-40 lg:px-40 sm:gap-8 md:gap-6 lg:gap-10 2xl:gap-2'>
+              <section className='flex justify-between gap-10 pb-4 mx-auto text-black bg-white lg:py-40 lg:px-40 sm:gap-8 md:gap-6 lg:gap-10 2xl:gap-2'>
                 {/* get in touch section */}
                   <div className='hidden lg:block'>
                       <div className='flex flex-col gap-6 tracking-wide'>
@@ -358,115 +357,49 @@ import { ArrowUpIcon } from "lucide-react"
         </footer>
       </footer>
 
-      <div className={`fixed flex items-center justify-center w-screen h-screen -translate-x-1/2 -translate-y-1/2 bg-black/50 backdrop-blur-xs top-1/2 left-1/2 ${showForm ? "z-40" : "z-[-1]"}`}>
-          <section className=' lg:w-[90%] 2xl:w-250 z-999 perspective-[1000px] group'>
-                  {/**Login form */}
+      <div className={`fixed flex items-center justify-center h-screen w-full -translate-x-1/2 -translate-y-1/2 bg-black/50 backdrop-blur-xs top-1/2 left-1/2 ${showForm ? "z-40" : "z-[-1]"}`}>
+          <section className=' lg:w-[90%] 2xl:w-250 z-999 perspective-[1000px] group w-full'>
 
                 <section className={`inset-0 relative w-full h-full transition-all ease-in-out duration-600 transform-3d ${signUp ? "rotate-y-180" : "rotate-y-0"} ${showForm ? "top-0" : "-top-200" }`}>
                     <section className='absolute flex items-center justify-center w-full h-full backface-hidden'>
 
-                      {/* <div className="hidden w-full h-full lg:block">
-                        <img className='w-full h-full bg-center bg-cover z-999' alt="LoginImage" src='/images/Login.jpg'/>
-                      </div >
+                      <div className="sm:max-w-sm">
+                            <LoginForm
+                          onSubmit={(e,data) => handleLoginSubmit(e, data)}
+                          switchTo={() => {showSignUp(true)}} closeForm={() => {setShowForm(false), showSignUp(false)}}/> 
 
-                      <div className="w-full h-full">
-                          <form className="w-full h-full text-black" autoComplete='off'>
-                            <div className='px-5 py-4 text-right'> <button className='cursor-pointer' title='close button' type='button' onClick={() => {setShowForm(false), showSignUp(false), restForm()}}><X size={32} color='black'/></button> </div>
-                              <div className='flex flex-col items-center justify-center'>
-                                  <UserCircle size={60} />
-                                  <h1 className='mt-4 text-3xl font-semibold'>Login Your Account</h1>
-                              </div>
-
-                            <div className='relative mt-8 '>
-                               <input className='block px-10 w-[80%] py-2 mx-auto border-b border-gray-300 outline-none peer' placeholder='' type="text" name="email" value={loginForm.email} onChange={handleLoginUpForm}/>
-                               <label className='absolute transition-all duration-300 ease-in-out lg:left-23 top-3 left-18 2xl:left-23 peer-focus:-top-4 peer-focus:text-sm peer-not-placeholder-shown:-top-4 peer-not-placeholder-shown:text-sm' htmlFor='loginPassword'>Email</label>
-                               <i className='absolute top-3 left-7 2xl:left-12 lg:left-11'><Mail size={28} color='black'/></i>
-                            </div>
-                              
-                            <div className='relative mt-8'>
-                              <input className='block px-10 w-[80%] py-2 mx-auto border-b border-gray-300 outline-none peer' placeholder='' type={loginShowPassword ? "text" : "password"} id='loginPassword' name="password" value={loginForm.password} onChange={handleLoginUpForm}/>
-                              <label className='absolute transition-all duration-300 ease-in-out lg:left-23 top-3 left-18 2xl:left-23 peer-focus:-top-4 peer-focus:text-sm peer-not-placeholder-shown:-top-3 peer-not-placeholder-shown:text-sm' htmlFor='loginPassword'>Password</label>
-                              <i className='absolute top-2 left-7 2xl:left-12 lg:left-11'><Lock size={28} color='black'/></i>
-                              <button className='absolute cursor-pointer top-2 right-8 lg:right-13 2xl:right-12' type='button' onClick={() => setLoginShowPassword(prev => !prev)} title={loginShowPassword ? "Hide Password" : "Show Password" }> {loginShowPassword ? <EyeOff   size={28} color='black'/> : <Eye  size={28} color='black'/>}</button>
-                            </div>
-
-
-                            <div className='px-4 mt-8'>
-                              <button type="button" className='w-[90%]  block mx-auto py-2 font-semibold text-white bg-[#0B1120] rounded-md cursor-pointer '>Login</button>
-                            </div>
-                            <h5 className='mt-4 font-semibold text-center'>Don't have an account? <button className='text-blue-600 cursor-pointer' type='button' onClick={() => {showSignUp(true), restForm()}}>Sign up</button></h5>
-                          </form>
-                      </div> */}
-
-                                    <LoginForm />
-
+                      </div>
+                      
                     </section>
                   
                   {/**Sign up form */}
-                    <section className='absolute w-full bg-blue-400 h-150 rotate-y-180 backface-hidden'>
-                      <section className='absolute flex items-center justify-center w-full h-full bg-white backface-hidden'>
+                    <section className={`absolute w-full -translate-x-1/2 -translate-y-1/2 h-150 rotate-y-180 backface-hidden top-1/2 left-1/2`} ref={signUpReferences}>
+                      <section className='absolute flex items-center justify-center w-full h-full backface-hidden'>
+                            <div className="w-full h-full sm:max-w-sm">
 
-                        {/* <div className="hidden w-full h-full lg:block">
-                            <div className="relative w-full h-full"> 
-                                  <img className="object-cover w-full h-full" alt="LoginImage" src="/images/upscalemedia-transformed.jpeg" />
-                                   <div className="absolute inset-0 bg-black/50"></div> 
+                                    {otpForm ? 
+                                                                          <SignupForm
+                                        onSubmit={(e, data) => handleSignupSubmit(e, data)}
+                                        closeForm={() => {setShowForm(false);showSignUp(false);}} switchTo={() => { showSignUp(false) }}
+                                      /> 
+                                  
+                                      :
+                                          <div className='fixed -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2'>
+                                              <InputOTPForm/>  
+                                          </div>                    
+
+                                  
+                                  
+                                    }
+
+
                             </div>
-                        </div > */}
-
-                        {/* <div className="w-full h-full">
-                            <form className="w-full h-full text-black" autoComplete='off'>
-                              <div className='px-5 text-right translate-y-5'> <button className='cursor-pointer' title='close button' type='button' onClick={() => {setShowForm(false), showSignUp(false), restForm()}}><X size={32} color='black'/></button> </div>
-                                <div className='flex flex-col items-center justify-center'>
-                                    <UserCircle size={60} />
-                                    <h1 className='mt-4 text-3xl font-semibold'>Sign In</h1>
-                                </div>
-
-                              <div className='relative mt-5 '>
-                                <input className='block px-10 w-[80%] py-2 mx-auto border-b border-gray-300 outline-none peer' placeholder='' type="text" id='signUpFirstName' name="signUpFirstName" value={signupForm.signUpFirstName} onChange={handleSignUpForm}/>
-                                <label className='absolute transition-all duration-300 ease-in-out lg:left-23 top-3 left-18 2xl:left-23 peer-focus:-top-4 peer-focus:text-sm peer-not-placeholder-shown:-top-4 peer-not-placeholder-shown:text-sm' htmlFor='signUpFirstName'>First name</label>
-                                <i className='absolute top-3 left-7 2xl:left-12 lg:left-11'><User size={28} color='black'/></i>
-                              </div>
-                              
-                              <div className='relative mt-5 '>
-                                <input className='block px-10 w-[80%] py-2 mx-auto border-b border-gray-300 outline-none peer' placeholder='' type="text" id='signUpLastName' name="signUpLastName" value={signupForm.signUpLastName} onChange={handleSignUpForm}/>
-                                <label className='absolute transition-all duration-300 ease-in-out lg:left-23 top-3 left-18 2xl:left-23 peer-focus:-top-4 peer-focus:text-sm peer-not-placeholder-shown:-top-4 peer-not-placeholder-shown:text-sm' htmlFor='signUpLastName'>Last Name</label>
-                                <i className='absolute top-3 left-7 2xl:left-12 lg:left-11'><User size={28} color='black'/></i>
-                              </div>
-
-                              <div className='relative mt-5 '>
-                                <input className='block px-10 w-[80%] py-2 mx-auto border-b border-gray-300 outline-none peer' placeholder='' type="text" id="signUpEmail" name="signUpEmail" value={signupForm.signUpEmail} onChange={handleSignUpForm}/>
-                                <label className='absolute transition-all duration-300 ease-in-out lg:left-23 top-3 left-18 2xl:left-23 peer-focus:-top-4 peer-focus:text-sm peer-not-placeholder-shown:-top-4 peer-not-placeholder-shown:text-sm' htmlFor='signUpEmail'>Email</label>
-                                <i className='absolute top-3 left-7 2xl:left-12 lg:left-11'><Mail size={28} color='black'/></i>
-                              </div>
-
-                              <div className='relative mt-5'>
-                                <input className='block px-10 w-[80%] py-2 mx-auto border-b border-gray-300 outline-none peer' placeholder='' type={signUpPass ? "text" : "password"} id='signUpPassword' name="signUpPassword" value={signupForm.signUpPassword} onChange={handleSignUpForm}/>
-                                <label className='absolute transition-all duration-300 ease-in-out lg:left-25 top-3 left-18 2xl:left-23 peer-focus:-top-4 peer-focus:text-sm peer-not-placeholder-shown:-top-3 peer-not-placeholder-shown:text-sm' htmlFor='signUpPassword'>Password</label>
-                                <i className='absolute top-2 left-7 2xl:left-12 lg:left-11'><Lock size={28} color='black'/></i>
-                                <button className='absolute cursor-pointer top-2 right-8 lg:right-13 2xl:right-12' type='button' onClick={() => setSignUpPass(prev => !prev)} title={signUpPass ? "Hide Password" : "Show Password" }> {signUpPass ? <EyeOff   size={28} color='black'/> : <Eye  size={28} color='black'/>}</button>
-                              </div>
-
-                              <div className='relative mt-5'>
-                                <input className='block px-10 w-[80%] py-2 mx-auto border-b border-gray-300 outline-none peer' placeholder='' type={signUpConfirmPass ? "text" : "password"} id='signUpConfirmPassword' name="signUpConfirmPassword" value={signupForm.signUpConfirmPassword} onChange={handleSignUpForm}/>
-                                <label className='absolute transition-all duration-300 ease-in-out lg:left-25 top-3 left-18 2xl:left-23 peer-focus:-top-4 peer-focus:text-sm peer-not-placeholder-shown:-top-3 peer-not-placeholder-shown:text-sm' htmlFor='signUpConfirmPassword'>Confirm Password</label>
-                                <i className='absolute top-2 left-7 2xl:left-12 lg:left-11'><Lock size={28} color='black'/></i>
-                                <button className='absolute cursor-pointer top-2 right-8 lg:right-13 2xl:right-12' type='button' onClick={() => setSignUpConfirmPass(prev => !prev)} title={signUpConfirmPass ? "Hide Password" : "Show Password" }> {signUpConfirmPass ? <EyeOff   size={28} color='black'/> : <Eye  size={28} color='black'/>}</button>
-                              </div>
-
-                              <div className='px-4 mt-5'>
-                                <button type="button" className='w-[90%]  block mx-auto py-2 font-semibold text-white bg-[#0B1120] rounded-md cursor-pointer '>Sign up</button>
-                              </div>
-                              <h5 className='mt-4 font-semibold text-center'>Already have an account? <button className='text-blue-600 cursor-pointer' type='button' onClick={() => {showSignUp(false), restForm()}}>Login</button></h5>
-                            </form>
-                        </div> */}
-                                                      <SignupForm />
-
                       </section>
                     </section>
                 </section>
           </section>
       </div>
-
+      
       <div className={`fixed z-9999999999 cursor-pointer right-12 bottom-6 md:h-12.5 h-8.5 w-8.5 md:w-12.5 flex justify-center items-center rounded-full  duration-300 ease-in-out ${topButton ? "block" : "hidden" }`} onClick={()=> scrollTo("header")}>
       <Button variant="outline" size="icon" className="rounded-full cursor-pointer">
         <ArrowUpIcon />

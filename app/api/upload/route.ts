@@ -31,7 +31,7 @@ export async function POST(req: Request) {
 
     // Save to MariaDB via Prisma
 
-
+    
     return NextResponse.json(result);
   } catch (err) {
     console.error(err);
