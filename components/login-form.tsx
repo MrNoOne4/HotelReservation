@@ -18,12 +18,14 @@ type LoginFormProps = {
   onSubmit?: ( e: React.FormEvent<HTMLFormElement>, data: { email: string; password: string } ) => void | Promise<void>;
   switchTo?: () => void;
   closeForm?: () => void;
+  loginFacebook?:() => void;
+  loginGoogle?: () => void;
 
 } & Omit<React.ComponentPropsWithoutRef<"div">, "onSubmit">;
 
 
 
-export function LoginForm({ className, onSubmit,switchTo, closeForm, ...props }: LoginFormProps) {
+export function LoginForm({ className, onSubmit,switchTo, closeForm, loginFacebook, loginGoogle, ...props }: LoginFormProps) {
     const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
 
     const [formData, setFormData] = useState({ email: '', password: '' });
@@ -46,6 +48,7 @@ export function LoginForm({ className, onSubmit,switchTo, closeForm, ...props }:
       setFormData({ email: '', password: '' })
       setIsPasswordVisible(false)
     }
+
   return (
     <div className={cn("flex flex-col mix-blend-multiply gap-6 bg-[#171717] backdrop-blur-none rounded-2xl", className)} {...props}>
       <Card>
@@ -61,18 +64,18 @@ export function LoginForm({ className, onSubmit,switchTo, closeForm, ...props }:
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={(e) => onSubmit && onSubmit(e, formData) && setFormData} >
+          <form onSubmit={(e) => onSubmit && onSubmit(e, formData) } >
             
             <div className="grid gap-6">
               <div className="flex flex-col gap-4">
-                <Button variant="outline" className="w-full cursor-pointer bg-[#212121] hover:bg-[#1B1B1B]">
+                <Button variant="outline" className="w-full cursor-pointer bg-[#212121] hover:bg-[#1B1B1B]" type="button" onClick={loginFacebook}>
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                   <path fill="currentColor" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.879v-6.99h-2.54v-2.89h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562v1.875h2.773l-.443 2.89h-2.33v6.99C18.343 21.128 22 16.991 22 12z"/>
                 </svg>
                   Login with Facebook
                 </Button>
 
-                <Button variant="outline" className="w-full cursor-pointer bg-[#212121] hover:bg-[#1B1B1B]">
+                <Button variant="outline" className="w-full cursor-pointer bg-[#212121] hover:bg-[#1B1B1B]" type="button" onClick={loginGoogle}>
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                     <path
                       d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"
@@ -119,7 +122,7 @@ export function LoginForm({ className, onSubmit,switchTo, closeForm, ...props }:
               </div>
               <div className="text-sm text-center">
                 Don&apos;t have an account?{" "}
-                <button className="underline cursor-pointer underline-offset-4" onClick={() => functionHandler()}>
+                <button className="underline cursor-pointer underline-offset-4" onClick={() => functionHandler()} type="button">
                   Sign up
                 </button>
               </div>

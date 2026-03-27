@@ -123,13 +123,13 @@ export function SignupForm({ className, onSubmit,switchTo, closeForm, ...props }
             </Field>
             <FieldGroup>
               <Field>
-                <Button type="submit" className="bg-[#e5e5e5] text-black hover:bg-[#fffafa] cursor-pointer">Create Account</Button>
+                <Button type="submit" className="bg-[#e5e5e5] text-black hover:bg-[#fffafa] cursor-pointer" >Create Account</Button>
                 <FieldDescription className="px-6 text-center">
-                  Already have an account? <button onClick={() => switchHandler()} className="cursor-pointer">Login in</button>
+                  Already have an account? <button onClick={() => switchHandler()} className="cursor-pointer" type="button">Login in</button>
                 </FieldDescription>
               </Field>
             </FieldGroup>
-          </FieldGroup>
+          </FieldGroup> 
         </form>
       </CardContent>
     </Card>

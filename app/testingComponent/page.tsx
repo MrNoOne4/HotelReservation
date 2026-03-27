@@ -5,6 +5,17 @@ import { InputOTPForm } from "@/components/InputOTPForm"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 import { Toaster } from "@/components/ui/sonner"
+import {SkeletonCard} from "@/components/SkeletonCard";
+import { SpinnerSize } from "@/components/SpinnerSize";
+import { Badge } from "@/components/ui/badge"
+import {
+  Card,
+  CardAction,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 
 export default function Upload() {
   const [file, setFile] = useState<File | null>(null);
@@ -41,8 +52,8 @@ export default function Upload() {
 
     // </div>
 
-     <div className="flex flex-wrap h-screen gap-2 text-black bg-white">
-      <Button variant="outline" onClick={() => toast("Event has been created")}>
+     <div className="flex items-center justify-center w-screen h-screen gap-2 text-black bg-white">
+      {/* <Button variant="outline" onClick={() => toast("Event has been created")}>
         Default
       </Button>
       <Button
@@ -94,7 +105,31 @@ export default function Upload() {
 
           <div className="relative w-full h-10 bg-black">
             <Toaster />
-          </div>
+          </div> */}
+
+
+                  {/* div className="w-1/2 bg-red-500 h-1/2">
+                    <SkeletonCard/>
+                    <SpinnerSize/>
+                  </div> */}
+            <Card className="relative mx-auto w-full max-w-sm pt-0">
+                  <div className="absolute inset-0 z-30 aspect-video bg-black/35" />
+                        
+                  <CardHeader>
+                    <CardAction>
+                      <Badge variant="secondary">Featured</Badge>
+                    </CardAction>
+                    <CardTitle>Design systems meetup</CardTitle>
+                    <CardDescription>
+                      A practical talk on component APIs, accessibility, and shipping
+                      faster.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardFooter>
+                    <Button className="w-full">View Event</Button>
+                  </CardFooter>
+                </Card>
+
 
     </div>
   

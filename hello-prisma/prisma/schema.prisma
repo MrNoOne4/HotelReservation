@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../generated/prisma"
 }
 
@@ -7,22 +7,111 @@ datasource db {
   provider = "mysql"
 }
 
-model task {
-  taskID       Int     @id @default(autoincrement())
-  userID       Int?
-  taskName     String  @db.VarChar(100)
-  taskStatus   String  @db.VarChar(100)
-  taskPriority String  @db.VarChar(100)
-  taskDate     String  @db.VarChar(100)
-  taskFinish   Boolean @default(false)
+model additionalservice {
+  ServiceId     Int     @id @default(autoincrement())
+  ReservationId Int
+  ServiceName   String  @db.VarChar(100)
+  ServicePrice  Decimal @db.Decimal(10, 2)
 
-  @@index([userID], map: "userID")
+  @@index([ReservationId], map: "ReservationId")
 }
 
-model todolistaccount {
-  userID       Int    @id @default(autoincrement())
-  firstName    String @db.VarChar(100)
-  lastName     String @db.VarChar(100)
-  gmail        String @unique(map: "gmail") @db.VarChar(100)
-  userPassword String @db.VarChar(255)
+model guestaccount {
+  AccountId     Int       @id @default(autoincrement())
+  GuestId       Int
+  provider      String    @db.VarChar(50)
+  provider_id   String?   @db.VarChar(255)
+  password_hash String?   @db.VarChar(255)
+  created_at    DateTime? @default(now()) @db.Timestamp(0)
+
+  @@index([GuestId], map: "GuestId")
+}
+
+model hotelroom {
+  RoomId              Int                 @id @default(autoincrement())
+  RoomType            hotelroom_RoomType
+  price               Int
+  bed_type            hotelroom_bed_type?
+  max_occupancy       Int
+  floor               Int
+  availability_status Boolean
+  description         String              @db.VarChar(255)
+
+  images hotelroomimages[] @relation("RoomImages")
+}
+
+model hotelroomimages {
+  ImageId  Int    @id @default(autoincrement())
+  RoomId   Int
+  ImageURL String @db.VarChar(1024)
+
+  room hotelroom @relation("RoomImages", fields: [RoomId], references: [RoomId])
+
+  @@index([RoomId], map: "RoomId")
+}
+
+model payment {
+  PaymentId     Int                    @id @default(autoincrement())
+  ReservationId Int
+  Amount        Decimal                @db.Decimal(10, 2)
+  PaymentMethod payment_PaymentMethod
+  PaymentStatus payment_PaymentStatus? @default(Pending)
+  PaymentDate   DateTime?              @default(now()) @db.Timestamp(0)
+
+  @@index([ReservationId], map: "ReservationId")
+}
+
+model reservation {
+  ReservationId  Int                 @id @default(autoincrement())
+  GuestId        Int
+  RoomId         Int
+  CheckInDate    DateTime            @db.Date
+  CheckOutDate   DateTime            @db.Date
+  NumberOfGuests Int
+  Status         reservation_Status? @default(Pending)
+  CreatedAt      DateTime?           @default(now()) @db.Timestamp(0)
+
+  @@index([GuestId], map: "GuestId")
+  @@index([RoomId], map: "RoomId")
+}
+
+model users {
+  GuestId       Int     @id @default(autoincrement())
+  GuestFullName String  @db.VarChar(255)
+  GuestEmail    String  @unique(map: "GuestEmail") @db.VarChar(255)
+  GuestPassword String  @db.VarChar(255)
+  isVerified    Boolean
+}
+
+enum hotelroom_RoomType {
+  Standard
+  Deluxe
+  Suite
+  Executive
+}
+
+enum payment_PaymentMethod {
+  CreditCard
+  DebitCard
+  PayPal
+  Cash
+}
+
+enum hotelroom_bed_type {
+  King
+  Queen
+  Twin
+}
+
+enum payment_PaymentStatus {
+  Pending
+  Completed
+  Failed
+}
+
+enum reservation_Status {
+  Pending
+  Confirmed
+  Cancelled
+  Completed
 }

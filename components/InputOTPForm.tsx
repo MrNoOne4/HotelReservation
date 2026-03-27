@@ -16,20 +16,24 @@ import {
 } from "@/components/ui/input-otp"
 import { RefreshCwIcon } from "lucide-react"
 import { useState } from "react";
+
 type InputOTPFormProps = {
-  onSubmit?: (otp: string) => void;
+  onSubmit?: ( e: React.FormEvent<HTMLFormElement>, otp: string ) => void | Promise<void>;
+  resendOTP?: () => Promise<void | boolean>;
+  resendBtn: boolean;
+  time: string;
   email?: string;
 }
 
-export function InputOTPForm({onSubmit, email}: InputOTPFormProps) {
-    const [otp, setOtp] = useState("");
+export function InputOTPForm({onSubmit, resendOTP,resendBtn,time, email}: InputOTPFormProps) {
+    const [otp, setOtp] = useState<string>("");
     const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        onSubmit?.(otp);
+    e.preventDefault();
+    onSubmit?.(e, otp);
     }
 
   return (
-    <Card className="max-w-xs mx-auto   bg-[#171717]">
+    <Card className=" mx-auto p-5  bg-[#171717]">
       <CardHeader>
         <CardTitle className="font-semibold">Verify your login</CardTitle>
         <CardDescription className="text-gray-400 ">
@@ -43,7 +47,7 @@ export function InputOTPForm({onSubmit, email}: InputOTPFormProps) {
             <FieldLabel htmlFor="otp-verification">
               Verification code
             </FieldLabel>
-            <Button variant="outline" size="xs">
+            <Button variant="outline" size="xs" className={`${resendBtn ? 'cursor-not-allowed' : "cursor-pointer"} `} onClick={resendOTP} disabled={resendBtn}>
               <RefreshCwIcon />
               Resend Code
             </Button>
@@ -64,20 +68,15 @@ export function InputOTPForm({onSubmit, email}: InputOTPFormProps) {
                         <InputOTPSlot index={5} />
                     </InputOTPGroup>
                 </InputOTP>
-
+                  <br/>
                 <CardFooter>
                         <Field>
-                        <Button type="submit" className="w-full bg-[#e5e5e5] hover:bg-[#ffffff] text-black cursor-pointer">
+                        <Button type="submit" className="w-full bg-[#e5e5e5] hover:bg-[#ffffff] text-black cursor-pointer" >
                             Verify
                         </Button>
                         <div className="text-sm text-muted-foreground">
-                            Having trouble signing in?{" "}
-                            <a
-                            href="#"
-                            className="= transition-colors underline-offset-4 hover:text-primary"
-                            >
-                            Contact support
-                            </a>
+                           Time Remaining{" "}
+                           <span><strong>{time}</strong></span>
                         </div>
                         </Field>
                 </CardFooter>
