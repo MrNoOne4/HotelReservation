@@ -7,6 +7,7 @@ import { SessionProvider } from "next-auth/react";
 import Providers from "@/components/Providers";
 import { getServerSession } from "next-auth";
 import  Footer  from "@/components/Footer";
+import { redirect } from "next/navigation";
 // Load fonts with strategy: "class" for consistent SSR
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,14 +27,16 @@ export const metadata: Metadata = {
 };
 export default async function RootLayout({children,}: {children: React.ReactNode;}) {
 
-
+    const session = await getServerSession();
 
   return (
+
         <html lang="en" suppressHydrationWarning>
           <body
             className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
           >
-              <Providers >
+            
+              <Providers session={session}>
                   {children}
                 <Footer/>
               </Providers> 
@@ -44,3 +47,4 @@ export default async function RootLayout({children,}: {children: React.ReactNode
   
 
 }
+  

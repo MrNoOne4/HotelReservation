@@ -61,7 +61,7 @@ export default function Upload() {
 
     // </div>
 
-     <div className="flex items-center justify-center w-screen h-screen gap-2 text-black bg-white">
+     <div className="flex items-center justify-center w-screen  gap-2 text-black bg-white h-[300vh]">
       {/* <Button variant="outline" onClick={() => toast("Event has been created")}>
         Default
       </Button>
@@ -141,7 +141,7 @@ export default function Upload() {
             
             {/* <CalendarRangeCalendarMultiMonthDemo/> */}
 
-         <CalendarRangeCalendarMultiMonthDemo/>
+         {/* <CalendarRangeCalendarMultiMonthDemo/> */}
     </div>
   
   );

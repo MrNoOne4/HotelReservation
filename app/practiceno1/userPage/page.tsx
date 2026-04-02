@@ -441,7 +441,7 @@ const sendMessages = async (e: React.FormEvent<HTMLFormElement> , data: messageP
 
         {/* Login Section */}
         {session ? 
-              <DropdownMenuIcons avatar={<AvatarWithBadge avatar={`${session.user?.image}`} name={session.user?.name}/>}  profile={() => alert("hello world")} logout={() => signOut({ callbackUrl: window.location.href })}/>
+              <DropdownMenuIcons avatar={<AvatarWithBadge avatar={`${session.user?.image}`} name={session.user?.name?.split(",")[0]}/>}   logout={() => signOut({ callbackUrl: window.location.href })}/>
           :
               <button className='flex  items-center justify-center w-1/3 gap-2 px-4 py-1 mt-4 mb-3 font-semibold text-white bg-black rounded-md cursor-pointer lg:py-2 lg:w-auto' onClick={() => setShowForm(true)}><LogIn size={20} color='white' /> Login</button>
       }
@@ -474,7 +474,7 @@ const sendMessages = async (e: React.FormEvent<HTMLFormElement> , data: messageP
           </article>
         </section>
 
-        <section className='px-20 text-white '>
+        <section className='md:px-20 px-10 text-white '>
           <div className='mx-auto'>
             <h1 className='my-6 text-3xl text-center md:text-5xl'>Book direct to enjoy a full 24-hour stay — guaranteed!</h1>
             <h6 className='text-sm text-center'>All our generously appointed guest rooms offer the ultimate luxury, privacy and comfort.</h6>
@@ -489,7 +489,7 @@ const sendMessages = async (e: React.FormEvent<HTMLFormElement> , data: messageP
                   {
                     hotelRooms.map((element: Rooms, index: number) => (
                         <article key={`${element.RoomId}_${index}`}>
-                            <Card className="max-w-md pt-0">
+                            <Card className="sm:max-w-md w-full pt-0">
                               <CardContent className="px-0 overflow-hidden">
                                 <img
                                   src={element.images?.[0]?.ImageURL || "/images/fallback.jpg"}
@@ -503,6 +503,8 @@ const sendMessages = async (e: React.FormEvent<HTMLFormElement> , data: messageP
                                 </CardTitle>
                                 <CardDescription>{element.description}</CardDescription>
                               </CardHeader>
+                                <hr className="bg-black"/>
+
                               <CardFooter className="flex items-center justify-between gap-3 max-sm:flex-col max-sm:items-stretch">
                                 <CardTitle className="mt-2 text-lg font-bold">
                                   {element.price} PHP/night

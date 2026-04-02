@@ -5,7 +5,8 @@ import { DropdownMenuIcons } from "@/components/DropdownMenuIcons";
 import { AvatarWithBadge } from "@/components/AvatarWithBadge";
 import { useSession, signOut } from "next-auth/react";
 import Carousel from "@/components/Carousel";
-
+import { redirect } from "next/navigation";
+import { SelectDates } from "@/components/SelectDates";
 interface RoomImage {
   imageId: number;
   roomId: number;
@@ -85,14 +86,15 @@ const RoomClient = ({ room }: { room: Room }) => {
       {/* HEADER */}
       <header className="sticky top-0 z-50 flex justify-evenly items-center px-10 h-16 bg-gray-950/75 backdrop-blur-xl border-b border-white/6">
         <div className="flex items-center gap-6">
-          <Link href="/practiceno1/userPage">
             <button
-              onClick={() => scrollTo("hotelRooms")}
+              onClick={() => {
+                redirect("/practiceno1/userPage");
+                
+              }}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-white/6 text-gray-400 text-[12px] font-medium cursor-pointer transition"
             >
               ← All Rooms
             </button>
-          </Link>
           <div className="text-yellow-400 font-serif text-2xl font-light tracking-wide">
             Nova <span className="italic">Stay</span>
           </div>
@@ -114,7 +116,7 @@ const RoomClient = ({ room }: { room: Room }) => {
               <div className="text-[10px] font-semibold uppercase tracking-widest text-yellow-400">
                 Room Details
               </div>
-              <div className="flex-1 h-px bg-gradient-to-r from-yellow-400/50 to-transparent"></div>
+              <div className="flex-1 h-px  to-transparent"></div>
             </div>
             <div className="rounded-xl overflow-hidden border border-white/6">
               <Carousel
@@ -172,15 +174,7 @@ const RoomClient = ({ room }: { room: Room }) => {
               <div className="my-5 h-px bg-white/6" />
 
               <div className="grid grid-cols-2 gap-2">
-                {(["Check-in", "Check-out"] as const).map(lbl => (
-                  <div key={lbl} className="flex flex-col">
-                    <label className="text-[9px] font-bold uppercase tracking-wide text-gray-500 mb-1">{lbl}</label>
-                    <input
-                      type="date"
-                      className="w-full bg-gray-800 border border-white/6 rounded-md px-3 py-2 text-white text-sm focus:border-yellow-400 focus:bg-yellow-200/5 outline-none"
-                    />
-                  </div>
-                ))}
+                <SelectDates />
               </div>
 
               <div className="my-5 h-px bg-white/6" />

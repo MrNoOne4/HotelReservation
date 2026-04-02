@@ -54,7 +54,7 @@ export default function CarouselWithPagination({ images }: properties) {
             <CarouselItem key={ image.ImageId}>
               <img
                 alt="dddepth-248"
-                className="size-full rounded-xl object-cover"
+                className="sm:h-110 w-full rounded-xl object-cover h-80 inset-0 "
                 src={image.ImageURL.trim()}
               />
             </CarouselItem>

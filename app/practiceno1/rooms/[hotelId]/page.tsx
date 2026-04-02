@@ -4,6 +4,10 @@ import { EmptyInputGroup } from "@/components/EmptyInputGroup";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import RoomClient from "@/components/RoomClient";
+import { signIn, useSession, signOut } from "next-auth/react";
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
+
 
 interface Params {
   params: {
@@ -30,6 +34,11 @@ interface Room {
 }
 
 const RoomPage = async ({ params }: Params) => {
+      const session = await getServerSession();
+      if (!session) {
+          redirect("/practiceno1/userPage");
+      }
+  
     const resolvedParams = await params;
 
   const hotelId = Number(resolvedParams.hotelId);
