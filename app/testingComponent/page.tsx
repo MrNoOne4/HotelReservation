@@ -16,6 +16,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import  Carousel  from "@/components/Carousel"
+import { DropdownMenuIcons } from "@/components/DropdownMenuIcons";
+import {AvatarWithBadge} from "@/components/AvatarWithBadge";
+
+import { CarouselDemo } from "@/components/CarouselDemo";
+import  CalendarRangeCalendarMultiMonthDemo  from "@/components/CalendarRangeCalendarMultiMonthDemo";
+import { Separator } from "@/components/ui/separator"
+
+import {AlertDialogBasic} from "@/components/AlertDialogBasic";
 
 export default function Upload() {
   const [file, setFile] = useState<File | null>(null);
@@ -112,7 +121,7 @@ export default function Upload() {
                     <SkeletonCard/>
                     <SpinnerSize/>
                   </div> */}
-            <Card className="relative mx-auto w-full max-w-sm pt-0">
+            {/* <Card className="relative mx-auto w-full max-w-sm pt-0">
                   <div className="absolute inset-0 z-30 aspect-video bg-black/35" />
                         
                   <CardHeader>
@@ -128,9 +137,11 @@ export default function Upload() {
                   <CardFooter>
                     <Button className="w-full">View Event</Button>
                   </CardFooter>
-                </Card>
+                </Card> */}
+            
+            {/* <CalendarRangeCalendarMultiMonthDemo/> */}
 
-
+         <CalendarRangeCalendarMultiMonthDemo/>
     </div>
   
   );

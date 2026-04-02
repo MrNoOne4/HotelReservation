@@ -35,16 +35,16 @@ export function InputOTPForm({onSubmit, resendOTP,resendBtn,time, email}: InputO
   return (
     <Card className=" mx-auto p-5  bg-[#171717]">
       <CardHeader>
-        <CardTitle className="font-semibold">Verify your login</CardTitle>
+        <CardTitle className="font-semibold text-white">Verify your login</CardTitle>
         <CardDescription className="text-gray-400 ">
-          Enter the verification code we sent to your email address:{" "}
+          Enter the verification code we sent to your Email address:{" "}
           <span className="font-medium text-gray-400">{email}</span>
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Field>
           <div className="flex items-center justify-between">
-            <FieldLabel htmlFor="otp-verification">
+            <FieldLabel htmlFor="otp-verification" className="text-white">
               Verification code
             </FieldLabel>
             <Button variant="outline" size="xs" className={`${resendBtn ? 'cursor-not-allowed' : "cursor-pointer"} `} onClick={resendOTP} disabled={resendBtn}>
@@ -55,14 +55,14 @@ export function InputOTPForm({onSubmit, resendOTP,resendBtn,time, email}: InputO
                 <form onSubmit={handleSubmit}>
                     
                 <InputOTP maxLength={6} id="otp-verification" required value={otp} onChange={setOtp}> 
-                    <InputOTPGroup className="*:data-[slot=input-otp-slot]:h-12 *:data-[slot=input-otp-slot]:w-11 *:data-[slot=input-otp-slot]:text-xl">
+                    <InputOTPGroup className="*:data-[slot=input-otp-slot]:h-12 text-white *:data-[slot=input-otp-slot]:w-11 *:data-[slot=input-otp-slot]:text-xl">
                         <InputOTPSlot index={0} />
                         <InputOTPSlot index={1} />
                         <InputOTPSlot index={2} />
                     </InputOTPGroup>
                     
-                    <InputOTPSeparator className="mx-2" />
-                    <InputOTPGroup className="*:data-[slot=input-otp-slot]:h-12 *:data-[slot=input-otp-slot]:w-11 *:data-[slot=input-otp-slot]:text-xl">
+                    <InputOTPSeparator className="mx-2 text-white" />
+                    <InputOTPGroup className="*:data-[slot=input-otp-slot]:h-12 text-white *:data-[slot=input-otp-slot]:w-11 *:data-[slot=input-otp-slot]:text-xl">
                         <InputOTPSlot index={3} />
                         <InputOTPSlot index={4} />
                         <InputOTPSlot index={5} />
@@ -74,7 +74,7 @@ export function InputOTPForm({onSubmit, resendOTP,resendBtn,time, email}: InputO
                         <Button type="submit" className="w-full bg-[#e5e5e5] hover:bg-[#ffffff] text-black cursor-pointer" >
                             Verify
                         </Button>
-                        <div className="text-sm text-muted-foreground">
+                        <div className="text-sm text-white">
                            Time Remaining{" "}
                            <span><strong>{time}</strong></span>
                         </div>

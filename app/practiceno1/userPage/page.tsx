@@ -22,10 +22,16 @@ import { signIn, useSession, signOut } from "next-auth/react";
 import { ArrowUpIcon, Home, Info, Bed, Phone } from "lucide-react"
 import {SkeletonCard} from "@/components/SkeletonCard";
 import { SpinnerSize } from "@/components/SpinnerSize";
-import { motion, useAnimation } from "framer-motion";
+import { DropdownMenuIcons } from "@/components/DropdownMenuIcons";
+import {AvatarWithBadge} from "@/components/AvatarWithBadge";
+import { redirect } from "next/navigation";
+import { useSearchParams } from 'next/navigation';
+
+
 // import { useInView } from "react-intersection-observer";
 
 const HotelReservation = () => {
+
   const [topButton, setTopButton] = useState<boolean>(false);
   const { data: session, status } = useSession();
 
@@ -135,9 +141,6 @@ const HotelReservation = () => {
     getHotelRoom();
   }, [])
 
-  console.log(hotelRooms);
-
-
 
   const [showForm, setShowForm] = useState<boolean>(false)
   const [signUp, showSignUp] = useState<boolean>(false);
@@ -187,12 +190,43 @@ const HotelReservation = () => {
   }
   let success: boolean | null;
 
+    interface signupForm {
+      fullName: string
+      signUpEmail: string,
+      signUpPassword: string,
+      signUpConfirmPassword: string,
+    }
+      const [signupForm, setSignupForm] = useState<signupForm>({
+      fullName: '',
+      signUpEmail: '',
+      signUpPassword: '',
+      signUpConfirmPassword: '',
+    })
+
+   
+
 
   const signUpReferences = useRef<HTMLDivElement>(null);
   const [otpForm, showOtpForm] = useState<boolean>(true);
 
   const handleSignupSubmit = async (e: React.FormEvent<HTMLFormElement>, data: SignupData) => {
     e.preventDefault();
+    setSignupForm(data);
+
+    const req = await fetch ('/api/HotelReservation/ValidateEmail', {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({email: data.signUpEmail})
+    })
+
+    const result = await req.json();
+
+    if (!result.user) {
+      toast.warning(result.message, { position: "top-center" })
+      return;
+    }
 
     if (!validateForm(data)) {
       return;
@@ -201,10 +235,13 @@ const HotelReservation = () => {
     sendUserVerificationCode(data);
 
     if (!success) {
-      alert("hello world");
       return;
     }
   }
+
+  const searchParams = useSearchParams();
+  const error = searchParams.get('error');
+
 
   async function sendUserVerificationCode(data: SignupData) {
     const otp = generateOTP();
@@ -260,8 +297,15 @@ const HotelReservation = () => {
 
   const [spinAnimation,setSpinAnimation] = useState<boolean>(false);  
 
+  const handleClick = (element: Rooms) => {
+    if (!session) {
+      setShowForm(true); 
+    } else {
+      redirect(`/practiceno1/rooms/${element.RoomId}`);
+    }
+  };
 
-const sendMessages = async (e: React.FormEvent<HTMLFormElement>, data: messageProps) => {
+const sendMessages = async (e: React.FormEvent<HTMLFormElement> , data: messageProps) => {
   e.preventDefault();
   setSpinAnimation(true); 
 
@@ -315,7 +359,7 @@ const sendMessages = async (e: React.FormEvent<HTMLFormElement>, data: messagePr
   }
 
 
-  const OTPhandleSubmit = async (e, data: string) => {
+  const OTPhandleSubmit = async (e: React.FormEvent<HTMLFormElement>, data: string) => {
     e.preventDefault();
     const raw = localStorage.getItem("localSaveOtp");
     const localSaveOtp: OTP | null = raw ? JSON.parse(raw) : null;
@@ -343,21 +387,42 @@ const sendMessages = async (e: React.FormEvent<HTMLFormElement>, data: messagePr
     if (timerRef.current) {
       clearInterval(timerRef.current);
     }
+
+    const insert = await fetch('/api/HotelReservation/SignUpAccount', {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userFullName: signupForm.fullName,
+            userEmail: signupForm.signUpEmail,
+            userPassword: signupForm.signUpPassword 
+          })
+    })
+
+    // || !userEmail || !userPassword
+    const result = await insert.json();
+     if (!insert.ok) {
+         toast.warning(result.message, { position: "top-center" });
+         return;
+     }
+
+    await signIn("credentials", {
+        email: signupForm.signUpEmail,
+        password: signupForm.signUpPassword,
+        callbackUrl: window.location.href
+    })
   }
 
-
-
+ useEffect(() => {
     if (status === "loading") {
-      return (
-        <div className='flex items-center justify-center h-screen'>
-            <SkeletonCard/>
-        </div>
-      )
-  }
+      
+     
+    }
+  }, [status]);
   
   return (
     <div className='box-border p-0 m-0 font-sans bg-[#F8FAFC] overflow-x-auto snap-x snap-mandatory scroll-smooth'>
-      <header className={`flex flex-col text-let px-0 py-5 ml-3 transition-all duration-300 ease-in-out md:mb-5 mb-5  2xl:mb-0 lg:px-10 2xl:px-40 lg:flex-row lg:items-center lg:justify-between lg:ml-0 pb- ${menu ? 'h-70' : 'h-15'} lg:h-auto`} id='header'>
+      
+      <header className={`flex flex-col text-let px-0 py-5 ml-3 transition-all duration-300 ease-in-out md:mb-5 mb-5  2xl:mb-0 lg:px-10 2xl:px-40 lg:flex-row lg:items-center lg:justify-evenly lg:ml-0 pb- ${menu ? 'h-70' : 'h-15'} lg:h-auto`} id='header'>
         {/* Logo Section */}
         <div className='flex items-center justify-between mt-3'>
           <h1 className='text-2xl lg:text-3xl text-[#a44a23] font-semibold mb-4'>Nova Stay</h1>
@@ -376,16 +441,14 @@ const sendMessages = async (e: React.FormEvent<HTMLFormElement>, data: messagePr
 
         {/* Login Section */}
         {session ? 
-                <button className='flex items-center justify-center w-1/3 gap-2 px-4 py-1 mt-4 mb-3 font-semibold text-white bg-black rounded-md cursor-pointer lg:py-2 lg:w-auto' onClick={() =>  signOut({ callbackUrl: window.location.href })}><LogIn size={20} color='white' /> Logout</button>
-
+              <DropdownMenuIcons avatar={<AvatarWithBadge avatar={`${session.user?.image}`} name={session.user?.name}/>}  profile={() => alert("hello world")} logout={() => signOut({ callbackUrl: window.location.href })}/>
           :
-                  <button className='flex items-center justify-center w-1/3 gap-2 px-4 py-1 mt-4 mb-3 font-semibold text-white bg-black rounded-md cursor-pointer lg:py-2 lg:w-auto' onClick={() => setShowForm(true)}><LogIn size={20} color='white' /> Login</button>
-
+              <button className='flex  items-center justify-center w-1/3 gap-2 px-4 py-1 mt-4 mb-3 font-semibold text-white bg-black rounded-md cursor-pointer lg:py-2 lg:w-auto' onClick={() => setShowForm(true)}><LogIn size={20} color='white' /> Login</button>
       }
       </header>
 
       <section className="relative" id='heroSection'>
-        <section className='flex items-center justify-center h-screen text-white bg-fixed bg-center bg-cover' style={{ backgroundImage: `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('/images/hero.jpeg')` }}>
+        <section className='flex items-center justify-center h-screen text-white bg-fixed bg-center bg-cover backdrop-blur-xs' style={{ backgroundImage: `linear-gradient(rgba(0,0,0,0.70), rgba(0,0,0,0.70)), url('/images/hero.jpeg')` }}>
           <article className='flex flex-col items-center justify-center w-full min-h-screen px-4 tracking-wide text-center text-white sm:px-6 md:px-8 lg:px-16'>
             <h1 className="mb-4 text-3xl font-bold sm:text-4xl md:text-5xl lg:text-6xl md:mb-6">
               Welcome to Nova Stay
@@ -429,7 +492,7 @@ const sendMessages = async (e: React.FormEvent<HTMLFormElement>, data: messagePr
                             <Card className="max-w-md pt-0">
                               <CardContent className="px-0 overflow-hidden">
                                 <img
-                                  src={element.images[0].ImageURL}
+                                  src={element.images?.[0]?.ImageURL || "/images/fallback.jpg"}
                                   alt="Banner"
                                   className="object-cover aspect-video h-70 rounded-t-xl transition-all duration-600 ease-in-out hover:scale-[1] scale-[1.2] shadow-2xl"
                                 />
@@ -444,7 +507,7 @@ const sendMessages = async (e: React.FormEvent<HTMLFormElement>, data: messagePr
                                 <CardTitle className="mt-2 text-lg font-bold">
                                   {element.price} PHP/night
                                 </CardTitle>
-                                <Button variant={"outline"} className="cursor-pointer">
+                                <Button variant={"outline"} className="cursor-pointer"onClick={() => handleClick(element)}>
                                   View Details
                                 </Button>
                               </CardFooter>
@@ -452,6 +515,10 @@ const sendMessages = async (e: React.FormEvent<HTMLFormElement>, data: messagePr
                         </article>
                       ))
                   }
+
+                  {/* {
+                    <CarouselDemo image={hotelRooms[0]?.images} />
+                  } */}
             </div>
 
 
@@ -532,80 +599,6 @@ const sendMessages = async (e: React.FormEvent<HTMLFormElement>, data: messagePr
         </section>
       </section>
 
-      <footer className=" bg-[#222431] w-full mt-0 pt-20  ">
-        <div className={`h-full w-[60%] mx-auto text-white`}>
-          <h1 className="text-2xl font-bold text-center">Nova Stay</h1>
-          <section className="grid w-full h-full grid-cols-2 gap-4 pt-16 md:grid-cols-3 lg:grid-cols-4">
-            <div className="flex flex-col gap-4 text-sm lg:text2xl">
-              <div>
-                <h1 className="text-lg lg:text-2xl">Community</h1>
-                <ul className="text-[#ccc]">
-                  <li className="cursor-pointer mt-1.5">Guest Stories</li>
-                  <li className="cursor-pointer mt-1.5">Travel Tips & Guides</li>
-                  <li className="cursor-pointer mt-1.5">Hotel Reviews</li>
-                  <li className="cursor-pointer mt-1.5">Loyalty Program</li>
-                </ul>
-              </div>
-
-              <div>
-                <h1 className="text-lg lg:text-2xl">Resources</h1>
-                <ul className="text-[#ccc]">
-                  <li className="cursor-pointer mt-1.5">Room Types & Amenities</li>
-                  <li className="cursor-pointer mt-1.5">Dining & Menu Guides</li>
-                  <li className="cursor-pointer mt-1.5">Spa & Wellness Services</li>
-                  <li className="cursor-pointer mt-1.5">Special Offers</li>
-
-                </ul>
-              </div>
-
-            </div>
-
-            <div className="flex flex-col gap-4 text-sm lg:text2xl">
-              <h1 className="mb-0 text-lg lg:text-2xl">Services</h1>
-              <ul className="text-[#ccc] cursor-pointer">
-                <li className="mb-1">Book a Stay</li>
-                <li className="cursor-pointer">Event & Conference Hosting</li>
-                <li className="cursor-pointer">Airport Transfers</li>
-                <li className="cursor-pointer">Custom Packages</li>
-                <li className="mb-2 cursor-pointer">Education</li>
-                <li className="mb-2 cursor-pointer">Find an Account</li>
-                <li className="cursor-pointer">Find a Partner</li>
-                <li className="cursor-pointer">Become a Partner</li>
-
-              </ul>
-            </div>
-
-            <div className="text-sm lg:text2xl">
-              <h1 className="mb-0 text-lg lg:text-2xl">About us</h1>
-              <ul className="text-[#ccc] cursor-pointer">
-                <li className="mb-1">Our Story</li>
-                <li className="cursor-pointer">Brand & Values</li>
-                <li className="cursor-pointer">Contact Information</li>
-                <li className="mb-2 cursor-pointer">Blog & News</li>
-
-              </ul>
-            </div>
-
-            <div className="flex flex-col gap-4 ">
-              <h1 className="mb-1 text-lg lg:text-2xl">Contact us</h1>
-              <ul className="text-[#ccc] cursor-pointer">
-                <li className="cursor-pointer">+69123456789</li>
-                <li className="cursor-pointer">1234 Stocklytics St.</li>
-              </ul>
-
-              <h1>INQUIRES</h1>
-              <p className="mb-1 text-sm cursor-pointer">theMan@gmail.com</p>
-
-              <h1>CAREERS</h1>
-              <p className="cursor-pointer">Dream@halo-lab.team</p>
-            </div>
-
-          </section>
-        </div>
-        <footer className="w-full h-12 bg-[#1b1c26] mt-8 flex items-center justify-center text-white">
-          <h1 className="text-sm text-center"> © 2026 Nova Stay - Group-5. All rights reserved. </h1>
-        </footer>
-      </footer>
 
       <div className={`fixed flex items-center justify-center h-screen w-full  bg-black/50 backdrop-blur-xs inset-0 ${showForm ? "z-40" : "z-[-1]"}`}>
         <section className=' lg:w-[90%] will-change-transform 2xl:w-250 z-999 perspective-[1000px] group w-full'>
@@ -617,7 +610,15 @@ const sendMessages = async (e: React.FormEvent<HTMLFormElement>, data: messagePr
                 <LoginForm
                   onSubmit={ async (e, data) => {
                     e.preventDefault();
-                     await signIn("credentials", {email: data.email, password: data.password, redirect: false })
+                     const res = await signIn("credentials", {email: data.email, password: data.password, redirect: false })
+                    if (res?.error) {
+                        toast.warning(res.error || "Something went wrong", { position: "top-center" });
+                        return;
+                    } else {
+                      toast.success("Logged in successfully!", {position: "top-center"})
+                      setShowForm(false);
+                    }
+                     
                   }}
                   switchTo={() => { showSignUp(true) }} closeForm={() => { setShowForm(false), showSignUp(false) }}
                   loginFacebook={() => signIn("facebook", {callbackUrl: window.location.href, redirect: true})}

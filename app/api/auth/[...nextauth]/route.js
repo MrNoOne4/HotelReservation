@@ -210,6 +210,7 @@ import FacebookProvider from "next-auth/providers/facebook";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcrypt";
 import { prisma } from "../../../../hello-prisma/lib/prisma";
+import {NextRequest, NextResponse} from "next/server";
 
 export const authOptions = {
   providers: [
@@ -226,17 +227,25 @@ export const authOptions = {
           where: { GuestEmail: credentials.email },
         });
 
-        if (!user || !user.GuestPassword) {
-          throw new Error(
-            "This email is registered via OAuth. Please login with your provider.",
-          );
+        if (!user) {
+            throw new Error("No account found with this email");
         }
+
+      if (!user.GuestPassword) {
+        // User registered via OAuth
+        throw new Error(
+          "This email is registered via OAuth. Please login with your provider."
+        );
+      }
 
         const isValid = await bcrypt.compare(
           credentials.password,
           user.GuestPassword,
         );
-        if (!isValid) return null;
+
+        if (!isValid) {
+          throw new Error("Invalid password");
+        };
 
         return {
           id: user.GuestId,
@@ -263,56 +272,80 @@ export const authOptions = {
     FacebookProvider({
       clientId: process.env.FACEBOOK_CLIENT_ID,
       clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
-      authorization: { params: { scope: "public_profile,email" } },
+      authorization: { params: { scope: "public_profile email" } },
     }),
   ],
 
   session: { strategy: "jwt" },
 
   callbacks: {
+    async redirect({ url, baseUrl }) {
+      if (url.startsWith(baseUrl)) return url;
+       return baseUrl;
+    },
+
     // Runs after sign-in
     async signIn({ user, account, profile }) {
       if (account?.provider === "google" || account?.provider === "facebook") {
-        const email = user.email;
-        if (!email) return false;
-
-        // Check if user exists
-        let existingUser = await prisma.users.findUnique({
-          where: { GuestEmail: email },
-        });
-
-        if (!existingUser) {
-          // Create new user
-          existingUser = await prisma.users.create({
-            data: {
-              GuestEmail: email,
-              GuestFullName: user.name ?? "",
-              GuestPassword: "", // OAuth users have no password
-              isVerified: true,
-            },
-          });
-        }
-
-        // Check if account exists in guestaccount table
-        const existingAccount = await prisma.guestaccount.findFirst({
-          where: {
-            GuestId: existingUser.GuestId,
-            provider: account.provider,
-          },
-        });
-
-        if (!existingAccount) {
-          await prisma.guestaccount.create({
-            data: {
-              GuestId: existingUser.GuestId,
+        
+          const existingAccount = await prisma.guestaccount.findFirst({
+            where: {
               provider: account.provider,
               provider_id: account.providerAccountId,
             },
           });
-        }
-      }
 
-      return true; // allow login
+          if (existingAccount) {
+            return true;
+          }
+
+        let email = user.email ?? profile?.email;
+
+        let existingUser = null;
+
+        if (email) {
+          existingUser = await prisma.users.findUnique({
+            where: { GuestEmail: email },
+          });
+        };
+
+        // Check if user exists
+        if (existingUser) {
+            await prisma.guestaccount.create({
+              data: {
+                GuestId: existingUser.GuestId,
+                provider: account.provider,
+                provider_id: account.providerAccountId,
+              },
+            });
+
+            return true;
+          }
+        if (!email) {
+          email = `${account.providerAccountId}@${account.provider}.com`;
+        }
+
+        const newUser = await prisma.users.create({
+              data: {
+                GuestEmail: email,
+                GuestFullName: user.name ?? "",
+                GuestPassword: " ",
+                isVerified: true,
+              },
+            });
+
+            await prisma.guestaccount.create({
+              data: {
+                GuestId: newUser.GuestId,
+                provider: account.provider,
+                provider_id: account.providerAccountId,
+              },
+            });
+
+            return true;
+          }
+
+          return true;
     },
 
     // Customize JWT token
@@ -337,6 +370,7 @@ export const authOptions = {
       return session;
     },
   },
+
 };
 
 const handler = NextAuth(authOptions);

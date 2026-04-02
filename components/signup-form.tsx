@@ -37,6 +37,7 @@ export function SignupForm({ className, onSubmit,switchTo, closeForm, ...props }
     const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
     const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] = useState<boolean>(false);
 
+    
       const [signupForm, setSignupForm] = useState<signupForm>({
       fullName: '',
       signUpEmail: '',
@@ -65,14 +66,14 @@ export function SignupForm({ className, onSubmit,switchTo, closeForm, ...props }
 
   return (  
 
-    <Card className={cn("flex flex-col gap-6 bg-[#171717] backdrop-blur-none rounded-2xl ", className)} {...props}>
-            <div className="flex justify-end ">
+    <Card className={cn("flex flex-col gap-6 bg-[#171717] backdrop-blur-none rounded-2xl text-white", className)} {...props}>
+          <div className="flex justify-end ">
             <Button className="cursor-pointer" onClick={() => removeHandler()}>
               <X size={30} color="white" />
             </Button>
           </div>
       <CardHeader>
-        <CardTitle>Create an account</CardTitle>
+        <CardTitle className="text-center text-xl">Create an account</CardTitle>
         <CardDescription>
           Enter your information below to create your account
         </CardDescription>
@@ -81,18 +82,18 @@ export function SignupForm({ className, onSubmit,switchTo, closeForm, ...props }
           <form onSubmit={(e) => onSubmit?.(e, signupForm) } >
           <FieldGroup>
             <Field>
-                <div className="relative">
+                <div className="relative space-y-1">
                       <FieldLabel htmlFor="name">Full Name</FieldLabel>
                       <Input id="name" type="text" placeholder="John Doe" required  className="bg-[#212121] hover:bg-[#1b1b1b] py-5 px-10" name="fullName" value={signupForm.fullName} onChange={handleSignUpForm}/>
-                        <i className='absolute top-8 left-3 2xl:left-2 lg:left-3'><User size={20} color='white'/></i>
+                        <i className='absolute top-9 left-3 2xl:left-2 lg:left-3'><User size={20} color='white'/></i>
 
                 </div>
             </Field>
             <Field>
-                <div className="relative">
+                <div className="relative  space-y-1">
                   <FieldLabel htmlFor="email">Email</FieldLabel>
                   <Input id="email" type="email" placeholder="m@example.com" required className="bg-[#212121] hover:bg-[#1b1b1b] px-10 py-5" name="signUpEmail" value={signupForm.signUpEmail} onChange={handleSignUpForm}/>
-                       <i className='absolute top-8 left-3 2xl:left-2 lg:left-3'><Mail size={20} color='white'/></i>
+                       <i className='absolute top-9 left-3 2xl:left-2 lg:left-3'><Mail size={20} color='white'/></i>
                 </div>
               <FieldDescription>
                 We&apos;ll use this to contact you. We will not share your email
@@ -100,25 +101,25 @@ export function SignupForm({ className, onSubmit,switchTo, closeForm, ...props }
               </FieldDescription>
             </Field>
             <Field>
-              <div className="relative">
+              <div className="relative space-y-1">
                 <FieldLabel htmlFor="password">Password</FieldLabel>
                 <Input id="password" type={isPasswordVisible ? "text" : "password"} required className="bg-[#212121] hover:bg-[#1b1b1b] py-5 px-10" name="signUpPassword" value={signupForm.signUpPassword} onChange={handleSignUpForm}/>
                 <FieldDescription>
                   Must be at least 8 characters long.
                 </FieldDescription>
-                      <i className='absolute top-7 left-3 2xl:left-3 lg:left-3'><Lock size={20} color='white'/></i>
-                      <button className='absolute cursor-pointer top-7 right-3 lg:right-3 2xl:right-3' type='button' onClick={() => setIsPasswordVisible(prev => !prev)} title={isPasswordVisible ? "Hide Password" : "Show Password" }> {isPasswordVisible ? <EyeOff   size={20} color='white'/> : <Eye  size={20} color='white'/>}</button>
+                      <i className='absolute top-9 left-3 2xl:left-3 lg:left-3'><Lock size={20} color='white'/></i>
+                      <button className='absolute cursor-pointer top-9 right-3 lg:right-3 2xl:right-3' type='button' onClick={() => setIsPasswordVisible(prev => !prev)} title={isPasswordVisible ? "Hide Password" : "Show Password" }> {isPasswordVisible ? <EyeOff   size={20} color='white'/> : <Eye  size={20} color='white'/>}</button>
               </div>
             </Field>
             <Field>
-              <div className="relative">
+              <div className="relative  space-y-1">
                    <FieldLabel htmlFor="confirm-password">
                     Confirm Password
                   </FieldLabel>
                   <Input id="confirm-password" type={isConfirmPasswordVisible ? "text" : "password"} required className="bg-[#212121] hover:bg-[#1b1b1b] py-5 px-10" name="signUpConfirmPassword" value={signupForm.signUpConfirmPassword} onChange={handleSignUpForm}/>
                   <FieldDescription>Please confirm your password.</FieldDescription>
-                  <i className='absolute top-7 left-3 2xl:left-3 lg:left-3'><Lock size={20} color='white'/></i>
-                  <button className='absolute cursor-pointer top-7 right-3 lg:right-3 2xl:right-3' type='button' onClick={() => setIsConfirmPasswordVisible(prev => !prev)} title={isConfirmPasswordVisible ? "Hide Password" : "Show Password" }> {isConfirmPasswordVisible ? <EyeOff   size={20} color='white'/> : <Eye  size={20} color='white'/>}</button>
+                  <i className='absolute top-9 left-3 2xl:left-3 lg:left-3'><Lock size={20} color='white'/></i>
+                  <button className='absolute cursor-pointer top-9 right-3 lg:right-3 2xl:right-3' type='button' onClick={() => setIsConfirmPasswordVisible(prev => !prev)} title={isConfirmPasswordVisible ? "Hide Password" : "Show Password" }> {isConfirmPasswordVisible ? <EyeOff   size={20} color='white'/> : <Eye  size={20} color='white'/>}</button>
               </div>
             </Field>
             <FieldGroup>
