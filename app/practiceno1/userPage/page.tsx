@@ -3,7 +3,6 @@
 
 import React, { ChangeEvent, useRef, useState,useEffect } from 'react'
 import { ThumbsUp, MessageCircle, Instagram, Send, Facebook, Menu, X, LogIn, User, Mail, UserCircle, Lock, Eye, EyeOff } from "lucide-react";
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -25,13 +24,10 @@ import { SpinnerSize } from "@/components/SpinnerSize";
 import { DropdownMenuIcons } from "@/components/DropdownMenuIcons";
 import {AvatarWithBadge} from "@/components/AvatarWithBadge";
 import { redirect } from "next/navigation";
-import { useSearchParams } from 'next/navigation';
-
-
-// import { useInView } from "react-intersection-observer";
+import { ProfileMenu } from "@/components/ProfileMenu";
+import Header  from "@/components/Header";
 
 const HotelReservation = () => {
-
   const [topButton, setTopButton] = useState<boolean>(false);
   const { data: session, status } = useSession();
 
@@ -239,9 +235,6 @@ const HotelReservation = () => {
     }
   }
 
-  const searchParams = useSearchParams();
-  const error = searchParams.get('error');
-
 
   async function sendUserVerificationCode(data: SignupData) {
     const otp = generateOTP();
@@ -422,7 +415,7 @@ const sendMessages = async (e: React.FormEvent<HTMLFormElement> , data: messageP
   return (
     <div className='box-border p-0 m-0 font-sans bg-[#F8FAFC] overflow-x-auto snap-x snap-mandatory scroll-smooth'>
       
-      <header className={`flex flex-col text-let px-0 py-5 ml-3 transition-all duration-300 ease-in-out md:mb-5 mb-5  2xl:mb-0 lg:px-10 2xl:px-40 lg:flex-row lg:items-center lg:justify-evenly lg:ml-0 pb- ${menu ? 'h-70' : 'h-15'} lg:h-auto`} id='header'>
+      <header className={`flex flex-col mt-4 text-let px-0 py-5 ml-3 transition-all duration-300 ease-in-out md:mb-5 mb-5  2xl:mb-0 lg:px-10 2xl:px-40 lg:flex-row lg:items-center lg:justify-evenly lg:ml-0 pb- ${menu ? 'h-70' : 'h-15'} lg:h-auto`} id='header'>
         {/* Logo Section */}
         <div className='flex items-center justify-between mt-3'>
           <h1 className='text-2xl lg:text-3xl text-[#a44a23] font-semibold mb-4'>Nova Stay</h1>
@@ -441,7 +434,10 @@ const sendMessages = async (e: React.FormEvent<HTMLFormElement> , data: messageP
 
         {/* Login Section */}
         {session ? 
-              <DropdownMenuIcons avatar={<AvatarWithBadge avatar={`${session.user?.image}`} name={session.user?.name?.split(",")[0]}/>}   logout={() => signOut({ callbackUrl: window.location.href })}/>
+              <span className='-translate-x-3 mt-4'>
+                {/* <DropdownMenuIcons avatar={<AvatarWithBadge avatar={`${session.user?.image}`} name={session.user?.name?.split(",")[0]}/>} logout={() => signOut({ callbackUrl: window.location.href })}/> */}
+                <ProfileMenu avatar={<AvatarWithBadge avatar={`${session?.user?.image}`} className='text-black' name={session?.user?.name?.split(",")[0]}/>} profile={() => redirect("/practiceno1/profile")} logout={() => signOut({ callbackUrl: window.location.href })}/>
+              </span>
           :
               <button className='flex  items-center justify-center w-1/3 gap-2 px-4 py-1 mt-4 mb-3 font-semibold text-white bg-black rounded-md cursor-pointer lg:py-2 lg:w-auto' onClick={() => setShowForm(true)}><LogIn size={20} color='white' /> Login</button>
       }
@@ -518,9 +514,6 @@ const sendMessages = async (e: React.FormEvent<HTMLFormElement> , data: messageP
                       ))
                   }
 
-                  {/* {
-                    <CarouselDemo image={hotelRooms[0]?.images} />
-                  } */}
             </div>
 
 

@@ -20,8 +20,8 @@ export function EmptyInputGroup() {
   return (
 <Empty>
       <EmptyHeader>
-        <EmptyTitle className="text-center text-2xl">ERROR 404</EmptyTitle>
-        <EmptyTitle>No Reservations Yet</EmptyTitle>
+        <EmptyTitle className="text-center text-2xl text-white">ERROR 404</EmptyTitle>
+        <EmptyTitle className=" text-white">No Reservations Yet</EmptyTitle>
         <EmptyDescription>
           You don&apos;t have any upcoming bookings at NovaStay. Start your journey by searching for your perfect stay below.
         </EmptyDescription>

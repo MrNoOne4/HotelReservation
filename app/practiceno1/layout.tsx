@@ -3,7 +3,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner"
-import { SessionProvider } from "next-auth/react";
 import Providers from "@/components/Providers";
 import { getServerSession } from "next-auth";
 import  Footer  from "@/components/Footer";
@@ -33,7 +32,7 @@ export default async function RootLayout({children,}: {children: React.ReactNode
 
         <html lang="en" suppressHydrationWarning>
           <body
-            className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
+            className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen `}
           >
             
               <Providers session={session}>

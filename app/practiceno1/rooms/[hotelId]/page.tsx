@@ -4,9 +4,9 @@ import { EmptyInputGroup } from "@/components/EmptyInputGroup";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import RoomClient from "@/components/RoomClient";
-import { signIn, useSession, signOut } from "next-auth/react";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
+import { Toaster } from "@/components/ui/sonner"
 
 
 interface Params {
@@ -90,7 +90,7 @@ const RoomPage = async ({ params }: Params) => {
     );
   }
 
-  return <RoomClient  room={{
+  return <RoomClient room={{
     ...hotelRoom,
     images: hotelRoom.images.map(img => ({
       imageId: img.ImageId,
@@ -98,6 +98,7 @@ const RoomPage = async ({ params }: Params) => {
       imageUrl: img.ImageURL
     }))
   }}/>;
+
 };
 
 export default RoomPage;

@@ -7,6 +7,8 @@ import { useSession, signOut } from "next-auth/react";
 import Carousel from "@/components/Carousel";
 import { redirect } from "next/navigation";
 import { SelectDates } from "@/components/SelectDates";
+import { ProfileMenu } from "@/components/ProfileMenu";
+
 interface RoomImage {
   imageId: number;
   roomId: number;
@@ -100,15 +102,12 @@ const RoomClient = ({ room }: { room: Room }) => {
           </div>
         </div>
 
-        <DropdownMenuIcons
-          avatar={<AvatarWithBadge avatar={`${session?.user?.image}`} name={session?.user?.name} />}
-          profile={() => alert("hello world")}
-          logout={() => signOut({ callbackUrl: window.location.origin + "/practiceno1/userPage" })}
-        />
+        <ProfileMenu avatar={<AvatarWithBadge  className="text-white  "  avatar={`${session?.user?.image}`} name={session?.user?.name?.split(",")[0]}/>} profile={() => redirect("/practiceno1/profile")} logout={() => signOut({ callbackUrl: window.location.href })}/>
+        
       </header>
 
       {/* MAIN */}
-      <main className="relative z-10 max-w-[1200px] mx-auto px-8 py-12 grid lg:grid-cols-[1fr_380px] gap-10">
+      <main className="relative z-10 max-w-300 mx-auto px-8 py-12 grid lg:grid-cols-[1fr_380px] gap-10">
         {/* LEFT */}
         <div className="flex flex-col gap-6">
           <div>
@@ -173,7 +172,7 @@ const RoomClient = ({ room }: { room: Room }) => {
 
               <div className="my-5 h-px bg-white/6" />
 
-              <div className="grid grid-cols-2 gap-2">
+              <div>
                 <SelectDates />
               </div>
 
@@ -184,7 +183,7 @@ const RoomClient = ({ room }: { room: Room }) => {
                 <span className="font-serif text-yellow-400 text-2xl">₱{price.toLocaleString()}</span>
               </div>
 
-              <button
+              <button 
                 disabled={!availability_status}
                 className={`w-full py-3 rounded-md text-[11px] font-bold uppercase tracking-widest ${
                   availability_status
@@ -194,10 +193,6 @@ const RoomClient = ({ room }: { room: Room }) => {
               >
                 {availability_status ? "Reserve Now" : "Not Available"}
               </button>
-
-              <p className="text-[10px] text-gray-500 mt-2 text-center">
-                Free cancellation <span className="opacity-50">·</span> No charge today
-              </p>
             </div>
           </div>
         </aside>

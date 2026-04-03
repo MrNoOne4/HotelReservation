@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { type DateRange } from 'react-day-picker'
 import { Calendar } from '@/components/ui/calendar'
+import { toast } from "sonner"
 
 const CalendarRangeCalendarMultiMonthDemo = () => {
   const [dateRange, setDateRange] = useState<DateRange | undefined>()
@@ -26,6 +27,7 @@ const CalendarRangeCalendarMultiMonthDemo = () => {
       const today = new Date()
       const tomorrow = new Date()
       tomorrow.setDate(today.getDate() + 1)
+      toast.warning("fuck off", { position: "bottom-left" });
       setDateRange({ from: today, to: tomorrow })
     }
   }, [])
