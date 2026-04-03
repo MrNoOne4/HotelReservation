@@ -25,7 +25,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator"
-import { User, Password } from "lucide-react";
+import { User, Lock } from "lucide-react";
 
 
 interface ProfileFormData {
@@ -72,7 +72,7 @@ const SettingsProfile1 = ({
       <div className="flex h-5 items-center gap-4 text-md mb-2 justify-center items-center">
           <button className="cursor-pointer"><User/>  Profile</button>
           <Separator orientation="vertical" />
-          <button className="cursor-pointer"><Password/> Change password</button>
+          <button className="cursor-pointer"><Lock/> Change password</button>
       </div>
         <Separator className="mb-3"/>
       <CardHeader>
