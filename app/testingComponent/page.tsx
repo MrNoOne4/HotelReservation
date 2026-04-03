@@ -25,6 +25,7 @@ import  CalendarRangeCalendarMultiMonthDemo  from "@/components/CalendarRangeCal
 import { Separator } from "@/components/ui/separator"
 
 import {AlertDialogBasic} from "@/components/AlertDialogBasic";
+import  { SettingsProfile1 }  from "@/components/settings-profile1";
 
 export default function Upload() {
   const [file, setFile] = useState<File | null>(null);
