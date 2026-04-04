@@ -34,13 +34,12 @@ interface Room {
 }
 
 const RoomPage = async ({ params }: Params) => {
-     const session = await getServerSession();
-      if (!session) {
-          redirect("/");
-      }
-  
-    const resolvedParams = await params;
+   const session = await getServerSession();
+   if (!session) {
+       redirect("/");
+   }
 
+  const resolvedParams = await params;
   const hotelId = Number(resolvedParams.hotelId);
 
   if (isNaN(hotelId)) {
@@ -80,7 +79,7 @@ const RoomPage = async ({ params }: Params) => {
             This room doesn&apos;t exist or has been removed.
           </p>
 
-          <Link href="/my-nextjs-site/app">
+          <Link href="/">
             <Button className="mt-6 rounded-lg bg-[#c9a96e] px-7 font-bold text-[#0D0C17] hover:bg-[#dfc080]" >
               ← Back to Rooms
             </Button>

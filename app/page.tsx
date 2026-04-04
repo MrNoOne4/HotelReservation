@@ -485,7 +485,7 @@ const sendMessages = async (e: React.FormEvent<HTMLFormElement> , data: messageP
                   {
                     hotelRooms.map((element: Rooms, index: number) => (
                         <article key={`${element.RoomId}_${index}`}>
-                            <Card className="sm:max-w-md w-full pt-0">
+                            <Card className="sm:max-w-md w-full pt-0 h-full">
                               <CardContent className="px-0 overflow-hidden">
                                 <img
                                   src={element.images?.[0]?.ImageURL || "/images/fallback.jpg"}
@@ -495,9 +495,9 @@ const sendMessages = async (e: React.FormEvent<HTMLFormElement> , data: messageP
                               </CardContent>
                               <CardHeader>
                                 <CardTitle>
-                                  <strong>{element.RoomType}</strong>
+                                  <strong className='text-lg md:text-2xl font-semibold'>{element.RoomType}</strong>
                                 </CardTitle>
-                                <CardDescription>{element.description}</CardDescription>
+                                <CardDescription className='text-sm'>{element.description}</CardDescription>
                               </CardHeader>
                                 <hr className="bg-black"/>
 

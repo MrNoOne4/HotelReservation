@@ -7,21 +7,20 @@ datasource db {
   provider = "mysql"
 }
 
-model additionalservice {
-  ServiceId     Int     @id @default(autoincrement())
-  ReservationId Int
-  ServiceName   String  @db.VarChar(100)
-  ServicePrice  Decimal @db.Decimal(10, 2)
-
-  @@index([ReservationId], map: "ReservationId")
+model users {
+  GuestId          Int     @id @default(autoincrement())
+  GuestFullName    String  @db.VarChar(255)
+  GuestEmail       String  @unique(map: "GuestEmail") @db.VarChar(255)
+  GuestPassword    String  @db.VarChar(255)
+  isVerified       Boolean
 }
 
 model guestaccount {
   AccountId     Int       @id @default(autoincrement())
   GuestId       Int
   provider      String    @db.VarChar(50)
-  provider_id   String?   @db.VarChar(255)
-  password_hash String?   @db.VarChar(255)
+  provider_id   String?   @db.VarChar(255) // optional
+  password_hash String?   @db.VarChar(255) // optional
   created_at    DateTime? @default(now()) @db.Timestamp(0)
 
   @@index([GuestId], map: "GuestId")
@@ -51,17 +50,6 @@ model hotelroomimages {
   @@index([RoomId], map: "RoomId")
 }
 
-model payment {
-  PaymentId     Int                    @id @default(autoincrement())
-  ReservationId Int
-  Amount        Decimal                @db.Decimal(10, 2)
-  PaymentMethod payment_PaymentMethod
-  PaymentStatus payment_PaymentStatus? @default(Pending)
-  PaymentDate   DateTime?              @default(now()) @db.Timestamp(0)
-
-  @@index([ReservationId], map: "ReservationId")
-}
-
 model reservation {
   ReservationId  Int                 @id @default(autoincrement())
   GuestId        Int
@@ -76,12 +64,24 @@ model reservation {
   @@index([RoomId], map: "RoomId")
 }
 
-model users {
-  GuestId       Int     @id @default(autoincrement())
-  GuestFullName String  @db.VarChar(255)
-  GuestEmail    String  @unique(map: "GuestEmail") @db.VarChar(255)
-  GuestPassword String  @db.VarChar(255)
-  isVerified    Boolean
+model payment {
+  PaymentId     Int                    @id @default(autoincrement())
+  ReservationId Int
+  Amount        Decimal                @db.Decimal(10, 2)
+  PaymentMethod payment_PaymentMethod
+  PaymentStatus payment_PaymentStatus? @default(Pending)
+  PaymentDate   DateTime?              @default(now()) @db.Timestamp(0)
+
+  @@index([ReservationId], map: "ReservationId")
+}
+
+model additionalservice {
+  ServiceId     Int     @id @default(autoincrement())
+  ReservationId Int
+  ServiceName   String  @db.VarChar(100)
+  ServicePrice  Decimal @db.Decimal(10, 2)
+
+  @@index([ReservationId], map: "ReservationId")
 }
 
 enum hotelroom_RoomType {
@@ -91,17 +91,17 @@ enum hotelroom_RoomType {
   Executive
 }
 
+enum hotelroom_bed_type {
+  King
+  Queen
+  Twin
+}
+
 enum payment_PaymentMethod {
   CreditCard
   DebitCard
   PayPal
   Cash
-}
-
-enum hotelroom_bed_type {
-  King
-  Queen
-  Twin
 }
 
 enum payment_PaymentStatus {

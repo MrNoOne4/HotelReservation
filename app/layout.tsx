@@ -63,6 +63,7 @@ import { getServerSession } from "next-auth";
 import  Footer  from "@/components/Footer";
 import { redirect } from "next/navigation";
 import './globals.css'
+import { TooltipProvider } from "@/components/ui/tooltip"
 
 // Load fonts with strategy: "class" for consistent SSR
 const geistSans = Geist({
@@ -89,13 +90,14 @@ export default async function RootLayout({children,}: {children: React.ReactNode
 
         <html lang="en" suppressHydrationWarning>
           <body
-            className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen `}
+            className={`${geistSans.variable} ${geistMono.variable} font-normal`}
           >
             
               <Providers session={session}>
-                  {children}
+                  <TooltipProvider>{children}</TooltipProvider>
                 <Footer/>
               </Providers> 
+
               <Toaster/>
           </body>
         </html>

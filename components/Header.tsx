@@ -14,7 +14,7 @@ export default function Header() {
   return (
     <header
       id="header"
-      className={`flex flex-col lg:flex-row lg:items-center lg:justify-between px-6 lg:px-10 2xl:px-40 py-5 mb-5 transition-all duration-300 ease-in-out`}
+      className={`flex flex-col lg:flex-row border-b lg:items-center lg:justify-between px-6 lg:px-10 2xl:px-40 py-5 mb-5 transition-all duration-300 ease-in-out`}
     >
       {/* Logo & Home Section */}
       <div className="flex items-center justify-between w-full lg:w-auto gap-6">

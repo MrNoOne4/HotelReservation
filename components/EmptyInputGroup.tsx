@@ -1,5 +1,3 @@
-import { SearchIcon } from "lucide-react"
-
 import {
   Empty,
   EmptyContent,
@@ -8,13 +6,6 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty"
 
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
-} from "@/components/ui/input-group"
-
-import { Kbd } from "@/components/ui/kbd"
 
 export function EmptyInputGroup() {
   return (
@@ -28,10 +19,10 @@ export function EmptyInputGroup() {
       </EmptyHeader>
       <EmptyContent>
         <EmptyDescription>
-          Need assistance? <a href="/practiceno1/userPage">Contact NovaStay support</a>
+          Need assistance? <a href="/">Contact NovaStay support</a>
         </EmptyDescription>
         <EmptyDescription>
-          Or <a href="/practiceno1/userPage">browse available hotels</a> to make your first reservation.
+          Or <a href="/">browse available hotels</a> to make your first reservation.
         </EmptyDescription>
       </EmptyContent>
     </Empty>

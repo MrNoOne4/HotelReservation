@@ -8,8 +8,7 @@ import { signIn, useSession, signOut } from "next-auth/react";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import Header  from "@/components/Header";
-import { ProfileMenu } from "@/components/ProfileMenu";
-import { AvatarWithBadge } from "@/components/AvatarWithBadge";
+
 import  { SettingsProfile1 }  from "@/components/settings-profile1";
 
 const Profile = async () => {
@@ -22,7 +21,7 @@ const Profile = async () => {
   return  (
     <div>
         <Header/>
-        <SettingsProfile1 className="mx-auto block my-30" defaultValues={{name: session.user?.name, email: session.user?.email, avatar: session.user?.image, username: session?.user?.name?.split(",")[0]}}/>
+        <SettingsProfile1 className="mx-auto block my-30" defaultValues={{name: session.user?.name ?? undefined,  email: session.user?.email ?? undefined}}/>
     
     </div>
   )

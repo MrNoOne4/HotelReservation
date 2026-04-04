@@ -1,187 +1,165 @@
 "use client";
 
-import { Camera, X } from "lucide-react";
-import { useState } from "react";
-
-import {
-  FileUpload,
-  FileUploadItem,
-  FileUploadItemDelete,
-  FileUploadList,
-  FileUploadTrigger,
-} from "@/components/ui/file-upload";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { cn } from "@/lib/utils";
-import { Separator } from "@/components/ui/separator"
-import { User, Lock } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { TooltipDemo } from "@/components/TooltipDemo";
 
-
-interface ProfileFormData {
-  name: string | null | undefined;
-  email: string | null | undefined;
-  username: string | null | undefined;
-  avatar?: string | null | undefined;
-  bio?: string | null | undefined;
+interface SimpleProfileData {
+  name?: string;
+  email?: string;
 }
 
-interface SettingsProfile1Props {
-  defaultValues?: Partial<ProfileFormData>;
-  onSave?: (data: ProfileFormData) => void;
+interface SimpleProfileProps {
+  defaultValues?: SimpleProfileData;
+  onSaveProfile?: (data: SimpleProfileData) => void;
+  onChangePassword?: (current: string, newPass: string) => void;
   className?: string;
 }
 
 const SettingsProfile1 = ({
-  defaultValues = {
-    name: "Alex Morgan",
-    email: "alex.morgan@email.com",
-    username: "alexmorgan",
-    avatar:
-      "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/avatar/avatar8.jpg",
-    bio: "Product designer with 8+ years of experience crafting intuitive digital experiences. Currently focused on design systems and accessibility.",
-  },
-  className,
-}: SettingsProfile1Props) => {
-  const [avatarFiles, setAvatarFiles] = useState<File[]>([]);
+  defaultValues = { name: "", email: "" },
+  onSaveProfile,
+  onChangePassword, className = "",
+}: SimpleProfileProps) => {
+  const [view, setView] = useState<"profile" | "password">("profile");
+  const [formData, setFormData] = useState<SimpleProfileData>(defaultValues);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [edit, setEdit] = useState<boolean>(true);
 
-  const initials = defaultValues.name
-    ?.split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase();
+  // Keep formData in sync if defaultValues change
+  useEffect(() => {
+    setFormData(defaultValues);
+  }, [defaultValues]);
 
-  // Get preview URL from uploaded file or use default avatar
-  const avatarPreview: string | undefined =
-  avatarFiles.length > 0
-    ? URL.createObjectURL(avatarFiles[0])
-    : defaultValues.avatar ?? undefined;
+  // Handle profile save
+  const handleSaveProfile = () => {
+    if (onSaveProfile) onSaveProfile(formData);
+    alert("Profile saved!");
+    setEdit(true); // Exit edit mode after save
+  };
+
+  // Handle password save
+  const handleSavePassword = () => {
+    if (onChangePassword) onChangePassword(currentPassword, newPassword);
+    alert("Password changed!");
+    setCurrentPassword("");
+    setNewPassword("");
+  };
+
+  const handleCancelProfile = () => {
+    setFormData({
+      name: defaultValues.name,
+      email: defaultValues.email,
+    }); 
+    setEdit(true); 
+  };
+
+  // Toggle edit/save for profile
+  const handleEditToggle = () => {
+    if (!edit) {
+      handleSaveProfile();
+    } else {
+      setEdit(false); 
+    }
+  };
 
   return (
-    <Card className={cn("w-full max-w-lg", className)}>
-      <div className="flex h-5 items-center gap-4 text-md mb-2 justify-center ">
-          <button className="cursor-pointer"><User/>  Profile</button>
-          <Separator orientation="vertical" />
-          <button className="cursor-pointer"><Lock/> Change password</button>
+    <Card className="w-full max-w-md mx-auto py-30">
+      {/* View toggle buttons */}
+      <div className="flex justify-center items-center gap-4 mt-4 mb-2 ">
+        <Button variant={view === "profile" ? "default" : "outline"} onClick={() => setView("profile")}>
+          View Profile
+        </Button>
+        <Separator orientation="vertical" />
+        <Button variant={view === "password" ? "default" : "outline"} onClick={() => setView("password")}>
+          Change Password
+        </Button>
+        <TooltipDemo />
       </div>
-        <Separator className="mb-3"/>
-      <CardHeader>
-        <CardTitle>Profile</CardTitle>
-        <CardDescription>
-          Update your personal information and profile picture
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Avatar Upload */}
-        <FileUpload
-          value={avatarFiles}
-          onValueChange={setAvatarFiles}
-          accept="image/*"
-          maxFiles={1}
-          maxSize={2 * 1024 * 1024}
-        >
-          <div className="flex items-center gap-4">
-            <FileUploadTrigger asChild>
-              <button
-                type="button"
-                className="group relative size-20 shrink-0 cursor-pointer rounded-full focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
-              >
-                <Avatar className="size-20">
-                  <AvatarImage
-                    src={avatarPreview ?? undefined}
-                    alt={defaultValues.name ?? undefined}
-                    className="object-cover"
-                  />
-                  <AvatarFallback className="text-xl font-semibold">
-                    {initials}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
-                  <Camera className="size-6 text-white" />
-                </div>
-              </button>
-            </FileUploadTrigger>
 
+      {view === "profile" ? (
+        <>
+          <CardHeader>
+            <CardTitle>Guest Profile</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
             <div className="space-y-1">
-              <p className="text-sm font-medium">Profile Photo</p>
-              <p className="text-xs text-muted-foreground">
-                Click the avatar to upload a new photo
-              </p>
-              <p className="text-xs text-muted-foreground">
-                JPG, PNG or GIF. Max 2MB.
-              </p>
+              <Label htmlFor="name">Full Name</Label>
+              <Input
+                id="name"
+                placeholder="Enter your full name"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                disabled={edit}
+              />
             </div>
-          </div>
-
-          {avatarFiles.length > 0 && (
-            <FileUploadList className="mt-3">
-              {avatarFiles.map((file, index) => (
-                <FileUploadItem
-                  key={index}
-                  value={file}
-                  className="rounded-lg border bg-muted/30 p-2"
-                >
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium">{file.name}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {(file.size / 1024).toFixed(1)} KB
-                    </p>
-                  </div>
-                  <FileUploadItemDelete asChild>
-                    <Button variant="ghost" size="icon" className="size-8">
-                      <X className="size-4" />
-                    </Button>
-                  </FileUploadItemDelete>
-                </FileUploadItem>
-              ))}
-            </FileUploadList>
-          )}
-        </FileUpload>
-
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor="name">Full Name</Label>
-            <Input
-              id="name"
-              placeholder="Enter your name"
-              defaultValue={defaultValues?.name ?? undefined}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="username">Username</Label>
-            <Input
-              id="username"
-              placeholder="Enter username"
-              defaultValue={defaultValues?.username ?? undefined}
-            />
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            type="email"
-            placeholder="Enter your email" disabled
-            defaultValue={defaultValues?.email ?? undefined}
-          />
-        </div>
-
-      </CardContent>
-      <CardFooter className="flex justify-end gap-2 mt-3">
-        <Button variant="outline" className="cursor-pointer">Cancel</Button>
-        <Button className="cursor-pointer">Save Changes</Button>
-      </CardFooter>
+            <div className="space-y-1">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="Enter your email"
+                value={formData.email}
+                disabled
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              />
+            </div>
+          </CardContent>
+          <CardFooter className="flex justify-end gap-2">
+            {!edit && (
+              <Button variant="outline" onClick={handleCancelProfile}>
+                Cancel
+              </Button>
+            )}
+            <Button onClick={handleEditToggle}>{edit ? "Edit" : "Save"}</Button>
+          </CardFooter>
+        </>
+      ) : (
+        <>
+          <CardHeader>
+            <CardTitle>Change Password</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-1">
+              <Label htmlFor="current-password">Current Password</Label>
+              <Input
+                id="current-password"
+                type="password"
+                placeholder="Enter current password"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+              />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="new-password">New Password</Label>
+              <Input
+                id="new-password"
+                type="password"
+                placeholder="Enter new password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+              />
+            </div>
+          </CardContent>
+          <CardFooter className="flex justify-end gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setCurrentPassword("");
+                setNewPassword("");
+              }}
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleSavePassword}>Save</Button>
+          </CardFooter>
+        </>
+      )}
     </Card>
   );
 };
