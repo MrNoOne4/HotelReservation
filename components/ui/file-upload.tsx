@@ -138,7 +138,7 @@ function useStore<T>(selector: (state: StoreState) => T): T {
 
   const lastValueRef = useLazyRef<{ value: T; state: StoreState } | null>(
     () => null,
-  );
+  ) as React.MutableRefObject<{ value: T; state: StoreState } | null>;
 
   const getSnapshot = React.useCallback(() => {
     const state = store.getState();
@@ -241,9 +241,9 @@ function FileUpload(props: FileUploadProps) {
   const labelId = React.useId();
 
   const dir = DirectionPrimitive.useDirection(dirProp);
-  const listeners = useLazyRef(() => new Set<() => void>()).current;
-  const files = useLazyRef<Map<File, FileState>>(() => new Map()).current;
-  const urlCache = useLazyRef(() => new WeakMap<File, string>()).current;
+  const listeners = useLazyRef(() => new Set<() => void>()).current!;
+  const files = useLazyRef<Map<File, FileState>>(() => new Map()).current!;
+  const urlCache = useLazyRef(() => new WeakMap<File, string>()).current!;
   const inputRef = React.useRef<HTMLInputElement>(null);
   const isControlled = value !== undefined;
 
@@ -420,7 +420,7 @@ function FileUpload(props: FileUploadProps) {
         });
       });
     };
-  }).current;
+  }).current!;
 
   React.useEffect(() => {
     if (isControlled) {

@@ -18,7 +18,7 @@ import { RefreshCwIcon } from "lucide-react"
 import { useState } from "react";
 
 type InputOTPFormProps = {
-  onSubmit?: ( e: React.FormEvent<HTMLFormElement>, otp: string ) => void | Promise<void>;
+  onSubmit?: (e: React.FormEvent<HTMLFormElement>, otp: string) => void | Promise<void>;
   resendOTP?: () => Promise<void | boolean>;
   resendBtn: boolean;
   time: string;
@@ -27,7 +27,7 @@ type InputOTPFormProps = {
 
 export function InputOTPForm({onSubmit, resendOTP,resendBtn,time, email}: InputOTPFormProps) {
     const [otp, setOtp] = useState<string>("");
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     onSubmit?.(e, otp);
     }

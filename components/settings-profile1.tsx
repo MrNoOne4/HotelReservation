@@ -29,11 +29,11 @@ import { User, Lock } from "lucide-react";
 
 
 interface ProfileFormData {
-  name: string;
-  email: string;
-  username: string;
-  avatar?: string;
-  bio?: string;
+  name: string | null | undefined;
+  email: string | null | undefined;
+  username: string | null | undefined;
+  avatar?: string | null | undefined;
+  bio?: string | null | undefined;
 }
 
 interface SettingsProfile1Props {
@@ -62,14 +62,14 @@ const SettingsProfile1 = ({
     .toUpperCase();
 
   // Get preview URL from uploaded file or use default avatar
-  const avatarPreview =
-    avatarFiles.length > 0
-      ? URL.createObjectURL(avatarFiles[0])
-      : defaultValues.avatar;
+  const avatarPreview: string | undefined =
+  avatarFiles.length > 0
+    ? URL.createObjectURL(avatarFiles[0])
+    : defaultValues.avatar ?? undefined;
 
   return (
     <Card className={cn("w-full max-w-lg", className)}>
-      <div className="flex h-5 items-center gap-4 text-md mb-2 justify-center">
+      <div className="flex h-5 items-center gap-4 text-md mb-2 justify-center ">
           <button className="cursor-pointer"><User/>  Profile</button>
           <Separator orientation="vertical" />
           <button className="cursor-pointer"><Lock/> Change password</button>
@@ -98,8 +98,8 @@ const SettingsProfile1 = ({
               >
                 <Avatar className="size-20">
                   <AvatarImage
-                    src={avatarPreview}
-                    alt={defaultValues.name}
+                    src={avatarPreview ?? undefined}
+                    alt={defaultValues.name ?? undefined}
                     className="object-cover"
                   />
                   <AvatarFallback className="text-xl font-semibold">
@@ -154,7 +154,7 @@ const SettingsProfile1 = ({
             <Input
               id="name"
               placeholder="Enter your name"
-              defaultValue={defaultValues.name}
+              defaultValue={defaultValues?.name ?? undefined}
             />
           </div>
           <div className="space-y-2">
@@ -162,7 +162,7 @@ const SettingsProfile1 = ({
             <Input
               id="username"
               placeholder="Enter username"
-              defaultValue={defaultValues.username}
+              defaultValue={defaultValues?.username ?? undefined}
             />
           </div>
         </div>
@@ -173,7 +173,7 @@ const SettingsProfile1 = ({
             id="email"
             type="email"
             placeholder="Enter your email" disabled
-            defaultValue={defaultValues.email}
+            defaultValue={defaultValues?.email ?? undefined}
           />
         </div>
 
