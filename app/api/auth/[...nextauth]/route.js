@@ -3,7 +3,7 @@ import GoogleProvider from "next-auth/providers/google";
 import FacebookProvider from "next-auth/providers/facebook";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcrypt";
-import  prisma  from "../../../../hello-prisma/lib/prisma";
+import  { prisma }  from "../../../../hello-prisma/lib/prisma";
 
 export const authOptions = {
   providers: [
