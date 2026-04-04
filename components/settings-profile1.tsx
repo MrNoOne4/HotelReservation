@@ -69,7 +69,7 @@ const SettingsProfile1 = ({
 
   return (
     <Card className={cn("w-full max-w-lg", className)}>
-      <div className="flex h-5 items-center gap-4 text-md mb-2 justify-center items-center">
+      <div className="flex h-5 items-center gap-4 text-md mb-2 justify-center">
           <button className="cursor-pointer"><User/>  Profile</button>
           <Separator orientation="vertical" />
           <button className="cursor-pointer"><Lock/> Change password</button>

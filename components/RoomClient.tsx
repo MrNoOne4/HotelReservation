@@ -90,7 +90,7 @@ const RoomClient = ({ room }: { room: Room }) => {
         <div className="flex items-center gap-6">
             <button
               onClick={() => {
-                redirect("/practiceno1/userPage");
+                redirect("/");
                 
               }}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-white/6 text-gray-400 text-[12px] font-medium cursor-pointer transition"
@@ -102,7 +102,7 @@ const RoomClient = ({ room }: { room: Room }) => {
           </div>
         </div>
 
-        <ProfileMenu avatar={<AvatarWithBadge  className="text-white  "  avatar={`${session?.user?.image}`} name={session?.user?.name?.split(",")[0]}/>} profile={() => redirect("/practiceno1/profile")} logout={() => signOut({ callbackUrl: window.location.href })}/>
+        <ProfileMenu avatar={<AvatarWithBadge  className="text-white  "  avatar={`${session?.user?.image}`} name={session?.user?.name?.split(",")[0]}/>} profile={() => redirect("/profile")} logout={() => signOut({ callbackUrl: window.location.href })}/>
         
       </header>
 

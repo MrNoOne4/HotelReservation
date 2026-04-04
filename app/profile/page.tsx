@@ -16,7 +16,7 @@ const Profile = async () => {
     const session = await getServerSession();
     
     if (!session) {
-        redirect("/practiceno1/userPage");
+        redirect("/");
     }
     
   return  (

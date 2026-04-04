@@ -34,9 +34,9 @@ interface Room {
 }
 
 const RoomPage = async ({ params }: Params) => {
-      const session = await getServerSession();
+     const session = await getServerSession();
       if (!session) {
-          redirect("/practiceno1/userPage");
+          redirect("/");
       }
   
     const resolvedParams = await params;
@@ -80,8 +80,8 @@ const RoomPage = async ({ params }: Params) => {
             This room doesn&apos;t exist or has been removed.
           </p>
 
-          <Link href="/practiceno1/userPage">
-            <Button className="mt-6 rounded-lg bg-[#c9a96e] px-7 font-bold text-[#0D0C17] hover:bg-[#dfc080]">
+          <Link href="/my-nextjs-site/app">
+            <Button className="mt-6 rounded-lg bg-[#c9a96e] px-7 font-bold text-[#0D0C17] hover:bg-[#dfc080]" >
               ← Back to Rooms
             </Button>
           </Link>
