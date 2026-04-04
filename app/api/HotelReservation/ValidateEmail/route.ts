@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "../../../../hello-prisma/lib/prisma";
+import  prisma  from "../../../../hello-prisma/lib/prisma";
 
 export async function POST(req: NextRequest) {
   return validateEmail(req);
