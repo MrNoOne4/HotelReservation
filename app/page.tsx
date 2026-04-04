@@ -214,7 +214,7 @@ const HotelReservation = () => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({email: data.signUpEmail})
+      body: JSON.stringify({email: data.signUpEmail, action: "validateEmail"}),
     })
 
     const result = await req.json();

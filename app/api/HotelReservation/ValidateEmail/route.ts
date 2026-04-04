@@ -1,11 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import  { prisma }  from "../../../../hello-prisma/lib/prisma";
+import bcryptjs from "bcryptjs";
 
 export async function POST(req: NextRequest) {
   return validateEmail(req);
 }
 
 export async function GET(req: NextRequest) {
+  const { email, action } = await req.json();
+
+  if (action === "validateEmail") {
+    return validateEmail(req);
+  }
+
   return validateEmail(req);
 }
 
@@ -29,3 +36,64 @@ async function validateEmail(req: NextRequest) {
     return NextResponse.json({ message: e instanceof Error ? e.message : "Unknown error" }, { status: 500 });
   }
 }
+
+export async function PATCH(req: NextRequest) {
+  try {
+    const body = await req.json();
+    const { email, action, name, password } = body;
+
+    if (!email) {
+      return NextResponse.json({ message: "Email required" }, { status: 400 });
+    }
+
+    // 🔹 Change Name
+    if (action === "changeName") {
+      if (!name) {
+        return NextResponse.json({ message: "Name required" }, { status: 400 });
+      }
+
+      await prisma.users.update({
+        where: { GuestEmail: email },
+        data: { GuestFullName: name },
+      });
+
+      return NextResponse.json({ message: "Name updated successfully" });
+    }
+
+    // 🔹 Change Password
+    if (action === "changePassword") {
+      if (!password) {
+        return NextResponse.json({ message: "Password required" }, { status: 400 });
+      }
+
+      const findacc = await prisma.users.findFirst({ where: { GuestEmail: email } });
+
+      if (!findacc) {
+        return NextResponse.json({ message: "User not found" }, { status: 404 });
+      }
+
+      const compare = await bcryptjs.compare(password, findacc.GuestPassword);
+
+      if (compare) {
+          await prisma.users.update({
+            where: { GuestEmail: email },
+            data: { GuestPassword: password },
+          });
+      }
+
+
+      return NextResponse.json({ message: "Password updated successfully" });
+    }
+
+    return NextResponse.json({ message: "Invalid action" }, { status: 400 });
+
+  } catch (e) {
+    return NextResponse.json(
+      { message: e instanceof Error ? e.message : "Unknown error" },
+      { status: 500 }
+    );
+  }
+}
+
+
+

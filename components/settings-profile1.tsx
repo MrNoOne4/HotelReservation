@@ -30,6 +30,7 @@ const SettingsProfile1 = ({
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [edit, setEdit] = useState<boolean>(true);
+  const [editChange, setChangeEdit] = useState<boolean>(false);
 
   // Keep formData in sync if defaultValues change
   useEffect(() => {
@@ -147,16 +148,22 @@ const SettingsProfile1 = ({
             </div>
           </CardContent>
           <CardFooter className="flex justify-end gap-2">
+
+            {editChange && 
             <Button
               variant="outline"
               onClick={() => {
                 setCurrentPassword("");
                 setNewPassword("");
+                setChangeEdit(false);
               }}
             >
               Cancel
             </Button>
-            <Button onClick={handleSavePassword}>Save</Button>
+              
+            }
+
+            <Button onClick={() => editChange ? handleSavePassword() : setChangeEdit(true) }>{ editChange ? "Save" : "Edit" }</Button>
           </CardFooter>
         </>
       )}
