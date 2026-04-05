@@ -371,7 +371,7 @@ const sendMessages = async (e: React.FormEvent<HTMLFormElement> , data: messageP
       return;
     }
 
-    alert("Verification Match");
+    toast.info("Verification successful! Creating your account...", { position: "top-center" });
     localStorage.clear();
     setShowForm(false);
     showOtpForm(true);
@@ -405,12 +405,16 @@ const sendMessages = async (e: React.FormEvent<HTMLFormElement> , data: messageP
     })
   }
 
- useEffect(() => {
+  // loading state
+
     if (status === "loading") {
-      
+      return (
+        <div className='flex justify-center items-center h-screen'>
+          <SkeletonCard/>
+        </div>
+      )
      
     }
-  }, [status]);
   
   return (
     <div className='box-border p-0 m-0 font-sans bg-[#F8FAFC] overflow-x-auto snap-x snap-mandatory scroll-smooth'>

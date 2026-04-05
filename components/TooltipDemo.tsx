@@ -14,7 +14,8 @@ export function TooltipDemo() {
         <Button variant="outline"><Info/></Button>
       </TooltipTrigger>
       <TooltipContent>
-        <p>Password change not allowed for this user</p>
+        <p>  Account updates for users registered via the custom sign-up are limited to password changes. Please contact support for modifications to other account information.
+</p>
       </TooltipContent>
     </Tooltip>
   )

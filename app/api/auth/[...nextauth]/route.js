@@ -59,11 +59,23 @@ export const authOptions = {
     }),
   ],
 
-  session: { strategy: "jwt" },
+  session: {
+     strategy: "jwt" 
+  },
 
   pages: { signIn: "/", error: "/" },
 
   callbacks: {
+  async redirect({ url, baseUrl }) {
+    if (!url) return baseUrl;
+    try {
+      let decodedUrl = decodeURIComponent(url.trim());
+      return decodedUrl.split("&error=")[0];
+    } catch {
+      return baseUrl;
+    }
+  },
+
     async signIn({ user, account, profile }) {
       if (!account) return true; // Credentials login already handled
 

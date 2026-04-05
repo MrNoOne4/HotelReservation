@@ -7,10 +7,17 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
-  const { email, action } = await req.json();
+  const url = new URL(req.url);
+  const email = url.searchParams.get("email");
+  const action = url.searchParams.get("action");
 
-  if (action === "validateEmail") {
-    return validateEmail(req);
+  if (action === "validateEmail") return validateEmail(req);
+  if (action === "changePassword") {
+    const user = await prisma.users.findFirst({ where: { GuestEmail: String(email) } });
+    if (user?.GuestPassword === null) {
+      return NextResponse.json({ message: "User registered with provider's auth, please login using the provider", havePassword: false }, { status: 401 });
+    }
+    return NextResponse.json({ message: "User registered with email and password, please login using email and password", havePassword: true }, { status: 200 });
   }
 
   return validateEmail(req);
@@ -40,51 +47,27 @@ async function validateEmail(req: NextRequest) {
 export async function PATCH(req: NextRequest) {
   try {
     const body = await req.json();
-    const { email, action, name, password } = body;
+    const { email, action, currentpassword, newPassword } = body;
 
-    if (!email) {
-      return NextResponse.json({ message: "Email required" }, { status: 400 });
-    }
-
-    // 🔹 Change Name
-    if (action === "changeName") {
-      if (!name) {
-        return NextResponse.json({ message: "Name required" }, { status: 400 });
+    if (action === "changePassword") {
+      if (!currentpassword || !newPassword) {
+        return NextResponse.json({ message: "Current password and new password are required" }, { status: 400 });
       }
 
+      const findacc = await prisma.users.findUnique({ where: { GuestEmail: email } });
+      if (!findacc) return NextResponse.json({ message: "User not found" }, { status: 404 });
+
+      const compare = await bcryptjs.compare(currentpassword, findacc.GuestPassword);
+      if (!compare) return NextResponse.json({ message: "Current password is incorrect" }, { status: 401 });
+
+      const hashedPassword = await bcryptjs.hash(newPassword, 10);
       await prisma.users.update({
         where: { GuestEmail: email },
-        data: { GuestFullName: name },
+        data: { GuestPassword: hashedPassword },
       });
-
-      return NextResponse.json({ message: "Name updated successfully" });
-    }
-
-    // 🔹 Change Password
-    if (action === "changePassword") {
-      if (!password) {
-        return NextResponse.json({ message: "Password required" }, { status: 400 });
-      }
-
-      const findacc = await prisma.users.findFirst({ where: { GuestEmail: email } });
-
-      if (!findacc) {
-        return NextResponse.json({ message: "User not found" }, { status: 404 });
-      }
-
-      const compare = await bcryptjs.compare(password, findacc.GuestPassword);
-
-      if (compare) {
-          await prisma.users.update({
-            where: { GuestEmail: email },
-            data: { GuestPassword: password },
-          });
-      }
-
 
       return NextResponse.json({ message: "Password updated successfully" });
     }
-
     return NextResponse.json({ message: "Invalid action" }, { status: 400 });
 
   } catch (e) {

@@ -20,7 +20,7 @@ const Profile = async () => {
     
   return  (
     <div>
-        <Header/>
+        <Header />
         <SettingsProfile1 className="mx-auto block my-30" defaultValues={{name: session.user?.name ?? undefined,  email: session.user?.email ?? undefined}}/>
     
     </div>

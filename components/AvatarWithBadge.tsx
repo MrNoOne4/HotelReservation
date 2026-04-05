@@ -11,19 +11,20 @@ type AvatarWithBadgeProps = {
 };
 
 export function AvatarWithBadge({ avatar, name, className }: AvatarWithBadgeProps) {
-  const initials = name
-    ? name
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .toUpperCase()
-    : "CN";
+  // const initials = name
+  //   ? name
+  //       .split(" ")
+  //       .map((n) => n[0])
+  //       .join("")
+  //       .toUpperCase()
+  //   : "CN";
+  const initials = name && name[0] !== undefined ? name[0].toUpperCase() : "CN";
 
   return (
     <div className={`flex items-center bg-transparent border-none object-contain  ${className || ""}`}>
       <Avatar className="">
         {avatar && <AvatarImage src={avatar} alt={name} />}
-        <AvatarFallback>{initials}</AvatarFallback>
+        <AvatarFallback className="text-black font-semibold">{initials}</AvatarFallback>
       </Avatar>
       {name && (
         <h1 className={`ml-2 ${className} text-lg font-sans font-light pointer-events-none`}>

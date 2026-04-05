@@ -19,7 +19,7 @@ export default function Header() {
       {/* Logo & Home Section */}
       <div className="flex items-center justify-between w-full lg:w-auto gap-6">
         <Link href="/">
-          <Button className="rounded-lg bg-[#c9a96e] font-bold text-[#0D0C17] hover:bg-[#dfc080] transition-colors duration-200">
+          <Button className="rounded-lg bg-[#c9a96e] font-bold text-[#0D0C17] hover:bg-[#dfc080] transition-colors duration-200 cursor-pointer">
             ← Home
           </Button>
         </Link>
