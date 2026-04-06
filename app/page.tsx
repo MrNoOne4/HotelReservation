@@ -266,7 +266,7 @@ const HotelReservation = () => {
       body: JSON.stringify({
         name: data.fullName,
         email: data.signUpEmail,
-        message: `Your Verification code is: ${otp}. Your code expires in 2 minutes`,
+        message: `${otp}`,
       }),
     });
 
