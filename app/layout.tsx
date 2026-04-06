@@ -61,7 +61,6 @@ import { Toaster } from "@/components/ui/sonner"
 import Providers from "@/components/Providers";
 import { getServerSession } from "next-auth";
 import  Footer  from "@/components/Footer";
-import { redirect } from "next/navigation";
 import './globals.css'
 import { TooltipProvider } from "@/components/ui/tooltip"
 

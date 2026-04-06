@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import  { prisma }  from "../../../../hello-prisma/lib/prisma";
 import bcryptjs from "bcryptjs";
+import  { prisma }  from "../../../../hello-prisma/lib/prisma";
 
 export async function POST(req: NextRequest) {
   return validateEmail(req);
@@ -12,6 +12,7 @@ export async function GET(req: NextRequest) {
   const action = url.searchParams.get("action");
 
   if (action === "validateEmail") return validateEmail(req);
+  
   if (action === "changePassword") {
     const user = await prisma.users.findFirst({ where: { GuestEmail: String(email) } });
     if (user?.GuestPassword === null) {

@@ -1,13 +1,7 @@
-import nodemailer from "nodemailer";
 import { NextRequest, NextResponse } from "next/server";
-  interface SignupData {
-    fullName: string;
-    signUpEmail: string;
-    signUpPassword: string;
-    signUpConfirmPassword: string;
-  }
+import nodemailer from "nodemailer";
 
-function buildMessageEmail(name: string, message: string): string {
+function buildMessageEmail(email: string, otp: string): string {
   const year = new Date().getFullYear();
 
   return `
@@ -41,16 +35,14 @@ function buildMessageEmail(name: string, message: string): string {
                       Hello,
                     </p>
 
-                    <p style="margin:0 0 16px;font-size:14px;color:#374151;line-height:1.5;">
-                      You have received a new message from <strong>${name}</strong>.
-                    </p>
+            
 
                     <div style="background:#f9fafb;border:1px solid #e5e7eb;
                                 border-radius:8px;padding:16px;margin-bottom:24px;
                                 font-size:14px;color:#374151;line-height:1.5;">
-                      ${message}
+                      ${otp}
                     </div>
-
+                    
                     <p style="margin:0;font-size:13px;color:#6b7280;">
                       Please respond to this message at your earliest convenience.
                     </p>
@@ -70,40 +62,36 @@ function buildMessageEmail(name: string, message: string): string {
         `;
 }
 
+
+
 export async function POST(req: NextRequest) {
-  try {
-    const { firstName, lastName, email, message } = await req.json();
+    try {
+        const { email, message } = await req.json();
+        if (!email || !message) {
+            return NextResponse.json({ message: "Email and message are required" }, { status: 400 });
+        }
 
-    if (!firstName || !lastName || !email || !message) {
-      return NextResponse.json(
-        { message: "Missing required fields" },
-        { status: 400 }
-      );
+        const transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS,
+            },
+        });
+
+        await transporter.sendMail({
+            from: `"Hotel Reservation Forgot Password" <${process.env.EMAIL_USER}>`,
+            to: email,
+            subject: `Forgot Password OTP for ${email}`,
+            html: buildMessageEmail(email, message),
+        });
+
+        return NextResponse.json({ message: "Email sent successfully" }, { status: 200 });
+
+    } catch (error) {
+        return NextResponse.json(
+            { message: error instanceof Error ? error.message : "Unknown error" },
+            { status: 500 }
+        );
     }
-
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-    });
-
-    await transporter.sendMail({
-      from: `"${firstName} ${lastName}" <${process.env.EMAIL_USER}>`,
-      to: "mathewdemesa1@gmail.com",
-      subject: `Message from ${email}`,
-      html: buildMessageEmail(firstName + " " + lastName, message),
-    });
-
-    return NextResponse.json(
-      { message: "Email sent successfully" },
-      { status: 200 }
-    );
-  } catch (error: any) {
-    return NextResponse.json(
-      { message: error.message || "Internal Server Error" },
-      { status: 500 }
-    );
-  }
 }

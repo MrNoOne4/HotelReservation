@@ -66,18 +66,18 @@ export const authOptions = {
   pages: { signIn: "/", error: "/" },
 
   callbacks: {
-  async redirect({ url, baseUrl }) {
-    if (!url) return baseUrl;
-    try {
-      let decodedUrl = decodeURIComponent(url.trim());
-      return decodedUrl.split("&error=")[0];
-    } catch {
-      return baseUrl;
-    }
-  },
+    async redirect({ url, baseUrl }) {
+      if (!url) return baseUrl;
+        try {
+          let decodedUrl = decodeURIComponent(url.trim());
+          return decodedUrl.split("&error=")[0];
+        } catch {
+          return baseUrl;
+        }
+    },
 
     async signIn({ user, account, profile }) {
-      if (!account) return true; // Credentials login already handled
+      if (!account) return true;
 
       const providerId = account.providerAccountId;
       const providerName = account.provider;
@@ -114,7 +114,7 @@ export const authOptions = {
         data: {
           GuestEmail: email,
           GuestFullName: user.name ?? "",
-          GuestPassword: " ", 
+          GuestPassword: "null", 
           isVerified: true,
         },
       });

@@ -6,6 +6,7 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
@@ -21,12 +22,13 @@ type LoginFormProps = {
   closeForm?: () => void;
   loginFacebook?:() => void;
   loginGoogle?: () => void;
+  forgotPassword?: () => void;
 
 } & Omit<React.ComponentPropsWithoutRef<"div">, "onSubmit">;
 
 
 
-export function LoginForm({ className, onSubmit,switchTo, closeForm, loginFacebook, loginGoogle, ...props }: LoginFormProps) {
+export function LoginForm({ className, onSubmit,switchTo, closeForm, loginFacebook, loginGoogle, forgotPassword, ...props }: LoginFormProps) {
     const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
 
     const [formData, setFormData] = useState({ email: '', password: '' });
@@ -104,9 +106,9 @@ export function LoginForm({ className, onSubmit,switchTo, closeForm, loginFacebo
                   <div className="flex items-center">
                     <Label htmlFor="password">Password</Label>
                     <a
-                      href="#"
+                      
                       className="ml-auto text-sm underline-offset-4 hover:underline"
-                    >
+                     onClick={forgotPassword}>
                       Forgot your password?
                     </a>
                   </div>
@@ -131,10 +133,12 @@ export function LoginForm({ className, onSubmit,switchTo, closeForm, loginFacebo
           </form>
         </CardContent>
 
-            <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-primary  text-gray500">
-              By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
+        <CardFooter>
+            <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-primary text-gray500">
+              By clicking continue, you agree to our  <a href="#">Terms of Service</a>{" "}
               and <a href="#">Privacy Policy</a>.
             </div>
+        </CardFooter>
 
       
       </Card>
