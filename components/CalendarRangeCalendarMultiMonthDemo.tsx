@@ -27,7 +27,6 @@ const CalendarRangeCalendarMultiMonthDemo = () => {
       const today = new Date()
       const tomorrow = new Date()
       tomorrow.setDate(today.getDate() + 1)
-      toast.warning("fuck off", { position: "bottom-left" });
       setDateRange({ from: today, to: tomorrow })
     }
   }, [])
@@ -73,6 +72,7 @@ const CalendarRangeCalendarMultiMonthDemo = () => {
         onSelect={setDateRange}
         numberOfMonths={2}
         className="rounded-lg border"
+        disabled={{ before: new Date() }}
       />
 
       <div className="flex justify-end mt-4 ">

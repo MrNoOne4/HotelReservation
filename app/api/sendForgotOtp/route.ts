@@ -14,7 +14,7 @@ function buildMessageEmail(email: string, otp: string): string {
       </head>
       <body style="margin:0;padding:0;background:#f3f4f6;font-family:Arial,sans-serif;">
 
-        <section style="height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:20px;">
+        <section style="display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:20px;">
                 <div style="max-width:480px;margin:40px auto;background:#ffffff;
                     border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.05);
                     border:1px solid #e5e7eb;overflow:hidden;">
@@ -24,15 +24,15 @@ function buildMessageEmail(email: string, otp: string): string {
                     <h2 style="margin:0;color:#ffffff;font-size:20px;font-weight:600;">
                       Hotel Reservation System
                     </h2>
-                    <p style="margin:4px 0 0;color:#dbeafe;font-size:13px;">
-                      New Customer Message
+                    <p style="margin:4px 0 0;color:#dbeafe;font-size:13px; color:white;">
+                      Reset Password OTP for ${email}
                     </p>
                   </div>
 
                   <!-- Body -->
                   <div style="padding:32px;">
                     <p style="margin:0 0 12px;font-size:16px;font-weight:500;">
-                      Hello,
+                      You have requested to reset your password. Please use the following OTP to proceed with resetting your password:
                     </p>
 
             
@@ -44,7 +44,7 @@ function buildMessageEmail(email: string, otp: string): string {
                     </div>
                     
                     <p style="margin:0;font-size:13px;color:#6b7280;">
-                      Please respond to this message at your earliest convenience.
+                      this is automated email, please do not reply to this email.
                     </p>
                   </div>
 

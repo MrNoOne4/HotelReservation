@@ -21,7 +21,7 @@ export default function ResetPasswordForm({ onSubmit, switchTo, closeForm }: pro
 
 
   return (
-    <section className="flex flex-col items-center gap-14 bg-[#212121] rounded-md">
+    <section className="flex flex-col items-center gap-14 bg-[#212121] rounded-md z-1">
       <button className="cursor-pointer text-white block ml-auto translate-y-6 -translate-x-5" onClick={closeForm}>
         {<X/>}
       </button>

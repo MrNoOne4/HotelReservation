@@ -14,18 +14,19 @@ import {
   InputOTPSeparator,
   InputOTPSlot,
 } from "@/components/ui/input-otp"
-import { RefreshCwIcon } from "lucide-react"
+import { RefreshCwIcon, X} from "lucide-react"
 import { useState } from "react";
 
 type InputOTPFormProps = {
   onSubmit?: (e: React.FormEvent<HTMLFormElement>, otp: string) => void | Promise<void>;
+  cancel?: () => void;
   resendOTP?: () => Promise<void | boolean>;
   resendBtn: boolean;
   time: string;
   email?: string;
 }
 
-export function InputOTPForm({onSubmit, resendOTP,resendBtn,time, email}: InputOTPFormProps) {
+export function InputOTPForm({onSubmit, cancel ,resendOTP,resendBtn,time, email}: InputOTPFormProps) {
     const [otp, setOtp] = useState<string>("");
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -35,7 +36,7 @@ export function InputOTPForm({onSubmit, resendOTP,resendBtn,time, email}: InputO
   return (
     <Card className=" mx-auto p-5  bg-[#171717]">
       <CardHeader>
-        <CardTitle className="font-semibold text-white">Verify your login</CardTitle>
+        <CardTitle className="font-semibold text-white flex justify-between">Verify your login <button onClick={cancel} className="cursor-pointer"><X/></button></CardTitle>
         <CardDescription className="text-gray-400 ">
           Enter the verification code we sent to your Email address:{" "}
           <span className="font-medium text-gray-400">{email}</span>
@@ -46,6 +47,7 @@ export function InputOTPForm({onSubmit, resendOTP,resendBtn,time, email}: InputO
           <div className="flex items-center justify-between">
             <FieldLabel htmlFor="otp-verification" className="text-white">
               Verification code
+              
             </FieldLabel>
             <Button variant="outline" size="xs" className={`${resendBtn ? 'cursor-not-allowed' : "cursor-pointer"} `} onClick={resendOTP} disabled={resendBtn}>
               <RefreshCwIcon />
