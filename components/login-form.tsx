@@ -67,7 +67,7 @@ export function LoginForm({ className, onSubmit,switchTo, closeForm, loginFacebo
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={(e) => onSubmit && onSubmit(e, formData) } >
+          <form onSubmit={(e) =>  onSubmit?.(e, formData) } >
             
             <div className="grid gap-6">
               <div className="flex flex-col gap-4">

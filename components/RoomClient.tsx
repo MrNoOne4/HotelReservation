@@ -1,13 +1,14 @@
 "use client";
 
-import Link from "next/link";
-import { DropdownMenuIcons } from "@/components/DropdownMenuIcons";
 import { AvatarWithBadge } from "@/components/AvatarWithBadge";
 import { useSession, signOut } from "next-auth/react";
 import Carousel from "@/components/Carousel";
 import { redirect } from "next/navigation";
-import { SelectDates } from "@/components/SelectDates";
 import { ProfileMenu } from "@/components/ProfileMenu";
+import { useState } from "react";
+import { DateRange } from "react-day-picker";
+import  DatePickerWithRange  from "@/components/DatePickerWithRange";
+import { useMemo } from "react"; 
 
 interface RoomImage {
   imageId: number;
@@ -34,6 +35,7 @@ const amenityIcons: Record<string, string> = {
   "City view": "⊹",
   "Mini bar": "◇",
 };
+
 
 function Pill({ label }: { label: string }) {
   const icon = amenityIcons[label];
@@ -71,14 +73,29 @@ function AvailBadge({ available }: { available: boolean }) {
   );
 }
 
-function scrollTo(section: string) {
-  const element = document.getElementById(section);
-  element?.scrollIntoView({ behavior: "smooth" });
-}
+
+
+
 
 const RoomClient = ({ room }: { room: Room }) => {
+  interface roomInformation {
+   totalRent: number;
+   totalDays: number;
+  }
   const { data: session } = useSession();
   const { RoomType, price, bed_type, max_occupancy, floor, availability_status, description, images } = room;
+  const [rentInfo, setRentInfo] = useState<roomInformation>({ totalRent: price, totalDays: 1 });
+
+  const [selectedRange, setSelectedRange] = useState<DateRange | undefined>(); 
+
+  useMemo(() => {
+     const timeDiff = selectedRange?.from && selectedRange?.to ? Math.ceil((selectedRange.to.getTime() - selectedRange.from.getTime()) / (1000 * 60 * 60 * 24)) : 0;
+     const totalRent = timeDiff * price;
+     setRentInfo({
+        totalRent: totalRent,
+        totalDays: timeDiff || 1,
+     });
+  }, [selectedRange, price])
 
   return (
     <div className="min-h-screen bg-gray-950 text-white relative font-sans overflow-x-hidden">
@@ -146,7 +163,7 @@ const RoomClient = ({ room }: { room: Room }) => {
 
         {/* RIGHT — BOOKING PANEL */}
         <aside>
-          <div className="sticky top-20 bg-gray-900 border border-white/6 rounded-xl overflow-hidden  transition">
+          <div className="sticky top-20 bg-gray-900 border border-white/6 rounded-xl overflow-hidden transition">
             <div className="p-7">
               <p className="text-[9px] font-bold uppercase tracking-widest text-gray-500 mb-1">Room Type</p>
               <h1 className="font-serif text-4xl font-light text-white leading-tight mb-2">{RoomType}</h1>
@@ -173,14 +190,19 @@ const RoomClient = ({ room }: { room: Room }) => {
               <div className="my-5 h-px bg-white/6" />
 
               <div>
-                <SelectDates />
+                <DatePickerWithRange onDateChangeMain={(range) => 
+                  setSelectedRange(range)
+                } />
+
               </div>
 
               <div className="my-5 h-px bg-white/6" />
 
               <div className="flex justify-between items-center bg-gray-800 border border-white/6 rounded-md px-3 py-2 mb-3">
-                <span className="text-[10px] font-bold uppercase tracking-wide text-gray-500">Estimated Total</span>
-                <span className="font-serif text-yellow-400 text-2xl">₱{price.toLocaleString()}</span>
+
+                <span className="text-[10px] font-bold uppercase tracking-wide text-gray-500">Estimated Total </span>
+                <span className="font-serif text-yellow-400 text-2xl">₱{rentInfo.totalRent ? rentInfo.totalRent.toLocaleString() : price.toLocaleString()} <sup>{rentInfo.totalDays} day</sup> </span>
+
               </div>
 
               <button 

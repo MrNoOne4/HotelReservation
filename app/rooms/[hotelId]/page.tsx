@@ -6,7 +6,6 @@ import Link from "next/link";
 import RoomClient from "@/components/RoomClient";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-import { Toaster } from "@/components/ui/sonner"
 
 
 interface Params {

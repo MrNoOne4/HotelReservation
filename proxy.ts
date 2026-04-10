@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export function proxy(request: NextRequest) {
-  // Example: Redirect unauthorized users
   if (request.nextUrl.pathname.startsWith('/profile') || request.nextUrl.pathname.startsWith('/rooms')) {
     if (!request.cookies.has('session')) {
       return NextResponse.redirect(new URL('/', request.url))
