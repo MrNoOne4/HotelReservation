@@ -1,15 +1,21 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { getToken } from "next-auth/jwt"
 
-export function proxy(request: NextRequest) {
-  if (request.nextUrl.pathname.startsWith('/profile') || request.nextUrl.pathname.startsWith('/rooms')) {
-    if (!request.cookies.has('session')) {
-      return NextResponse.redirect(new URL('/', request.url))
-    }
+export async function proxy(request: NextRequest) {
+  const token = await getToken({ req: request })
+
+  const protectedRoutes =
+    request.nextUrl.pathname.startsWith('/profile') ||
+    request.nextUrl.pathname.startsWith('/rooms')
+
+  if (protectedRoutes && !token) {
+    return NextResponse.redirect(new URL('/', request.url))
   }
+
   return NextResponse.next()
 }
 
 export const config = {
-  matcher: '/dashboard/:path*',
+  matcher: ['/profile/:path*', '/rooms/:path*'],
 }

@@ -95,27 +95,59 @@ const HotelReservation = () => {
     setMessage((prev) => ({ ...prev, [name]: value }))
   }
 
-  interface RoomImage {
-    ImageId: number
-    RoomId: number
-    ImageURL: string
-  }
+interface BedType {
+  BedTypeId: number;
+  BedName: string;
+}
 
-  interface Rooms {
-    RoomId: number
-    RoomType: string
-    price: number
-    bed_type: string
-    max_occupancy: number
-    floor: number
-    availability_status: boolean
-    description: string
-    images: RoomImage[]
-  }
+interface RoomType {
+  RoomTypeId: number;
+  TypeName: string;
+  Description: string;
+}
 
-  const [hotelRooms, setHotelRooms] = useState<Rooms[]>([])
+interface Service {
+  ServiceId: number;
+  ServiceName?: string; // optional because not shown but likely exists
+  Description?: string;
+}
+
+interface RoomImage {
+  ImageId: number;
+  RoomId: number;
+  ImageURL: string;
+}
+
+interface RoomService {
+  RoomServiceId: number;
+  RoomId: number;
+  ServiceId: number;
+  service: Service; // nested object from API
+}
+
+interface Room {
+  RoomId: number;
+  RoomNumber: string;
+  RoomTypeId: number;
+  BedTypeId: number;
+  BasePrice: string; 
+  MaxOccupancy: number;
+  Floor: number;
+  Description: string;
+  bedtypes: BedType;
+  roomtypes: RoomType;
+  images: RoomImage[];
+  roomservices: RoomService[];
+}
+
+  const [hotelRooms, setHotelRooms] = useState<Room[]>([])
+
   const [formForgotPassword, setFormForgotPassword] = useState<boolean>(false);
 
+  hotelRooms.forEach((element, index) => {
+    console.log(element);
+  })
+  
 
   const [forgotStep, setForgotStep] = useState<"email" | "otp" | "password">("email");
   const [forgotEmail, setForgotEmail] = useState<string>("");
@@ -130,7 +162,7 @@ const HotelReservation = () => {
         const res = await fetch('/api/HotelReservation/HotelRoom', {
           method: 'GET'
         })
-        const data: Rooms[] = await res.json()
+        const data: Room[] = await res.json()
 
         if (!res.ok) {
           toast.warning("Failed to fetch rooms", { position: "top-center" });
@@ -434,7 +466,7 @@ const HotelReservation = () => {
   
   const [spinAnimation, setSpinAnimation] = useState<boolean>(false);
 
-  const handleClick = (element: Rooms) => {
+  const handleClick = (element: Room) => {
     if (!session) {
       setLoginShowForm(true);
     } else {
@@ -622,7 +654,7 @@ const HotelReservation = () => {
             id="hotelRooms"
           >
             {
-              hotelRooms.map((element: Rooms, index: number) => (
+              hotelRooms.map((element: Room, index: number) => (
                 <article key={`${element.RoomId}_${index}`}>
                   <Card className="sm:max-w-md w-full pt-0 h-full">
                     <CardContent className="px-0 overflow-hidden">
@@ -634,14 +666,14 @@ const HotelReservation = () => {
                     </CardContent>
                     <CardHeader>
                       <CardTitle>
-                        <strong className='text-lg md:text-2xl font-semibold'>{element.RoomType}</strong>
+                        <strong className='text-lg md:text-2xl font-semibold'>{element.roomtypes?.TypeName}</strong>
                       </CardTitle>
-                      <CardDescription className='text-sm'>{element.description}</CardDescription>
+                      <CardDescription className='text-sm'>{element.Description}</CardDescription>
                     </CardHeader>
                     <hr className="bg-black" />
                     <CardFooter className="flex items-center justify-between gap-3 max-sm:flex-col max-sm:items-stretch">
                       <CardTitle className="mt-2 text-lg font-bold">
-                        {element.price} PHP/night
+                        {element.BasePrice} PHP/night
                       </CardTitle>
                       <Button variant={"outline"} className="cursor-pointer" onClick={() => handleClick(element)}>
                         View Details

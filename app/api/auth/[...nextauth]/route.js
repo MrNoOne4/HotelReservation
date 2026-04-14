@@ -2,8 +2,9 @@ import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import FacebookProvider from "next-auth/providers/facebook";
 import CredentialsProvider from "next-auth/providers/credentials";
-import bcrypt from "bcrypt";
-import  { prisma }  from "../../../../hello-prisma/lib/prisma";
+import bcrypt from "bcryptjs";
+import { prisma } from "../../../../hello-prisma/lib/prisma";
+
 
 export const authOptions = {
   providers: [
@@ -16,14 +17,15 @@ export const authOptions = {
         if (!credentials?.email || !credentials?.password) return null;
 
         const user = await prisma.users.findUnique({
-          where: { GuestEmail: credentials.email },
+          where: { Email: credentials.email },
         });
 
         if (!user) {
           throw new Error("No account found with this email");
         }
 
-        if (!user.GuestPassword) {
+        // "null" string check covers OAuth users who have no real password
+        if (!user.PasswordHash) {
           throw new Error(
             "This email is registered via OAuth. Please login with your provider."
           );
@@ -31,15 +33,15 @@ export const authOptions = {
 
         const isValid = await bcrypt.compare(
           credentials.password,
-          user.GuestPassword
+          user.PasswordHash
         );
 
         if (!isValid) throw new Error("Invalid password");
 
         return {
-          id: user.GuestId,
-          name: user.GuestFullName,
-          email: user.GuestEmail,
+          id: String(user.UserId),
+          name: user.FullName,
+          email: user.Email,
         };
       },
     }),
@@ -60,7 +62,7 @@ export const authOptions = {
   ],
 
   session: {
-     strategy: "jwt" 
+    strategy: "jwt",
   },
 
   pages: { signIn: "/", error: "/" },
@@ -68,12 +70,12 @@ export const authOptions = {
   callbacks: {
     async redirect({ url, baseUrl }) {
       if (!url) return baseUrl;
-        try {
-          let decodedUrl = decodeURIComponent(url.trim());
-          return decodedUrl.split("&error=")[0];
-        } catch {
-          return baseUrl;
-        }
+      try {
+        let decodedUrl = decodeURIComponent(url.trim());
+        return decodedUrl.split("&error=")[0];
+      } catch {
+        return baseUrl;
+      }
     },
 
     async signIn({ user, account, profile }) {
@@ -82,60 +84,63 @@ export const authOptions = {
       const providerId = account.providerAccountId;
       const providerName = account.provider;
 
-      let email = user.email ?? profile?.email ?? `${providerId}@${providerName}.com`;
+      // Only allow providers defined in your enum
+
+
+      const safeProvider = providerName === "google" ? "Google" : providerName === "facebook" ? "Facebook" : null;
+
+      let email =
+        user.email ?? profile?.email ?? `${providerId}@${providerName}.com`;
 
       let existingUser = await prisma.users.findUnique({
-        where: { GuestEmail: email },
+        where: { Email: email },
       });
 
       if (existingUser) {
-        const existingAccount = await prisma.guestaccount.findFirst({
-          where: { GuestId: existingUser.GuestId, provider: providerName },
+        const existingAccount = await prisma.userauthproviders.findFirst({
+          where: { UserId: existingUser.UserId, Provider: safeProvider },
         });
 
         if (!existingAccount) {
-          await prisma.guestaccount.create({
+          await prisma.userauthproviders.create({
             data: {
-              GuestId: existingUser.GuestId,
-              provider: providerName,
-              provider_id: providerId ? String(providerId) : null,
+              UserId: existingUser.UserId,
+              Provider: safeProvider,
+              ProviderUserId: providerId ?? null,
             },
           });
         }
 
-        user.id = existingUser.GuestId;
-        user.email = existingUser.GuestEmail;
-        user.name = existingUser.GuestFullName;
+        user.id = String(existingUser.UserId);
+        user.email = existingUser.Email;
+        user.name = existingUser.FullName;
         return true;
       }
 
-      // Create a new user if none exists
       const newUser = await prisma.users.create({
         data: {
-          GuestEmail: email,
-          GuestFullName: user.name ?? "",
-          GuestPassword: "null", 
-          isVerified: true,
+          Email: email,
+          FullName: user.name ?? "",
+          PasswordHash: "",   
+          IsVerified: true,
         },
       });
 
-      // Link OAuth provider
-      await prisma.guestaccount.create({
+      await prisma.userauthproviders.create({
         data: {
-          GuestId: newUser.GuestId,
-          provider: providerName,
-          provider_id: providerId ? String(providerId) : null,
+          UserId: newUser.UserId,
+          Provider: safeProvider,
+          ProviderUserId: providerId ?? null,
         },
       });
 
-      // Return the new user
-      user.id = newUser.GuestId;
-      user.email = newUser.GuestEmail;
-      user.name = newUser.GuestFullName;
+      user.id = String(newUser.UserId);
+      user.email = newUser.Email;
+      user.name = newUser.FullName;
       return true;
     },
 
-    async jwt({ token, user, account }) {
+    async jwt({token, user, account }) {
       if (user) {
         token.id = user.id;
         token.email = user.email;
@@ -145,9 +150,11 @@ export const authOptions = {
     },
 
     async session({ session, token }) {
-      session.user.id = token.id;
-      session.user.email = token.email;
-      session.user.provider = token.provider ?? null;
+      if (session.user) {
+        session.user.id = token.id;
+        session.user.email = token.email;
+        session.user.provider = token.provider ?? null;
+      }
       return session;
     },
   },

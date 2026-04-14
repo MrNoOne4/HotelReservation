@@ -14,22 +14,49 @@ interface Params {
   };
 }
 
+interface BedType {
+  BedTypeId: number;
+  BedName: string;
+}
+
+interface RoomType {
+  RoomTypeId: number;
+  TypeName: string;
+  Description: string;
+}
+
+interface Service {
+  ServiceId: number;
+  ServiceName?: string;
+  Description?: string;
+}
+
 interface RoomImage {
-  ImageId: number
-  RoomId: number
-  ImageURL: string
+  ImageId: number;
+  RoomId: number;
+  ImageURL: string;
+}
+
+interface RoomService {
+  RoomServiceId: number;
+  RoomId: number;
+  ServiceId: number;
+  service: Service; 
 }
 
 interface Room {
   RoomId: number;
-  RoomType: string;
-  price: number;
-  bed_type: string;
-  max_occupancy: number;
-  floor: number;
-  availability_status: boolean;
-  description: string;
+  RoomNumber: string;
+  RoomTypeId: number;
+  BedTypeId: number;
+  BasePrice: string; 
+  MaxOccupancy: number;
+  Floor: number;
+  Description: string;
+  bedtypes: BedType;
+  roomtypes: RoomType;
   images: RoomImage[];
+  roomservices: RoomService[];
 }
 
 const RoomPage = async ({ params }: Params) => {
@@ -88,14 +115,18 @@ const RoomPage = async ({ params }: Params) => {
     );
   }
 
-  return <RoomClient room={{
-    ...hotelRoom,
-    images: hotelRoom.images.map(img => ({
-      imageId: img.ImageId,
-      roomId: img.RoomId,
-      imageUrl: img.ImageURL
-    }))
-  }}/>;
+  return (
+    <RoomClient
+      room={{
+        ...hotelRoom,
+          images: hotelRoom.images.map((img) => ({
+          ImageId: img.ImageId,
+          RoomId: img.RoomId,
+          ImageURL: img.ImageURL,
+        })),
+      }}
+    />
+  );
 
 };
 

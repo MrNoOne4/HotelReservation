@@ -13,10 +13,10 @@ export async function POST(req: NextRequest) {
 
         const userAccount = await prisma.users.create({
             data: {
-                GuestFullName: userFullName,
-                GuestEmail: userEmail,
-                GuestPassword: hashPassword,
-                isVerified: true,
+                FullName: userFullName,
+                Email: userEmail,
+                PasswordHash: hashPassword,
+                IsVerified: true,
             }
         })
 

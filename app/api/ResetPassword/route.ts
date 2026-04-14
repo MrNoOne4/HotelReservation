@@ -20,7 +20,7 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ message: "New passwords do not match" }, { status: 400 });
     }
 
-    const findUser = await prisma.users.findUnique({ where: { GuestEmail: email } });
+    const findUser = await prisma.users.findUnique({ where: { Email: email } });
 
     if (!findUser) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
@@ -29,8 +29,8 @@ export async function PATCH(req: NextRequest) {
 
     const hashedPassword = await bcryptjs.hash(newPassword, 10);
     await prisma.users.update({
-      where: { GuestEmail: email },
-      data: { GuestPassword: hashedPassword },
+      where: { Email: email },
+      data: { PasswordHash: hashedPassword },
     });
 
     return NextResponse.json({ message: "Password updated successfully" });
