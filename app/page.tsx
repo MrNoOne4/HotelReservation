@@ -106,10 +106,16 @@ interface RoomType {
   Description: string;
 }
 
-interface Service {
-  ServiceId: number;
-  ServiceName?: string; // optional because not shown but likely exists
-  Description?: string;
+interface Amenity {
+  AmenityId: number;
+  AmenityName: string;
+}
+
+interface RoomAmenity {
+  RoomAmenityId: number;
+  RoomId: number;
+  AmenityId: number;
+  amenity: Amenity;
 }
 
 interface RoomImage {
@@ -118,29 +124,29 @@ interface RoomImage {
   ImageURL: string;
 }
 
-interface RoomService {
-  RoomServiceId: number;
-  RoomId: number;
-  ServiceId: number;
-  service: Service; // nested object from API
-}
-
 interface Room {
   RoomId: number;
   RoomNumber: string;
   RoomTypeId: number;
   BedTypeId: number;
-  BasePrice: string; 
+  BasePrice: string;
   MaxOccupancy: number;
   Floor: number;
   Description: string;
-  bedtypes: BedType;
-  roomtypes: RoomType;
+
+  bedtype: BedType;
+  roomtype: RoomType;
   images: RoomImage[];
-  roomservices: RoomService[];
+
+  roomamenities: RoomAmenity[];
+
+  amenities: string[];
 }
 
+
   const [hotelRooms, setHotelRooms] = useState<Room[]>([])
+
+  console.log(hotelRooms);
 
   const [formForgotPassword, setFormForgotPassword] = useState<boolean>(false);
 
@@ -666,7 +672,7 @@ interface Room {
                     </CardContent>
                     <CardHeader>
                       <CardTitle>
-                        <strong className='text-lg md:text-2xl font-semibold'>{element.roomtypes?.TypeName}</strong>
+                        <strong className='text-lg md:text-2xl font-semibold'>{element.roomtype?.TypeName}</strong>
                       </CardTitle>
                       <CardDescription className='text-sm'>{element.Description}</CardDescription>
                     </CardHeader>

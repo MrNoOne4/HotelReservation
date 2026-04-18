@@ -7,22 +7,83 @@ datasource db {
   provider = "mysql"
 }
 
+
+
 model bedtypes {
   BedTypeId Int    @id @default(autoincrement())
-  BedName   String @unique(map: "BedName") @db.VarChar(50)
+  BedName   String @unique @db.VarChar(50)
 
-  rooms     rooms[]
+  rooms rooms[]
 }
 
-model payments {
-  PaymentId      Int                     @id @default(autoincrement())
-  ReservationId  Int
-  Amount         Decimal                @db.Decimal(10, 2)
-  PaymentMethod  payments_PaymentMethod
-  PaymentStatus  payments_PaymentStatus? @default(Pending)
-  PaymentDate    DateTime?              @default(now()) @db.Timestamp(0)
+model roomtypes {
+  RoomTypeId  Int     @id @default(autoincrement())
+  TypeName    String  @unique @db.VarChar(50)
+  Description String? @db.Text
 
-  @@index([ReservationId], map: "ReservationId")
+  rooms rooms[]
+}
+
+model rooms {
+  RoomId     Int    @id @default(autoincrement())
+  RoomNumber String @unique @db.VarChar(20)
+
+  RoomTypeId Int
+  BedTypeId  Int
+
+  Floor        Int
+  MaxOccupancy Int
+  BasePrice    Decimal @db.Decimal(10, 2)
+  Description  String? @db.Text
+
+  // Relations
+  bedtype  bedtypes  @relation(fields: [BedTypeId], references: [BedTypeId])
+  roomtype roomtypes @relation(fields: [RoomTypeId], references: [RoomTypeId])
+
+  images        roomimages[]
+  roomamenities roomamenities[]
+}
+
+model roomimages {
+  ImageId  Int    @id @default(autoincrement())
+  RoomId   Int
+  ImageURL String @db.VarChar(1024)
+
+  room rooms @relation(fields: [RoomId], references: [RoomId])
+}
+
+
+
+model amenities {
+  AmenityId   Int    @id @default(autoincrement())
+  AmenityName String @db.VarChar(100)
+
+  roomamenities roomamenities[]
+}
+
+model roomamenities {
+  RoomAmenityId Int @id @default(autoincrement())
+  RoomId        Int
+  AmenityId     Int
+
+  room    rooms     @relation(fields: [RoomId], references: [RoomId])
+  amenity amenities @relation(fields: [AmenityId], references: [AmenityId])
+
+  @@index([RoomId])
+  @@index([AmenityId])
+}
+
+
+
+model reservations {
+  ReservationId Int                  @id @default(autoincrement())
+  UserId        Int
+  CheckInDate   DateTime             @db.Date
+  CheckOutDate  DateTime             @db.Date
+  Status        reservations_Status? @default(Pending)
+  CreatedAt     DateTime?            @default(now()) @db.Timestamp(0)
+
+  @@index([UserId])
 }
 
 model reservationrooms {
@@ -31,122 +92,55 @@ model reservationrooms {
   RoomId            Int
   PriceAtBooking    Decimal @db.Decimal(10, 2)
 
-  @@index([ReservationId], map: "ReservationId")
-  @@index([RoomId], map: "RoomId")
+  @@index([ReservationId])
+  @@index([RoomId])
 }
 
-model reservations {
-  ReservationId Int                   @id @default(autoincrement())
-  UserId        Int
-  CheckInDate   DateTime             @db.Date
-  CheckOutDate  DateTime             @db.Date
-  Status        reservations_Status? @default(Pending)
-  CreatedAt     DateTime?            @default(now()) @db.Timestamp(0)
 
-  @@index([UserId], map: "UserId")
+
+model payments {
+  PaymentId     Int                     @id @default(autoincrement())
+  ReservationId Int
+  Amount        Decimal                 @db.Decimal(10, 2)
+  PaymentMethod payments_PaymentMethod
+  PaymentStatus payments_PaymentStatus? @default(Pending)
+  PaymentDate   DateTime?               @default(now()) @db.Timestamp(0)
+
+  @@index([ReservationId])
 }
 
-model reservationservices {
-  ReservationServiceId Int     @id @default(autoincrement())
-  ReservationId        Int
-  ServiceId            Int
-  Quantity             Int?    @default(1)
-  PriceAtTime          Decimal @db.Decimal(10, 2)
-
-  @@index([ReservationId], map: "ReservationId")
-  @@index([ServiceId], map: "ServiceId")
-}
 
 model roomblocks {
-  BlockId     Int                   @id @default(autoincrement())
+  BlockId     Int                @id @default(autoincrement())
   RoomId      Int
-  BlockedFrom DateTime             @db.Date
-  BlockedTo   DateTime             @db.Date
-  Reason      roomblocks_Reason?   @default(Reserved)
+  BlockedFrom DateTime           @db.Date
+  BlockedTo   DateTime           @db.Date
+  Reason      roomblocks_Reason? @default(Reserved)
 
-  @@index([RoomId], map: "RoomId")
+  @@index([RoomId])
 }
 
-model roomimages {
-  ImageId  Int    @id @default(autoincrement())
-  RoomId   Int
-  ImageURL String @db.VarChar(1024)
 
-  room rooms @relation(fields: [RoomId], references: [RoomId], onDelete: Cascade)
-
-  @@index([RoomId], map: "RoomId")
-}
-
-model rooms {
-  RoomId        Int     @id @default(autoincrement())
-  RoomNumber    String  @unique @db.VarChar(20)
-  RoomTypeId    Int
-  BedTypeId     Int
-  Floor         Int
-  MaxOccupancy  Int
-  BasePrice     Decimal @db.Decimal(10, 2)
-  Description   String? @db.Text
-
-  bedtypes     bedtypes   @relation(fields: [BedTypeId], references: [BedTypeId])
-  roomtypes    roomtypes  @relation(fields: [RoomTypeId], references: [RoomTypeId])
-
-  images       roomimages[]
-  roomservices roomservices[]
-
-  @@index([BedTypeId], map: "BedTypeId")
-  @@index([RoomTypeId], map: "RoomTypeId")
-}
-
-model roomservices {
-  RoomServiceId Int @id @default(autoincrement())
-  RoomId        Int
-  ServiceId     Int
-
-  room    rooms    @relation(fields: [RoomId], references: [RoomId], onDelete: Cascade)
-  service services @relation(fields: [ServiceId], references: [ServiceId], onDelete: Cascade)
-
-  @@index([RoomId], map: "RoomId")
-  @@index([ServiceId], map: "ServiceId")
-}
-
-model roomtypes {
-  RoomTypeId Int    @id @default(autoincrement())
-  TypeName   String @unique(map: "TypeName") @db.VarChar(50)
-  Description String? @db.Text
-
-  rooms rooms[]
-}
-
-model services {
-  ServiceId   Int     @id @default(autoincrement())
-  ServiceName String  @db.VarChar(100)
-  BasePrice   Decimal @db.Decimal(10, 2)
-
-  roomservices roomservices[]
+model users {
+  UserId       Int       @id @default(autoincrement())
+  FullName     String    @db.VarChar(255)
+  Email        String    @unique @db.VarChar(255)
+  PasswordHash String    @db.VarChar(255)
+  IsVerified   Boolean?  @default(false)
+  CreatedAt    DateTime? @default(now()) @db.Timestamp(0)
 }
 
 model userauthproviders {
-  AuthId        Int     @id @default(autoincrement())
-  UserId        Int
-  Provider      userauthproviders_Provider
-  ProviderUserId String? @db.VarChar(255)
-  password_hash String? @db.VarChar(255)
-  CreatedAt     DateTime? @default(now()) @db.Timestamp(0)
+  AuthId         Int                        @id @default(autoincrement())
+  UserId         Int
+  Provider       userauthproviders_Provider
+  ProviderUserId String?                    @db.VarChar(255)
+  // ✅ removed password_hash — it doesn't exist in the DB and belongs on users instead
+  CreatedAt      DateTime?                  @default(now()) @db.Timestamp(0)
 
-  user users @relation(fields: [UserId], references: [UserId], onDelete: Cascade)
-  @@index([UserId], map: "UserId")
+  @@index([UserId])
 }
 
-model users {
-  UserId       Int     @id @default(autoincrement())
-  FullName     String  @db.VarChar(255)
-  Email        String  @unique(map: "Email") @db.VarChar(255)
-  PasswordHash String  @db.VarChar(255)
-  IsVerified   Boolean? @default(false)
-  CreatedAt    DateTime? @default(now()) @db.Timestamp(0)
-
-   authProviders userauthproviders[]
-}
 
 enum userauthproviders_Provider {
   google

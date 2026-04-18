@@ -1,12 +1,9 @@
-// app/rooms/[hotelId]/page.tsx
-
 import { EmptyInputGroup } from "@/components/EmptyInputGroup";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import RoomClient from "@/components/RoomClient";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-
 
 interface Params {
   params: {
@@ -25,10 +22,16 @@ interface RoomType {
   Description: string;
 }
 
-interface Service {
-  ServiceId: number;
-  ServiceName?: string;
-  Description?: string;
+interface Amenity {
+  AmenityId: number;
+  AmenityName: string;
+}
+
+interface RoomAmenity {
+  RoomAmenityId: number;
+  RoomId: number;
+  AmenityId: number;
+  amenity: Amenity;
 }
 
 interface RoomImage {
@@ -37,33 +40,30 @@ interface RoomImage {
   ImageURL: string;
 }
 
-interface RoomService {
-  RoomServiceId: number;
-  RoomId: number;
-  ServiceId: number;
-  service: Service; 
-}
-
 interface Room {
   RoomId: number;
   RoomNumber: string;
   RoomTypeId: number;
   BedTypeId: number;
-  BasePrice: string; 
+  BasePrice: string;
   MaxOccupancy: number;
   Floor: number;
   Description: string;
-  bedtypes: BedType;
-  roomtypes: RoomType;
+
+  bedtype: BedType;
+  roomtype: RoomType;
   images: RoomImage[];
-  roomservices: RoomService[];
+
+  roomamenities: RoomAmenity[];
+
+  amenities: string[];
 }
 
 const RoomPage = async ({ params }: Params) => {
-   const session = await getServerSession();
-   if (!session) {
-       redirect("/");
-   }
+  const session = await getServerSession();
+  if (!session) {
+    redirect("/");
+  }
 
   const resolvedParams = await params;
   const hotelId = Number(resolvedParams.hotelId);
@@ -76,9 +76,10 @@ const RoomPage = async ({ params }: Params) => {
     );
   }
 
-  const res = await fetch("http://localhost:3000/api/HotelReservation/HotelRoom", {
-    cache: "no-store",
-  });
+  const res = await fetch(
+    "http://localhost:3000/api/HotelReservation/HotelRoom",
+    { cache: "no-store" }
+  );
 
   if (!res.ok) throw new Error("Failed to fetch rooms");
 
@@ -94,19 +95,22 @@ const RoomPage = async ({ params }: Params) => {
           alt="Not found"
           className="aspect-video w-80 rounded-2xl object-cover opacity-50"
         />
+
         <div className="text-center">
           <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.2em] text-[#c9a96e]">
             404 — Not Found
           </p>
+
           <h1 className="mb-2 text-3xl font-bold text-white">
             Room Unavailable
           </h1>
+
           <p className="text-sm text-[#555]">
             This room doesn&apos;t exist or has been removed.
           </p>
 
           <Link href="/">
-            <Button className="mt-6 rounded-lg bg-[#c9a96e] px-7 font-bold text-[#0D0C17] hover:bg-[#dfc080]" >
+            <Button className="mt-6 rounded-lg bg-[#c9a96e] px-7 font-bold text-[#0D0C17] hover:bg-[#dfc080]">
               ← Back to Rooms
             </Button>
           </Link>
@@ -119,15 +123,19 @@ const RoomPage = async ({ params }: Params) => {
     <RoomClient
       room={{
         ...hotelRoom,
-          images: hotelRoom.images.map((img) => ({
+
+        images: hotelRoom.images.map((img) => ({
           ImageId: img.ImageId,
           RoomId: img.RoomId,
           ImageURL: img.ImageURL,
         })),
+
+        amenities: hotelRoom.roomamenities.map(
+          (ra) => ra.amenity.AmenityName
+        ),
       }}
     />
   );
-
 };
 
 export default RoomPage;
