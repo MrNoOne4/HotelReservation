@@ -60,6 +60,7 @@ interface Room {
 }
 
 const RoomPage = async ({ params }: Params) => {
+  
   const session = await getServerSession();
   if (!session) {
     redirect("/");

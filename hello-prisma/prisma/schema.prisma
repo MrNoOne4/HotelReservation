@@ -78,6 +78,10 @@ model roomamenities {
 model reservations {
   ReservationId Int                  @id @default(autoincrement())
   UserId        Int
+  GuestFirstName String @db.VarChar(100)
+  GuestLastName String @db.VarChar(100)
+  GuestPhone String @db.VarChar(100)
+  GuestAddress String @db.VarChar(100)
   CheckInDate   DateTime             @db.Date
   CheckOutDate  DateTime             @db.Date
   Status        reservations_Status? @default(Pending)
@@ -95,7 +99,6 @@ model reservationrooms {
   @@index([ReservationId])
   @@index([RoomId])
 }
-
 
 
 model payments {
@@ -135,7 +138,6 @@ model userauthproviders {
   UserId         Int
   Provider       userauthproviders_Provider
   ProviderUserId String?                    @db.VarChar(255)
-  // ✅ removed password_hash — it doesn't exist in the DB and belongs on users instead
   CreatedAt      DateTime?                  @default(now()) @db.Timestamp(0)
 
   @@index([UserId])

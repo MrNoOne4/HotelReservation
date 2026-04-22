@@ -8,6 +8,9 @@ import { ProfileMenu } from "@/components/ProfileMenu";
 import { useState, useEffect } from "react";
 import { DateRange } from "react-day-picker";
 import DatePickerWithRange from "@/components/DatePickerWithRange";
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 
 interface BedType {
   BedTypeId: number;
@@ -114,6 +117,10 @@ const RoomClient = ({ room }: { room: Room }) => {
     });
   }, [selectedRange, price]);
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const handleReserve = () => {
+    setIsModalOpen(false);
+  };
   return (
     <div className="min-h-screen bg-gray-950 text-white">
 
@@ -133,7 +140,7 @@ const RoomClient = ({ room }: { room: Room }) => {
           </div>
         </div>
 
-        <ProfileMenu avatar={<AvatarWithBadge  className="text-white  "  avatar={`${session?.user?.image}`} name={session?.user?.name?.split(",")[0]}/>} profile={() => redirect("/profile")} logout={() => signOut({ callbackUrl: window.location.href })}/>
+        <ProfileMenu avatar={<AvatarWithBadge  className="text-white  "  avatar={`${session?.user?.image}`} name={session?.user?.name?.split(",")[0]}/>} profile={() => redirect("/profile")} billing={() => redirect("/booking")} logout={() => signOut({ callbackUrl: window.location.href })}/>
         
       </header>
 
@@ -206,30 +213,82 @@ const RoomClient = ({ room }: { room: Room }) => {
                 Taxes & fees included
               </p>
 
+                {isModalOpen && (
+                  <section className="fixed inset-0 bg-black/50 backdrop-blur-[2px] flex justify-center items-center p-4 z-50">
+
+                    <section className="relative bg-white w-full max-w-lg rounded-lg p-6 sm:p-8 text-black space-y-6">
+
+                      <button
+                        onClick={() => setIsModalOpen(false)}
+                        className="absolute top-3 right-3 text-gray-500 hover:text-black text-xl"
+                      >
+                        ✕
+                      </button>
+
+                      <h1 className="text-center text-xl sm:text-2xl font-semibold">
+                        Reservation Guest Info
+                      </h1>
+
+                      <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div className="space-y-1">
+                            <Label htmlFor="firstName">First Name</Label>
+                            <Input id="firstName" placeholder="First name" />
+                          </div>
+
+                          <div className="space-y-1">
+                            <Label htmlFor="lastName">Last Name</Label>
+                            <Input id="lastName" placeholder="Last name" />
+                          </div>
+                        </div>
+
+                        <div className="space-y-1">
+                          <Label htmlFor="phone">Phone Number</Label>
+                          <Input id="phone" placeholder="Enter phone number" />
+                        </div>
+
+                        <div className="space-y-1">
+                          <Label htmlFor="address">Address</Label>
+                          <Input id="address" placeholder="Enter address" />
+                        </div>
+                      </form>
+
+                      {/* Date + total */}
+                      <div className="space-y-4">
+                        <DatePickerWithRange
+                          onDateChangeMain={(range) => setSelectedRange(range)}
+                        />
+
+                        <div className="h-px bg-gray-200" />
+
+                        <div className="flex justify-between items-center bg-gray-100 border border-gray-200 rounded-md px-3 py-3">
+                          <span className="text-xs font-bold uppercase text-gray-500">
+                            Estimated Total
+                          </span>
+
+                          <span className="font-serif text-yellow-500 text-xl sm:text-2xl">
+                            ₱{rentInfo.totalRent.toLocaleString()}
+                            <sup className="text-xs text-gray-500 ml-1">
+                              {rentInfo.totalDays} day{rentInfo.totalDays > 1 ? "s" : ""}
+                            </sup>
+                          </span>
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={handleReserve}
+                        className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-semibold py-3 rounded-md transition"
+                      >
+                        Reserve
+                      </button>
+
+                    </section>
+                  </section>
+                )}
+
+
               <div className="my-5 h-px bg-white/6" />
-
-              <DatePickerWithRange
-                onDateChangeMain={(range) =>
-                  setSelectedRange(range)
-                }
-              />
-
-              <div className="my-5 h-px bg-white/6" />
-
-              <div className="flex justify-between items-center bg-gray-800 border border-white/6 rounded-md px-3 py-2 mb-3">
-                <span className="text-[10px] font-bold uppercase text-gray-500">
-                  Estimated Total
-                </span>
-
-                <span className="font-serif text-yellow-400 text-2xl">
-                  ₱{rentInfo.totalRent.toLocaleString()}
-                  <sup>{rentInfo.totalDays} day</sup>
-                </span>
-              </div>
-
-              <button className="w-full py-3 rounded-md text-[11px] font-bold uppercase tracking-widest bg-black hover:bg-[#212121] transition">
-                Reserve Now
-              </button>
+                <button onClick={() => setIsModalOpen(true)} className="w-full py-3 rounded-md text-[11px] font-bold cursor-pointer uppercase tracking-widest bg-black hover:bg-[#212121] transition" > Book Now </button>
 
             </div>
           </div>

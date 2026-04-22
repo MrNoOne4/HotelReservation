@@ -17,12 +17,15 @@ const Profile = async () => {
     if (!session) {
         redirect("/");
     }
+
+    console.log(session);
     
   return  (
     <div>
-        <Header />
-        <SettingsProfile1 className="mx-auto block my-30" defaultValues={{name: session.user?.name ?? undefined,  email: session.user?.email ?? undefined}}/>
-    
+        <header>
+            <Header />
+            <SettingsProfile1 className="mx-auto block my-30" defaultValues={{name: session.user?.name ?? undefined,  email: session.user?.email ?? undefined}}/>
+        </header>
     </div>
   )
 }

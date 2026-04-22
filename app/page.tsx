@@ -26,6 +26,8 @@ import { useRouter } from "next/navigation";
 import { ProfileMenu } from "@/components/ProfileMenu";
 import ResetPasswordForm from "@/components/ResetPasswordForm";
 
+
+
 const HotelReservation = () => {
   const [topButton, setTopButton] = useState<boolean>(false);
   const { data: session, status } = useSession();
@@ -160,7 +162,6 @@ interface Room {
   const [forgotRemainingTime, setForgotRemainingTime] = useState<string>("");
   const [forgotResendOTPBtn, setForgotResendOTPBtn] = useState<boolean>(true);
   const forgotTimerRef = useRef<NodeJS.Timeout | null>(null);
-  // ─────────────────────────────────────────────────────────────────────────────
 
   useEffect(() => {
     const getHotelRoom = async () => {
@@ -387,6 +388,15 @@ interface Room {
       return;
     }
 
+    const findUser = await fetch (`/api/Validator?email=${encodeURIComponent(email)}`)
+    
+    const data = await findUser.json();
+
+    if (!data.found) {
+         toast.warning(data.message || "Failed to reset password.", { position: "top-center" });
+         return;
+    }
+    
 
     setForgotEmail(email);
     const sent = await sendUserForgotOtp(email);
@@ -614,7 +624,7 @@ interface Room {
         {/* Login Section */}
         {session ?
           <span className='-translate-x-3 mt-4'>
-            <ProfileMenu avatar={<AvatarWithBadge avatar={`${session?.user?.image}`} className='text-black' name={session?.user?.name?.split(",")[0]} />} profile={() => router.push("/profile")} logout={() => signOut({ callbackUrl: window.location.href })} />
+            <ProfileMenu avatar={<AvatarWithBadge avatar={`${session?.user?.image}`} className='text-black' name={session?.user?.name?.split(",")[0]} />} profile={() => router.push("/profile")} billing={() => router.push("/booking")}  logout={() => signOut({ callbackUrl: window.location.href })} />
           </span>
           :
           <button className='flex  items-center justify-center w-1/3 gap-2 px-4 py-1 mt-4 mb-3 font-semibold text-white bg-black rounded-md cursor-pointer lg:py-2 lg:w-auto' onClick={() => setLoginShowForm(true)}><LogIn size={20} color='white' /> Login</button>
@@ -832,25 +842,24 @@ interface Room {
         <div className='w-full h-screen flex justify-center items-center fixed inset-0 bg-black/50 backdrop-blur-xs z-0'>
 
           {forgotStep === "email" && (
-            <ResetPasswordForm
-              onSubmit={(e, data) => {
-                e.preventDefault();
+              <ResetPasswordForm
+                onSubmit={(e, data) => {
+                  e.preventDefault();
+                  handleForgotEmailSubmit(data.email);
+                }}
 
-                handleForgotEmailSubmit(data.email);
-                
-              }}
-              closeForm={() => {
-                setFormForgotPassword(false);
-                setForgotStep("email");
-                setForgotEmail("");
-              }}
-              switchTo={() => {
-                setFormForgotPassword(false);
-                setLoginShowForm(true);
-              }}
-            />
-          )
-          
+                closeForm={() => {
+                  setFormForgotPassword(false);
+                  setForgotStep("email");
+                  setForgotEmail("");
+                }}
+
+                switchTo={() => {
+                  setFormForgotPassword(false);
+                  setLoginShowForm(true);
+                }}
+              />
+            )
           }
 
           {forgotStep === "otp" && (

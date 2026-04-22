@@ -40,6 +40,7 @@ export default function Header() {
                 className="text-black"
               />
             }
+            billing={() => redirect("/booking")} 
             profile={() => redirect("/profile")}
             logout={() => signOut({ callbackUrl: window.location.href })}
           />

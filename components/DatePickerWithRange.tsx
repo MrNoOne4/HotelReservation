@@ -4,11 +4,13 @@ import * as React from "react"
 import { addDays, format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
 import { type DateRange } from "react-day-picker"
-
-import { Button } from "@/components/ui/button"
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { Calendar } from "@/components/ui/calendar"
 import { Field, FieldLabel } from "@/components/ui/field"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { useState } from 'react'
 
 type Props = {
   onDateChangeMain?: (range: DateRange | undefined) => void
@@ -50,17 +52,19 @@ export default function DatePickerWithRange ({onDateChangeMain}: Props) {
             )}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto px-10 sm:px-8 md:px-6 lg:px-4 2xl:px-2" align="start">
-            <div className="text-center mb-4">
-            <h1 className="font-semibold text-lg">Book an appointment</h1>
-            <h5 className="text-sm text-muted-foreground">
-              Select the dates for your appointment
-            </h5>
+        <PopoverContent className="w-full p-3" align="end">
+          
+          <div className="text-center ">
+              <h5 className="text-sm text-muted-foreground">
+                Select the dates for your appointment
+              </h5>
           </div>
 
-          <div className="flex justify-between items-center mb-4 p-3 border rounded-lg">
+          
+
+          <div className="flex justify-between items-center border rounded-lg text-sm">
             <div>
-              <p className="text-xs text-muted-foreground">Check-in</p>
+              <p className="text-xs ">Check-in</p>
               <p className="font-medium">
                 {date?.from ? date.from.toLocaleDateString() : '--'}
               </p>
@@ -75,6 +79,7 @@ export default function DatePickerWithRange ({onDateChangeMain}: Props) {
           </div>
 
           <Calendar
+          
             mode="range"
             defaultMonth={date?.from}
             selected={date}
@@ -84,7 +89,7 @@ export default function DatePickerWithRange ({onDateChangeMain}: Props) {
                 setDate(dateRange)           
                 onDateChangeMain?.(dateRange)
             }}
-            className="rounded-lg border "
+            className="rounded-lg border scale-90 origin-top-left "
             disabled={{ before: new Date() }}
           />
         </PopoverContent>
