@@ -17,6 +17,7 @@ export async function POST(req: NextRequest) {
                 Email: userEmail,
                 PasswordHash: hashPassword,
                 IsVerified: true,
+                Role: "user",
             }
         })
 

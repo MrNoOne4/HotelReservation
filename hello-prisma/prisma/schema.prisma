@@ -136,8 +136,10 @@ model users {
   FullName     String    @db.VarChar(255)
   Email        String    @unique @db.VarChar(255)
   PasswordHash String    @db.VarChar(255)
+  Role         String    @default("user")
   IsVerified   Boolean?  @default(false)
   CreatedAt    DateTime? @default(now()) @db.Timestamp(0)
+
 }
 
 model userauthproviders {

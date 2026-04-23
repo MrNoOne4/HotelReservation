@@ -11,6 +11,7 @@ import DatePickerWithRange from "@/components/DatePickerWithRange";
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toast } from "sonner"
+import { SpinnerSize } from "@/components/SpinnerSize";
 
 
 interface BedType {
@@ -118,30 +119,102 @@ const RoomClient = ({ room }: { room: Room }) => {
     });
   }, [selectedRange, price]);
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const handleReserve = async () => {
 
+
+  interface guestInfo {
+    firstName: string,
+    lastName: string,
+    phone: string,
+    address: string,
+  }
+
+  const [guestInfo, setGuestInfo] = useState<guestInfo>({
+        firstName: "",
+        lastName: "",
+        phone: "",
+        address: "",
+  })
+  const [bookedRanges, setBookedRanges] = useState<{ from: Date; to: Date }[]>([])
+
+  useEffect(() => {
+    const fetchBookedDates = async () => {
+      const res = await fetch(`/api/HotelReservation/BookedDates?roomId=${RoomId}`)
+      const data = await res.json()
+      setBookedRanges(data.map((r: { from: string; to: string }) => ({
+        from: new Date(r.from),
+        to: new Date(r.to),
+      })))
+    }
+    fetchBookedDates()
+  }, [RoomId])
+
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target as HTMLInputElement;
+
+      setGuestInfo((prev) => ({
+        ...prev, [name]: value
+      }))
+
+  }
+
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const handleReserve = async () => {
     if (!selectedRange?.from || !selectedRange?.to) {
-        toast.warning("Please select check-in and check-out dates.");
+      toast.warning("Please select check-in and check-out dates.", {
+        position: "top-center",
+      });
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const req = await fetch("/api/Reserve", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          roomId: RoomId,
+          checkIn: selectedRange.from.toISOString().split("T")[0],
+          checkOut: selectedRange.to.toISOString().split("T")[0],
+          firstName: guestInfo.firstName,
+          lastName: guestInfo.lastName,
+          phone: guestInfo.phone,
+          address: guestInfo.address,
+        }),
+      });
+
+      const res = await req.json();
+
+      setIsModalOpen(false);
+
+      if (!req.ok) {
+        toast.warning(
+          res?.message || "Booking failed. Please check your details and try again.",
+          { position: "top-center" }
+        );
         return;
       }
 
-      const req = await fetch ('/api/booking', {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          
-        })
-      })
-
-    setIsModalOpen(false);
+      toast.success("Booking successfully completed!", {
+        position: "top-center",
+      });
+    } catch (error) {
+      toast.error("Something went wrong. Please try again.", {
+        position: "top-center",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
-
       <header className="sticky top-0 z-50 flex justify-evenly items-center px-0 md:px-10 h-16 bg-gray-950/75 backdrop-blur-xl border-b border-white/6">
         <div className="flex items-center gap-6">
             <button
@@ -237,7 +310,7 @@ const RoomClient = ({ room }: { room: Room }) => {
                     <section className="relative bg-white w-full max-w-lg rounded-lg p-6 sm:p-8 text-black space-y-6">
 
                       <button
-                        onClick={() => setIsModalOpen(false)}
+                        onClick={() => {setIsModalOpen(false), setGuestInfo({ firstName: "", lastName: "", phone: "", address: ""})}}
                         className="absolute top-3 right-3 text-gray-500 hover:text-black text-xl"
                       >
                         ✕
@@ -251,31 +324,31 @@ const RoomClient = ({ room }: { room: Room }) => {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           <div className="space-y-1">
                             <Label htmlFor="firstName">First Name</Label>
-                            <Input id="firstName" placeholder="First name" />
+                            <Input id="firstName" placeholder="First name" value={guestInfo.firstName} name="firstName" onChange={handleChange}/>
                           </div>
 
                           <div className="space-y-1">
                             <Label htmlFor="lastName">Last Name</Label>
-                            <Input id="lastName" placeholder="Last name" />
+                            <Input id="lastName" placeholder="Last name" value={guestInfo.lastName} name="lastName" onChange={handleChange}/>
                           </div>
                         </div>
 
                         <div className="space-y-1">
                           <Label htmlFor="phone">Phone Number</Label>
-                          <Input id="phone" placeholder="Enter phone number" />
+                          <Input id="phone" placeholder="Enter phone number" value={guestInfo.phone} name="phone" onChange={handleChange}/>
                         </div>
 
                         <div className="space-y-1">
                           <Label htmlFor="address">Address</Label>
-                          <Input id="address" placeholder="Enter address" />
+                          <Input id="address" placeholder="Enter address" value={guestInfo.address} name="address" onChange={handleChange}/>
                         </div>
                       </form>
 
-                      {/* Date + total */}
                       <div className="space-y-4">
-                        <DatePickerWithRange
-                          onDateChangeMain={(range) => setSelectedRange(range)}
-                        />
+                          <DatePickerWithRange
+                            onDateChangeMain={(range) => setSelectedRange(range)}
+                            bookedRanges={bookedRanges}
+                          />
 
                         <div className="h-px bg-gray-200" />
 
@@ -312,6 +385,10 @@ const RoomClient = ({ room }: { room: Room }) => {
           </div>
         </aside>
       </main>
+
+      {loading && <section className="fixed inset-0 bg-black/70 backdrop-blur-[1px] flex justify-center items-center">
+                <SpinnerSize />
+      </section>}
     </div>
   );
 };

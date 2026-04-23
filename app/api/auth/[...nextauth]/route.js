@@ -130,6 +130,7 @@ export const authOptions = {
           FullName: user.name ?? "",
           PasswordHash: " ",
           IsVerified: true,
+          Role: "user"
         },
       });
 

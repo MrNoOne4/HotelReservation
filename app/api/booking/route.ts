@@ -12,17 +12,26 @@ export async function GET(req: NextRequest) {
         );
     }
 
-    const booking = await prisma.reservations.findMany({
-        where: {
-            UserId: Number(id),
-        },
-    });
+        // In your Booking page (server component), also fetch room info
+        const bookings = await prisma.reservations.findMany({
+            where: { UserId: Number(id)! },
+            orderBy: { CreatedAt: "desc" },
+            include: {
+                reservationrooms: {
+                    include: {
+                        room: {
+                        include: { roomtype: true }
+                        }
+                    }
+                }
+            }
+        })
 
     
 
 
     return NextResponse.json(
-        { bookingHistory: booking },
+        { bookingHistory: bookings },
         { status: 200 }
     );
 }
