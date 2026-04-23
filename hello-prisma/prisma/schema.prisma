@@ -42,6 +42,9 @@ model rooms {
 
   images        roomimages[]
   roomamenities roomamenities[]
+
+  reservationrooms reservationrooms[]
+
 }
 
 model roomimages {
@@ -87,6 +90,7 @@ model reservations {
   Status        reservations_Status? @default(Pending)
   CreatedAt     DateTime?            @default(now()) @db.Timestamp(0)
 
+  reservationrooms reservationrooms[]
   @@index([UserId])
 }
 
@@ -95,6 +99,9 @@ model reservationrooms {
   ReservationId     Int
   RoomId            Int
   PriceAtBooking    Decimal @db.Decimal(10, 2)
+
+  reservation reservations @relation(fields: [ReservationId], references: [ReservationId])
+  room        rooms         @relation(fields: [RoomId], references: [RoomId])
 
   @@index([ReservationId])
   @@index([RoomId])

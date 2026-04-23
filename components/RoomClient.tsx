@@ -8,9 +8,10 @@ import { ProfileMenu } from "@/components/ProfileMenu";
 import { useState, useEffect } from "react";
 import { DateRange } from "react-day-picker";
 import DatePickerWithRange from "@/components/DatePickerWithRange";
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { toast } from "sonner"
+
 
 interface BedType {
   BedTypeId: number;
@@ -118,9 +119,26 @@ const RoomClient = ({ room }: { room: Room }) => {
   }, [selectedRange, price]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const handleReserve = () => {
+  const handleReserve = async () => {
+
+    if (!selectedRange?.from || !selectedRange?.to) {
+        toast.warning("Please select check-in and check-out dates.");
+        return;
+      }
+
+      const req = await fetch ('/api/booking', {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          
+        })
+      })
+
     setIsModalOpen(false);
   };
+
   return (
     <div className="min-h-screen bg-gray-950 text-white">
 
@@ -277,9 +295,9 @@ const RoomClient = ({ room }: { room: Room }) => {
 
                       <button
                         onClick={handleReserve}
-                        className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-semibold py-3 rounded-md transition"
+                        className="w-full bg-yellow-500 cursor-pointer hover:bg-yellow-600 text-black font-semibold py-3 rounded-md transition"
                       >
-                        Reserve
+                        Reserve 
                       </button>
 
                     </section>
