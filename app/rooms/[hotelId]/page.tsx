@@ -84,7 +84,9 @@ const RoomPage = async ({ params }: Params) => {
 
   if (!res.ok) throw new Error("Failed to fetch rooms");
 
+  
   const hotelRooms: Room[] = await res.json();
+
 
   const hotelRoom = hotelRooms.find((r) => r.RoomId === hotelId);
 

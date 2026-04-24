@@ -79,7 +79,6 @@ function Stat({ label, value }: { label: string; value: string }) {
 
 const RoomClient = ({ room }: { room: Room }) => {
   const { data: session } = useSession();
-
   const {
     RoomId,
     Floor,
@@ -89,7 +88,9 @@ const RoomClient = ({ room }: { room: Room }) => {
     amenities,
     bedtype,
     roomtype,
+    RoomNumber
   } = room;
+
 
   const price = Number(BasePrice);
 
@@ -170,6 +171,13 @@ const RoomClient = ({ room }: { room: Room }) => {
       return;
     }
 
+    if (!guestInfo.firstName || !guestInfo.lastName || !guestInfo.phone || !guestInfo.address) {
+        toast.warning("Please Fill up the basic information before booking.", {
+          position: "top-center",
+        });
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -204,6 +212,7 @@ const RoomClient = ({ room }: { room: Room }) => {
       toast.success("Booking successfully completed!", {
         position: "top-center",
       });
+      setGuestInfo({ firstName: "", lastName: "", phone: "", address: ""});
     } catch (error) {
       toast.error("Something went wrong. Please try again.", {
         position: "top-center",
@@ -283,7 +292,7 @@ const RoomClient = ({ room }: { room: Room }) => {
                   value={`${MaxOccupancy} guests`}
                 />
                 <Stat label="Floor" value={`Level ${Floor}`} />
-                <Stat label="Room ID" value={`#${RoomId}`} />
+                <Stat label="Room ID" value={`#${RoomNumber}`} />
               </div>
 
               <div className="my-5 h-px bg-white/6" />
