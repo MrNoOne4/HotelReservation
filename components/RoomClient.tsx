@@ -239,6 +239,7 @@ useEffect(() => {
       setLoading(false);
     }
   };
+const [paymentMethod, setPaymentMethod] = useState<string>("Cash")
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
@@ -393,6 +394,33 @@ useEffect(() => {
                         </div>
                       </div>
 
+                      <div className="space-y-2">
+                        <Label>Payment Method</Label>
+                        <div className="grid grid-cols-2 gap-2">
+                          {["Cash", "CreditCard", "DebitCard", "PayPal"].map((method) => (
+                            <button
+                              key={method}
+                              type="button"
+                              onClick={() => setPaymentMethod(method)}
+                              className={`py-2 px-3 rounded-md border text-sm font-medium transition
+                                ${paymentMethod === method
+                                  ? "bg-yellow-500 text-black border-yellow-500"
+                                  : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"
+                                }`}
+                            >
+                              {method === "CreditCard" ? "💳 Credit Card"  : ""}
+                              {method === "DebitCard"  ? "💳 Debit Card"   : ""}
+                              {method === "PayPal"     ? "🅿️ PayPal"       : ""}
+                              {method === "Cash"       ? "💵 Cash"          : ""}
+                            </button>
+                          ))}
+                        </div>
+                        <p className="text-xs text-gray-400">
+                          {paymentMethod === "Cash"
+                            ? "Pay at the front desk upon check-in."
+                            : "Payment details will be collected at the hotel."}
+                        </p>
+                      </div>
                       <button
                         onClick={handleReserve}
                         className="w-full bg-yellow-500 cursor-pointer hover:bg-yellow-600 text-black font-semibold py-3 rounded-md transition"

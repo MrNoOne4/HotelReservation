@@ -66,7 +66,7 @@ const Booking = async () => {
                             </thead>
                             <tbody className="divide-y divide-gray-100">
 
-                            {bookings.map((b) => {
+                            {bookings.map((b: any) => {
                                 const room = b.reservationrooms[0]
                                 const days = Math.ceil(
                                 (new Date(b.CheckOutDate).getTime() - new Date(b.CheckInDate).getTime())
