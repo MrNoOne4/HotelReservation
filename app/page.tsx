@@ -393,7 +393,7 @@ interface Room {
     const data = await findUser.json();
 
     if (!data.found) {
-         toast.warning(data.message || "Failed to reset password.", { position: "top-center" });
+         toast.warning(data.message || "Email not found", { position: "top-center" });
          return;
     }
     

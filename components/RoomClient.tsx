@@ -79,6 +79,8 @@ function Stat({ label, value }: { label: string; value: string }) {
 
 const RoomClient = ({ room }: { room: Room }) => {
   const { data: session } = useSession();
+
+
   const {
     RoomId,
     Floor,
@@ -122,19 +124,35 @@ const RoomClient = ({ room }: { room: Room }) => {
 
 
 
-  interface guestInfo {
-    firstName: string,
-    lastName: string,
-    phone: string,
-    address: string,
-  }
+interface GuestInfo {
+  firstName: string;
+  lastName: string;
+  phone: string;
+  address: string;
+}
 
-  const [guestInfo, setGuestInfo] = useState<guestInfo>({
-        firstName: "",
-        lastName: "",
-        phone: "",
-        address: "",
-  })
+const userName = session?.user?.name ?? "";
+
+const [guestInfo, setGuestInfo] = useState<GuestInfo>({
+  firstName: "",
+  lastName: "",
+  phone: "",
+  address: "",
+});
+
+useEffect(() => {
+  if (!userName) return;
+
+  const split = userName.trim().split(" ");
+
+  setGuestInfo((prev) => ({
+    ...prev,
+    firstName: split[0] || "",
+    lastName: split.slice(1).join(" ") || "",
+  }));
+}, [userName]);
+
+ 
   const [bookedRanges, setBookedRanges] = useState<{ from: Date; to: Date }[]>([])
 
   useEffect(() => {
