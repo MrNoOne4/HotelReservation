@@ -7,13 +7,36 @@ datasource db {
 }
 
 
+model users {
+  UserId       Int       @id @default(autoincrement())
+  FullName     String    @db.VarChar(255)
+  Email        String    @unique @db.VarChar(255)
+  PasswordHash String    @db.VarChar(255)
+  Role         String    @default("user")
+  IsVerified   Boolean?  @default(false)
+  CreatedAt    DateTime? @default(now()) @db.Timestamp(0)
 
-model bedtypes {
-  BedTypeId Int    @id @default(autoincrement())
-  BedName   String @unique @db.VarChar(50)
+  reservations     reservations[] @relation("UserReservations")
+  checkedInBy      reservations[] @relation("CheckedInBy")
+  checkedOutBy     reservations[] @relation("CheckedOutBy")
 
-  rooms rooms[]
+  verifiedPayments payments[]
+  userauthproviders userauthproviders[]
 }
+
+
+model userauthproviders {
+  AuthId         Int                        @id @default(autoincrement())
+  UserId         Int
+  Provider       userauthproviders_Provider
+  ProviderUserId String?                    @db.VarChar(255)
+  CreatedAt      DateTime?                  @default(now()) @db.Timestamp(0)
+
+  user users @relation(fields: [UserId], references: [UserId])
+
+  @@index([UserId])
+}
+
 
 model roomtypes {
   RoomTypeId  Int     @id @default(autoincrement())
@@ -23,38 +46,39 @@ model roomtypes {
   rooms rooms[]
 }
 
+model bedtypes {
+  BedTypeId Int    @id @default(autoincrement())
+  BedName   String @unique @db.VarChar(50)
+
+  rooms rooms[]
+}
+
 model rooms {
-  RoomId     Int    @id @default(autoincrement())
-  RoomNumber String @unique @db.VarChar(20)
-
-  RoomTypeId Int
-  BedTypeId  Int
-
+  RoomId       Int     @id @default(autoincrement())
+  RoomNumber   String  @unique @db.VarChar(20)
+  RoomTypeId   Int
+  BedTypeId    Int
   Floor        Int
   MaxOccupancy Int
   BasePrice    Decimal @db.Decimal(10, 2)
   Description  String? @db.Text
 
-  // Relations
   bedtype  bedtypes  @relation(fields: [BedTypeId], references: [BedTypeId])
   roomtype roomtypes @relation(fields: [RoomTypeId], references: [RoomTypeId])
 
-  images        roomimages[]
-  roomamenities roomamenities[]
+  images           roomimages[]
+  roomamenities    roomamenities[]
 
   reservationrooms reservationrooms[]
-
 }
 
 model roomimages {
   ImageId  Int    @id @default(autoincrement())
   RoomId   Int
-  ImageURL String @db.VarChar(1024)
+  ImageURL String @db.Text
 
-  room rooms @relation(fields: [RoomId], references: [RoomId])
+  room rooms @relation(fields: [RoomId], references: [RoomId], onDelete: Cascade)
 }
-
-
 
 model amenities {
   AmenityId   Int    @id @default(autoincrement())
@@ -68,56 +92,12 @@ model roomamenities {
   RoomId        Int
   AmenityId     Int
 
-  room    rooms     @relation(fields: [RoomId], references: [RoomId])
+  room    rooms     @relation(fields: [RoomId], references: [RoomId], onDelete: Cascade)
   amenity amenities @relation(fields: [AmenityId], references: [AmenityId])
 
   @@index([RoomId])
   @@index([AmenityId])
 }
-
-
-
-model reservations {
-  ReservationId Int                  @id @default(autoincrement())
-  UserId        Int
-  GuestFirstName String @db.VarChar(100)
-  GuestLastName String @db.VarChar(100)
-  GuestPhone String @db.VarChar(100)
-  GuestAddress String @db.VarChar(100)
-  CheckInDate   DateTime             @db.Date
-  CheckOutDate  DateTime             @db.Date
-  Status        reservations_Status? @default(Pending)
-  CreatedAt     DateTime?            @default(now()) @db.Timestamp(0)
-
-  reservationrooms reservationrooms[]
-  @@index([UserId])
-}
-
-model reservationrooms {
-  ReservationRoomId Int     @id @default(autoincrement())
-  ReservationId     Int
-  RoomId            Int
-  PriceAtBooking    Decimal @db.Decimal(10, 2)
-
-  reservation reservations @relation(fields: [ReservationId], references: [ReservationId])
-  room        rooms         @relation(fields: [RoomId], references: [RoomId])
-
-  @@index([ReservationId])
-  @@index([RoomId])
-}
-
-
-model payments {
-  PaymentId     Int                     @id @default(autoincrement())
-  ReservationId Int
-  Amount        Decimal                 @db.Decimal(10, 2)
-  PaymentMethod payments_PaymentMethod
-  PaymentStatus payments_PaymentStatus? @default(Pending)
-  PaymentDate   DateTime?               @default(now()) @db.Timestamp(0)
-
-  @@index([ReservationId])
-}
-
 
 model roomblocks {
   BlockId     Int                @id @default(autoincrement())
@@ -130,27 +110,73 @@ model roomblocks {
 }
 
 
-model users {
-  UserId       Int       @id @default(autoincrement())
-  FullName     String    @db.VarChar(255)
-  Email        String    @unique @db.VarChar(255)
-  PasswordHash String    @db.VarChar(255)
-  Role         String    @default("user")
-  IsVerified   Boolean?  @default(false)
-  CreatedAt    DateTime? @default(now()) @db.Timestamp(0)
+model reservations {
+  ReservationId  Int     @id @default(autoincrement())
+  UserId         Int?  
 
-}
+  GuestFirstName String? @db.VarChar(255)
+  GuestLastName  String? @db.VarChar(255)
+  GuestPhone     String? @db.VarChar(255)
+  GuestAddress   String? @db.VarChar(255)
 
-model userauthproviders {
-  AuthId         Int                        @id @default(autoincrement())
-  UserId         Int
-  Provider       userauthproviders_Provider
-  ProviderUserId String?                    @db.VarChar(255)
-  CreatedAt      DateTime?                  @default(now()) @db.Timestamp(0)
+  CheckInDate    DateTime  @db.Date
+  CheckOutDate   DateTime  @db.Date
+
+  ActualCheckIn  DateTime? @db.Timestamp(0)
+  ActualCheckOut DateTime? @db.Timestamp(0)
+
+  CheckedInBy    Int?
+  CheckedOutBy   Int?
+
+  Status         reservations_Status? @default(Pending)
+
+  CancelReason   String?   @db.VarChar(255)
+  CancelledAt    DateTime? @db.Timestamp(0)
+
+  CreatedAt      DateTime? @default(now()) @db.Timestamp(0)
+
+  // Relations
+  user        users? @relation("UserReservations", fields: [UserId], references: [UserId], onDelete: SetNull)
+  checkedIn   users? @relation("CheckedInBy",      fields: [CheckedInBy],  references: [UserId], onDelete: SetNull)
+  checkedOut  users? @relation("CheckedOutBy",      fields: [CheckedOutBy], references: [UserId], onDelete: SetNull)
+
+  reservationrooms reservationrooms[]
+  payments         payments[]
 
   @@index([UserId])
+  @@index([CheckedInBy])
+  @@index([CheckedOutBy])
 }
 
+model reservationrooms {
+  ReservationRoomId Int     @id @default(autoincrement())
+  ReservationId     Int
+  RoomId            Int? 
+  PriceAtBooking    Decimal @db.Decimal(10, 2)
+  reservation reservations @relation(fields: [ReservationId], references: [ReservationId])
+  room rooms? @relation(fields: [RoomId], references: [RoomId], onDelete: SetNull)
+
+  @@index([ReservationId])
+  @@index([RoomId])
+}
+
+
+model payments {
+  PaymentId     Int     @id @default(autoincrement())
+  ReservationId Int
+  Amount        Decimal @db.Decimal(10, 2)
+  PaymentMethod payments_PaymentMethod
+  PaymentStatus payments_PaymentStatus? @default(Pending)
+  ReferenceCode String?   @db.VarChar(50)
+  VerifiedBy    Int?
+  VerifiedAt    DateTime? @db.Timestamp(0)
+  PaidAt        DateTime? @db.Timestamp(0)
+  PaymentDate   DateTime? @default(now()) @db.Timestamp(0)
+  reservation reservations @relation(fields: [ReservationId], references: [ReservationId])
+  verifiedBy  users? @relation(fields: [VerifiedBy], references: [UserId], onDelete: SetNull)
+  @@index([ReservationId])
+  @@index([VerifiedBy])
+}
 
 enum userauthproviders_Provider {
   google
@@ -158,16 +184,18 @@ enum userauthproviders_Provider {
 }
 
 enum payments_PaymentMethod {
+  Cash
+  GCash
   CreditCard
   DebitCard
-  PayPal
-  Cash
 }
 
 enum payments_PaymentStatus {
   Pending
+  AwaitingVerification
   Completed
   Failed
+  Refunded
 }
 
 enum reservations_Status {
@@ -175,6 +203,7 @@ enum reservations_Status {
   Confirmed
   Cancelled
   Completed
+  NoShow
 }
 
 enum roomblocks_Reason {

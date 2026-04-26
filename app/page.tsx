@@ -25,6 +25,7 @@ import { AvatarWithBadge } from "@/components/AvatarWithBadge";
 import { useRouter } from "next/navigation";
 import { ProfileMenu } from "@/components/ProfileMenu";
 import ResetPasswordForm from "@/components/ResetPasswordForm";
+import  { SelectDemo }  from "@/components/SelectDemo";
 
 
 
@@ -147,8 +148,9 @@ interface Room {
 
 
   const [hotelRooms, setHotelRooms] = useState<Room[]>([])
+  const [category, setCategory] = useState<string>("All");
 
-  console.log(hotelRooms);
+
 
   const [formForgotPassword, setFormForgotPassword] = useState<boolean>(false);
 
@@ -166,7 +168,7 @@ interface Room {
   useEffect(() => {
     const getHotelRoom = async () => {
       try {
-        const res = await fetch('/api/HotelReservation/HotelRoom', {
+        const res = await fetch(`/api/HotelReservation/HotelRoom?category=${encodeURIComponent(category)}`, {
           method: 'GET'
         })
         const data: Room[] = await res.json()
@@ -182,7 +184,7 @@ interface Room {
       }
     }
     getHotelRoom();
-  }, [])
+  }, [category])
 
   const [showLoginForm, setLoginShowForm] = useState<boolean>(false)
   const [signUp, showSignUp] = useState<boolean>(false);
@@ -592,6 +594,20 @@ interface Room {
     })
   }
 
+    type Option = {
+    label: string;
+    value: string;
+  };
+
+  const rooms: Option[] = [
+    { label: "All", value: "All" },
+    { label: "Standard", value: "1" },
+    { label: "Deluxe", value: "2" },
+    { label: "Suite", value: "3" },
+    { label: "Executive", value: "4" },
+
+  ];
+
   // loading state
   if (status === "loading") {
     return (
@@ -659,10 +675,20 @@ interface Room {
         </section>
 
         <section className='md:px-20 px-10 text-white'>
-          <div className='mx-auto'>
-            <h1 className='my-6 text-3xl text-center md:text-5xl'>Book direct to enjoy a full 24-hour stay — guaranteed!</h1>
-            <h6 className='text-sm text-center'>All our generously appointed guest rooms offer the ultimate luxury, privacy and comfort.</h6>
+          <div>
+            <div className='mx-auto'>
+                <h1 className='my-6 text-3xl text-center md:text-5xl'>Book direct to enjoy a full 24-hour stay — guaranteed!</h1>
+                <h6 className='text-sm text-center'>All our generously appointed guest rooms offer the ultimate luxury, privacy and comfort.</h6>
+            </div>
+
+            <div className="flex justify-end text-right">
+                  <div className="bg-white text-black rounded-xs w-40 mt-10 sm:mt-0">
+                      <SelectDemo label="Room" rooms={rooms} onChange={setCategory}/>
+                  </div>
+            </div>
+
           </div>
+          
 
           {/* Card Container */}
           <div
@@ -671,7 +697,7 @@ interface Room {
           >
             {
               hotelRooms.map((element: Room, index: number) => (
-                <article key={`${element.RoomId}_${index}`}>
+                <article key={`${element.RoomId}_${index}`}  className="opacity-0 translate-y-6 animate-fadeIn">
                   <Card className="sm:max-w-md w-full pt-0 h-full">
                     <CardContent className="px-0 overflow-hidden">
                       <img

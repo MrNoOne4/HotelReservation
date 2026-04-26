@@ -22,5 +22,5 @@ export async function requireRole(allowedRoles: string[]) {
   if (!allowedRoles.includes(dbUser.Role))
     return NextResponse.json({ message: "Access denied" }, { status: 403 })
 
-  return null  // passed — proceed
+  return null  
 }
