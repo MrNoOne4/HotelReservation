@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
             RoomTypeId: Number(category),
           }
         : undefined, 
-
+          
       include: {
         bedtype: true,
         roomtype: true,

@@ -171,6 +171,7 @@ interface Room {
         const res = await fetch(`/api/HotelReservation/HotelRoom?category=${encodeURIComponent(category)}`, {
           method: 'GET'
         })
+        
         const data: Room[] = await res.json()
 
         if (!res.ok) {
