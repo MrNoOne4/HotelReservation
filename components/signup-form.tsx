@@ -66,12 +66,12 @@ export function SignupForm({ className, onSubmit,switchTo, closeForm, ...props }
 
   return (  
 
-    <Card className={cn("flex flex-col gap-6 bg-[#171717] backdrop-blur-none rounded-2xl text-white", className)} {...props}>
-          <div className="flex justify-end ">
-            <Button className="cursor-pointer" onClick={() => removeHandler()}>
-              <X size={30} color="white" />
-            </Button>
-          </div>
+    <Card className={cn("block flex-col gap-6 bg-[#171717] backdrop-blur-none rounded-2xl text-white w-[90%] mx-auto", className)} {...props}>
+      <div className="flex justify-end ">
+        <Button className="cursor-pointer" onClick={() => removeHandler()}>
+          <X size={30} color="white" />
+        </Button>
+      </div>
       <CardHeader>
         <CardTitle className="text-center text-xl">Create an account</CardTitle>
         <CardDescription>

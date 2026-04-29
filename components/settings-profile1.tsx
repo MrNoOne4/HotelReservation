@@ -61,11 +61,31 @@ useEffect(() => {
   }, [defaultValues]);
 
   // Handle profile save
+  const validateForm = (data: setPassword): boolean => {
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
 
+
+
+    if (data.current.length < 8 || data.newPass.length < 8) {
+      toast.warning("Password must contain at least 8 letters", { position: "top-center" });
+      return false;
+    }
+
+
+    if (!passwordRegex.test(data.newPass)) {
+      toast.warning("Password must contain at least 8 letters, 1 number, 1 special character, 1 uppercase, and 1 lowercase letter", { position: "top-center" });
+      return false;
+    }
+
+    return true;
+  }
+  
 
   // Handle password save
   const handleSavePassword = async () => {
-
+    const isValid = validateForm(password);
+    if (!isValid) return;
+    
     try {
       const res = await fetch("http://localhost:3000/api/HotelReservation/ValidateEmail", {
           method: "PATCH",
@@ -129,7 +149,7 @@ useEffect(() => {
               <Input
                 id="name"
                 placeholder="Enter your full name"
-                value={formData.name}
+                value={formData.name} disabled
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               />
             </div>

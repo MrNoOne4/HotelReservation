@@ -1,48 +1,35 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { type DateRange } from 'react-day-picker'
-import { Calendar } from '@/components/ui/calendar'
-import { toast } from "sonner"
+import { useState } from 'react'
 
-const CalendarRangeCalendarMultiMonthDemo = () => {
-  const [dateRange, setDateRange] = useState<DateRange | undefined>()
-  const [isSaved, setIsSaved] = useState(false)
+import * as React from "react"
+import { addDays, format } from "date-fns"
+import { CalendarIcon } from "lucide-react"
+import { type DateRange } from "react-day-picker"
+import { Button } from "@/components/ui/button"
+import { Calendar } from "@/components/ui/calendar"
+import { Field, FieldLabel } from "@/components/ui/field"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 
-  // Load saved date range or default to today + tomorrow
-  useEffect(() => {
-    const saved = localStorage.getItem('savedDateRange')
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved)
-        const from = parsed.from ? new Date(parsed.from) : undefined
-        const to = parsed.to ? new Date(parsed.to) : undefined
-        if (!isNaN(from?.getTime() ?? NaN) && !isNaN(to?.getTime() ?? NaN)) {
-          setDateRange({ from, to })
-        }
-      } catch {
-        console.warn('Failed to parse savedDateRange')
-      }
-    } else {
-      const today = new Date()
-      const tomorrow = new Date()
-      tomorrow.setDate(today.getDate() + 1)
-      toast.warning("fuck off", { position: "bottom-left" });
-      setDateRange({ from: today, to: tomorrow })
-    }
-  }, [])
 
-  const handleSave = () => {
-    if (dateRange) {
-      localStorage.setItem('savedDateRange', JSON.stringify(dateRange))
-      setIsSaved(true)
-    }
-  }
+type Props = {
+  onDateChange?: (range: DateRange | undefined) => void
+}
 
-  if (!dateRange || isSaved) return null
+const CalendarRangeCalendarMultiMonthDemo = ({ onDateChange }: Props) => {
+  // const [dateRange, setDateRange] = useState<DateRange>({
+  //   from: new Date(),
+  //   to: new Date(new Date().setDate(new Date().getDate() + 1)),
+  // })
+
+  const [date, setDate] = React.useState<DateRange | undefined>({
+    from: new Date(),
+    to: addDays( new Date(new Date().setDate(new Date().getDate() + 1)), 0),
+  })
+
 
   return (
-    <div className="text-black block mx-auto overflow-hidden bg-white p-2  rounded-md">
+    <div className="text-black block mx-auto overflow-hidden bg-white p-2 rounded-md">
       <div className="text-center mb-4">
         <h1 className="font-semibold text-lg">Book an appointment</h1>
         <h5 className="text-sm text-muted-foreground">
@@ -54,35 +41,38 @@ const CalendarRangeCalendarMultiMonthDemo = () => {
         <div>
           <p className="text-xs text-muted-foreground">Check-in</p>
           <p className="font-medium">
-            {dateRange?.from ? dateRange.from.toLocaleDateString() : '--'}
+            {date?.from ? date.from.toLocaleDateString() : '--'}
           </p>
         </div>
 
         <div>
           <p className="text-xs text-muted-foreground">Check-out</p>
           <p className="font-medium">
-            {dateRange?.to ? dateRange.to.toLocaleDateString() : '--'}
+            {date?.to ? date.to.toLocaleDateString() : '--'}
           </p>
         </div>
       </div>
 
       <Calendar
         mode="range"
-        defaultMonth={dateRange?.from}
-        selected={dateRange}
-        onSelect={setDateRange}
+        selected={date}            
+        onSelect={(range) => {
+          if (!range) return
+          setDate(range)           
+          onDateChange?.(range)
+        }}
         numberOfMonths={2}
         className="rounded-lg border"
+        disabled={{ before: new Date() }}
       />
 
-      <div className="flex justify-end mt-4 ">
-        <button
-          onClick={handleSave}
-          className="bg-black text-white py-3 px-5 rounded-md cursor-pointer overflow-hidden"
-        >
-          Save Changes
-        </button>
-      </div>
+      {/* <Calendar
+        mode="range"
+        defaultMonth={date?.from}
+        selected={date}
+        onSelect={setDate}
+        numberOfMonths={2}
+      /> */}
     </div>
   )
 }

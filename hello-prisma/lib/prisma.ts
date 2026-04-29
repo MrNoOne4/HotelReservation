@@ -1,5 +1,22 @@
+// import { PrismaClient } from "../generated/prisma/client";
+
+// const globalForPrisma = globalThis as unknown as {
+//   prisma: PrismaClient | undefined;
+// };
+
+// export const prisma =
+//   globalForPrisma.prisma ??
+//   new PrismaClient();
+
+// if (process.env.NODE_ENV !== "production") {
+//   globalForPrisma.prisma = prisma;
+// }
+
+
+
 import { PrismaMariaDb } from "@prisma/adapter-mariadb";
-import { PrismaClient } from "../generated/prisma/client";
+// import { PrismaClient } from "../generated/prisma/client";
+import { PrismaClient } from "@prisma/client";
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
@@ -25,34 +42,34 @@ if (process.env.NODE_ENV !== "production") {
 
 
 
-// import "dotenv/config";
-// import { PrismaMariaDb } from '@prisma/adapter-mariadb';
-// import { PrismaClient } from '../generated/prisma/client';
+// // import "dotenv/config";
+// // import { PrismaMariaDb } from '@prisma/adapter-mariadb';
+// // import { PrismaClient } from '../generated/prisma/client';
 
-// const adapter = new PrismaMariaDb({
-//   host: process.env.DATABASE_HOST,
-//   user: process.env.DATABASE_USER,
-//   password: process.env.DATABASE_PASSWORD,
-//   database: process.env.DATABASE_NAME,
-//   connectionLimit: 5
-// });
-// const prisma = new PrismaClient({ adapter });
+// // const adapter = new PrismaMariaDb({
+// //   host: process.env.DATABASE_HOST,
+// //   user: process.env.DATABASE_USER,
+// //   password: process.env.DATABASE_PASSWORD,
+// //   database: process.env.DATABASE_NAME,
+// //   connectionLimit: 5
+// // });
+// // const prisma = new PrismaClient({ adapter });
 
-// export { prisma }
-
-
-
-// import { PrismaClient } from '../generated/prisma/client';
-
-// // lib/prisma.ts
+// // export { prisma }
 
 
-// declare global {
-//   var prisma: PrismaClient | undefined;
-// }
 
-// const prisma = global.prisma || new PrismaClient();
+// // import { PrismaClient } from '../generated/prisma/client';
 
-// if (process.env.NODE_ENV !== 'production') global.prisma = prisma;
+// // // lib/prisma.ts
 
-// export default prisma;
+
+// // declare global {
+// //   var prisma: PrismaClient | undefined;
+// // }
+
+// // const prisma = global.prisma || new PrismaClient();
+
+// // if (process.env.NODE_ENV !== 'production') global.prisma = prisma;
+
+// // export default prisma;

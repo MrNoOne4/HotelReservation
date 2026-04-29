@@ -1,10 +1,3 @@
-// app/rooms/[hotelId]/page.tsx
-
-import { EmptyInputGroup } from "@/components/EmptyInputGroup";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import RoomClient from "@/components/RoomClient";
-import { signIn, useSession, signOut } from "next-auth/react";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import Header  from "@/components/Header";
@@ -17,12 +10,15 @@ const Profile = async () => {
     if (!session) {
         redirect("/");
     }
+
+    console.log(session);
     
   return  (
     <div>
-        <Header />
-        <SettingsProfile1 className="mx-auto block my-30" defaultValues={{name: session.user?.name ?? undefined,  email: session.user?.email ?? undefined}}/>
-    
+        <header>
+            <Header />
+            <SettingsProfile1 className="mx-auto block my-30" defaultValues={{name: session.user?.name ?? undefined,  email: session.user?.email ?? undefined}}/>
+        </header>
     </div>
   )
 }
