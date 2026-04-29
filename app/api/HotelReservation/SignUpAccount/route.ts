@@ -21,8 +21,6 @@ export async function POST(req: NextRequest) {
             }
         })
 
-        
-
         return NextResponse.json({message: "Account successully create"}, {status: 200});
 
     } catch (e) {

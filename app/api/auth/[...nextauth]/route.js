@@ -10,8 +10,14 @@ export const authOptions = {
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
+        email: { 
+          label: "Email",
+          type: "email"
+        },
+        password: { 
+          label: "Password",
+          type: "password"
+         },
       },
 
       async authorize(credentials) {
@@ -35,7 +41,7 @@ export const authOptions = {
           credentials.password,
           user.PasswordHash
         );
-        console.log("PASSWORD MATCH:", isValid);
+        
         if (!isValid) {
           return null;
         }
