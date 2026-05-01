@@ -11,7 +11,6 @@ const Profile = async () => {
         redirect("/");
     }
 
-    console.log(session);
     
   return  (
     <div>
